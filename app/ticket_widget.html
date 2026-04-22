@@ -1,0 +1,3181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket Management</title>
+    <script src="https://js.zohostatic.com/creator/widgets/version/2.0/widgetsdk-min.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --ink: #0f1117;
+            --ink-soft: #3d4252;
+            --ink-muted: #7c8296;
+            --ink-ghost: #b0b6c8;
+            --surface: #ffffff;
+            --surface-2: #f4f5f8;
+            --surface-3: #eceef3;
+            --surface-4: #e2e5ed;
+            --accent: #4f6ef7;
+            --accent-dark: #3d5ce6;
+            --accent-glow: rgba(79, 110, 247, .18);
+            --green: #059669;
+            --green-bg: #d1fae5;
+            --red: #dc2626;
+            --red-bg: #fee2e2;
+            --amber: #d97706;
+            --amber-bg: #fef3c7;
+            --blue: #2563eb;
+            --blue-bg: #dbeafe;
+            --purple: #7c3aed;
+            --border: #e2e5ed;
+            --border-focus: #4f6ef7;
+            --r-sm: 6px;
+            --r-md: 10px;
+            --r-lg: 16px;
+            --r-xl: 22px;
+            --shadow-xs: 0 1px 2px rgba(15, 17, 23, .06);
+            --shadow-sm: 0 2px 6px rgba(15, 17, 23, .08);
+            --shadow-lg: 0 12px 40px rgba(15, 17, 23, .14);
+            --shadow-xl: 0 24px 64px rgba(15, 17, 23, .18);
+            --font: 'DM Sans', sans-serif;
+            --mono: 'DM Mono', monospace;
+            --tr: 200ms cubic-bezier(.4, 0, .2, 1);
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--surface-2);
+            color: var(--ink);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-size: 14px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            overflow: hidden;
+        }
+
+        /* ── TOPBAR */
+        .topbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-xs);
+            flex-shrink: 0;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .app-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #4f6ef7, #7c3aed);
+            border-radius: var(--r-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            box-shadow: 0 2px 8px rgba(79, 110, 247, .3);
+        }
+
+        .app-title {
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: -.2px;
+        }
+
+        .app-subtitle {
+            font-size: 12px;
+            color: var(--ink-muted);
+            margin-top: 1px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Loading bar */
+        .loading-bar {
+            height: 2px;
+            background: linear-gradient(90deg, #4f6ef7, #7c3aed, #4f6ef7);
+            background-size: 200% 100%;
+            animation: lbar 1.2s linear infinite;
+            position: fixed;
+            top: 56px;
+            left: 0;
+            right: 0;
+            z-index: 999;
+            display: none;
+        }
+
+        .loading-bar.active {
+            display: block;
+        }
+
+        @keyframes lbar {
+            0% {
+                background-position: 200% 0
+            }
+
+            100% {
+                background-position: -200% 0
+            }
+        }
+
+        .main {
+            padding: 20px 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ── BUTTONS */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: var(--r-md);
+            font-size: 13px;
+            font-weight: 600;
+            font-family: var(--font);
+            cursor: pointer;
+            transition: var(--tr);
+            white-space: nowrap;
+            outline: none;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(79, 110, 247, .3);
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(79, 110, 247, .4);
+        }
+
+        .btn-primary:active {
+            transform: none;
+        }
+
+        .btn-primary:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--ink-soft);
+            border: 1px solid var(--border);
+        }
+
+        .btn-ghost:hover {
+            background: var(--surface-3);
+            color: var(--ink);
+        }
+
+        .btn-icon {
+            padding: 7px;
+            background: var(--surface);
+            color: var(--ink-muted);
+            border: 1px solid var(--border);
+            border-radius: var(--r-md);
+            cursor: pointer;
+            transition: var(--tr);
+            display: flex;
+        }
+
+        .btn-icon:hover {
+            background: var(--surface-3);
+            color: var(--ink);
+        }
+
+        /* ── TOOLBAR */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+
+        .search-wrap {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+            max-width: 340px;
+        }
+
+        .search-wrap .s-icon {
+            position: absolute;
+            left: 11px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--ink-ghost);
+            pointer-events: none;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 8px 12px 8px 34px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-md);
+            font-size: 13px;
+            font-family: var(--font);
+            background: var(--surface);
+            color: var(--ink);
+            outline: none;
+            transition: var(--tr);
+        }
+
+        .search-input:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .search-input::placeholder {
+            color: var(--ink-ghost);
+        }
+
+        .spacer {
+            flex: 1;
+        }
+
+        .sort-select {
+            padding: 7px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-md);
+            font-size: 12px;
+            font-family: var(--font);
+            color: var(--ink-soft);
+            background: var(--surface);
+            outline: none;
+            cursor: pointer;
+            transition: var(--tr);
+        }
+
+        /* ── FILTER BAR */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 10px;
+            padding: 10px 14px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-lg);
+            box-shadow: var(--shadow-xs);
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 10;
+            flex-shrink: 0;
+        }
+
+        .fb-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--ink-muted);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .fb-sep {
+            width: 1px;
+            height: 18px;
+            background: var(--border);
+            margin: 0 2px;
+        }
+
+        .fd-wrap {
+            position: relative;
+        }
+
+        .fd-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            background: var(--surface);
+            font-size: 12px;
+            font-weight: 600;
+            font-family: var(--font);
+            color: var(--ink-soft);
+            cursor: pointer;
+            transition: var(--tr);
+            white-space: nowrap;
+        }
+
+        .fd-btn:hover {
+            background: var(--surface-2);
+            color: var(--ink);
+            border-color: var(--ink-ghost);
+        }
+
+        .fd-btn.has-value {
+            background: rgba(79, 110, 247, .08);
+            border-color: var(--accent);
+            color: var(--accent-dark);
+        }
+
+        .fd-btn.is-open {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+
+        .fd-count {
+            background: var(--accent);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            min-width: 16px;
+            height: 16px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+        }
+
+        .fd-chevron {
+            transition: transform var(--tr);
+            opacity: .5;
+        }
+
+        .fd-btn.is-open .fd-chevron {
+            transform: rotate(180deg);
+        }
+
+        .fd-menu {
+            position: absolute;
+            top: calc(100% + 5px);
+            left: 0;
+            min-width: 210px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-md);
+            box-shadow: var(--shadow-lg);
+            z-index: 400;
+            display: none;
+            padding: 6px;
+        }
+
+        .fd-menu.open {
+            display: block;
+            animation: dropIn .14s ease;
+        }
+
+        @keyframes dropIn {
+            from {
+                opacity: 0;
+                transform: translateY(-5px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .fd-search {
+            width: 100%;
+            padding: 7px 10px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            font-size: 12px;
+            font-family: var(--font);
+            color: var(--ink);
+            background: var(--surface-2);
+            outline: none;
+            margin-bottom: 5px;
+        }
+
+        .fd-search:focus {
+            border-color: var(--border-focus);
+            background: var(--surface);
+        }
+
+        .fd-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .fd-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .fd-list::-webkit-scrollbar-thumb {
+            background: var(--surface-4);
+            border-radius: 2px;
+        }
+
+        .fd-item {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 7px 8px;
+            border-radius: var(--r-sm);
+            cursor: pointer;
+            user-select: none;
+            transition: background var(--tr);
+        }
+
+        .fd-item:hover {
+            background: var(--surface-2);
+        }
+
+        .fd-item.selected {
+            background: rgba(79, 110, 247, .06);
+        }
+
+        .fd-check {
+            width: 15px;
+            height: 15px;
+            border: 1.5px solid var(--border);
+            border-radius: 3px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--tr);
+        }
+
+        .fd-item.selected .fd-check {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .fd-item.selected .fd-check::after {
+            content: '';
+            width: 8px;
+            height: 5px;
+            border-left: 2px solid #fff;
+            border-bottom: 2px solid #fff;
+            transform: rotate(-45deg) translateY(-1px);
+            display: block;
+        }
+
+        .fd-item-label {
+            font-size: 12px;
+            color: var(--ink);
+            flex: 1;
+        }
+
+        .fd-empty {
+            padding: 10px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--ink-muted);
+        }
+
+        .fd-clear {
+            display: none;
+            align-items: center;
+            gap: 4px;
+            padding: 5px 10px;
+            border: 1px solid #fca5a5;
+            border-radius: var(--r-sm);
+            background: var(--red-bg);
+            color: var(--red);
+            font-size: 12px;
+            font-weight: 600;
+            font-family: var(--font);
+            cursor: pointer;
+            transition: var(--tr);
+        }
+
+        .fd-clear:hover {
+            background: #fecaca;
+        }
+
+        .fd-clear.visible {
+            display: inline-flex;
+        }
+
+        /* ── FILTER CHIPS */
+        .filter-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .filter-chips:empty {
+            display: none;
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px 4px 12px;
+            background: rgba(79, 110, 247, .1);
+            border: 1px solid rgba(79, 110, 247, .25);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--accent);
+            animation: chipIn .18s ease;
+        }
+
+        @keyframes chipIn {
+            from {
+                opacity: 0;
+                transform: scale(.85)
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1)
+            }
+        }
+
+        .chip-x {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--accent);
+            opacity: .6;
+            display: flex;
+            padding: 0;
+            transition: var(--tr);
+        }
+
+        .chip-x:hover {
+            opacity: 1;
+        }
+
+        /* ── TABLE CARD */
+        .table-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-lg);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .tc-header {
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .rec-count {
+            font-size: 12px;
+            color: var(--ink-muted);
+            font-weight: 500;
+        }
+
+        .rec-count strong {
+            color: var(--ink-soft);
+            font-weight: 700;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+            overflow-y: auto;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .table-wrap::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .table-wrap::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .table-wrap::-webkit-scrollbar-thumb {
+            background: var(--surface-4);
+            border-radius: 3px;
+        }
+
+        .table-wrap::-webkit-scrollbar-thumb:hover {
+            background: var(--ink-ghost);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead tr {
+            background: var(--surface-2);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+
+        th {
+            padding: 10px 16px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--ink-muted);
+            white-space: nowrap;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background var(--tr);
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: #f7f8fb;
+        }
+
+        tbody tr.selected {
+            background: rgba(79, 110, 247, .05);
+        }
+
+        td {
+            padding: 12px 16px;
+            font-size: 13px;
+            color: var(--ink-soft);
+            vertical-align: middle;
+        }
+
+        td.col-orderid {
+            font-weight: 700;
+            color: var(--ink);
+            font-family: var(--mono);
+        }
+
+        .sn-mono {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--ink-muted);
+            background: var(--surface-2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+        }
+
+        .items-pill {
+            font-family: var(--mono);
+            font-size: 12px;
+            font-weight: 600;
+            background: var(--surface-2);
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            color: var(--ink-soft);
+        }
+
+        /* Status badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .3px;
+            text-transform: uppercase;
+        }
+
+        .badge::before {
+            content: '';
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .badge-pending {
+            background: var(--amber-bg);
+            color: var(--amber);
+        }
+
+        .badge-pending::before {
+            background: var(--amber);
+        }
+
+        .badge-partial {
+            background: var(--blue-bg);
+            color: var(--blue);
+        }
+
+        .badge-partial::before {
+            background: var(--blue);
+        }
+
+        .badge-cancelled {
+            background: var(--red-bg);
+            color: var(--red);
+        }
+
+        .badge-cancelled::before {
+            background: var(--red);
+        }
+
+        .badge-delivered {
+            background: var(--green-bg);
+            color: var(--green);
+        }
+
+        .badge-delivered::before {
+            background: var(--green);
+        }
+
+        /* Auto-assigned palette for dynamic statuses */
+        .badge-dyn-0 {
+            background: #ede9fe;
+            color: #7c3aed;
+        }
+
+        .badge-dyn-0::before {
+            background: #7c3aed;
+        }
+
+        .badge-dyn-1 {
+            background: #ccfbf1;
+            color: #0f766e;
+        }
+
+        .badge-dyn-1::before {
+            background: #0f766e;
+        }
+
+        .badge-dyn-2 {
+            background: #ffedd5;
+            color: #c2410c;
+        }
+
+        .badge-dyn-2::before {
+            background: #c2410c;
+        }
+
+        .badge-dyn-3 {
+            background: #fce7f3;
+            color: #be185d;
+        }
+
+        .badge-dyn-3::before {
+            background: #be185d;
+        }
+
+        .badge-dyn-4 {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .badge-dyn-4::before {
+            background: #0369a1;
+        }
+
+        .badge-dyn-5 {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .badge-dyn-5::before {
+            background: #15803d;
+        }
+
+        .badge-dyn-6 {
+            background: #fef9c3;
+            color: #a16207;
+        }
+
+        .badge-dyn-6::before {
+            background: #a16207;
+        }
+
+        .badge-dyn-7 {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .badge-dyn-7::before {
+            background: #475569;
+        }
+
+        .row-acts {
+            display: flex;
+            gap: 4px;
+        }
+
+        .act-btn {
+            padding: 5px 10px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            background: var(--surface);
+            font-size: 11px;
+            font-weight: 600;
+            font-family: var(--font);
+            color: var(--ink-soft);
+            cursor: pointer;
+            transition: var(--tr);
+        }
+
+        .act-btn:hover {
+            background: var(--surface-3);
+        }
+
+        .act-btn.del {
+            color: var(--red);
+            border-color: #fca5a5;
+        }
+
+        .act-btn.del:hover {
+            background: var(--red-bg);
+            border-color: var(--red);
+        }
+
+        /* Skeleton */
+        @keyframes shimmer {
+            0% {
+                background-position: -600px 0
+            }
+
+            100% {
+                background-position: 600px 0
+            }
+        }
+
+        .sk-row td {
+            padding: 13px 16px;
+        }
+
+        .sk-cell {
+            height: 13px;
+            border-radius: 4px;
+            background: linear-gradient(90deg, var(--surface-3) 25%, var(--surface-4) 50%, var(--surface-3) 75%);
+            background-size: 600px 100%;
+            animation: shimmer 1.4s infinite;
+        }
+
+        /* Empty */
+        .t-empty {
+            padding: 60px 20px;
+            text-align: center;
+            color: var(--ink-muted);
+        }
+
+        .t-empty-icon {
+            font-size: 44px;
+            margin-bottom: 12px;
+        }
+
+        .t-empty-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--ink-soft);
+            margin-bottom: 4px;
+        }
+
+        .t-empty-sub {
+            font-size: 13px;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 11px 20px;
+            border-top: 1px solid var(--border);
+            background: var(--surface-2);
+            gap: 16px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+
+        .pg-info {
+            font-size: 12px;
+            color: var(--ink-muted);
+        }
+
+        .pg-size-wrap {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .pg-size-select {
+            padding: 5px 10px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            background: var(--surface);
+            font-size: 12px;
+            font-weight: 500;
+            font-family: var(--font);
+            color: var(--ink-soft);
+            cursor: pointer;
+            outline: none;
+            transition: var(--tr);
+        }
+
+        .pg-size-select:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+
+        .pg-ctrl {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .pg-btn {
+            padding: 5px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            background: var(--surface);
+            font-size: 12px;
+            font-weight: 600;
+            font-family: var(--font);
+            color: var(--ink-soft);
+            cursor: pointer;
+            transition: var(--tr);
+        }
+
+        .pg-btn:hover:not(:disabled) {
+            background: var(--surface-3);
+            color: var(--ink);
+        }
+
+        .pg-btn:disabled {
+            opacity: .4;
+            cursor: not-allowed;
+        }
+
+        .pg-btn.active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+
+        /* ── DETAIL DRAWER */
+        .drawer-ov {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 17, 23, .4);
+            z-index: 500;
+            backdrop-filter: blur(4px);
+        }
+
+        .drawer-ov.open {
+            display: block;
+            animation: fadeOv .25s ease;
+        }
+
+        @keyframes fadeOv {
+            from {
+                opacity: 0
+            }
+
+            to {
+                opacity: 1
+            }
+        }
+
+        .drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 620px;
+            background: #fafbfe;
+            box-shadow: -8px 0 32px rgba(15, 17, 23, .12);
+            display: flex;
+            flex-direction: column;
+            z-index: 501;
+            transform: translateX(100%);
+            transition: transform 350ms cubic-bezier(.16, 1, .3, 1);
+        }
+
+        .drawer-ov.open .drawer {
+            transform: translateX(0);
+        }
+
+        .drawer-hdr {
+            padding: 24px 28px 20px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+            box-shadow: var(--shadow-xs);
+            position: relative;
+            z-index: 10;
+        }
+
+        .drawer-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .d-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #4f6ef7, #7c3aed);
+            border-radius: var(--r-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 6px 16px rgba(79, 110, 247, .3);
+        }
+
+        .d-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--ink);
+            letter-spacing: -.3px;
+            margin-bottom: 6px;
+            font-family: var(--mono);
+        }
+
+        .d-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .d-id {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--ink-soft);
+            background: var(--surface-3);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .d-close {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            color: var(--ink-muted);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--tr);
+            flex-shrink: 0;
+            box-shadow: var(--shadow-xs);
+        }
+
+        .d-close:hover {
+            background: var(--surface-2);
+            color: var(--ink);
+            transform: rotate(90deg);
+        }
+
+        .d-acts {
+            display: flex;
+            gap: 10px;
+        }
+
+        .d-acts .btn {
+            flex: 1;
+            justify-content: center;
+            padding: 10px 16px;
+            border-radius: var(--r-md);
+            font-size: 13px;
+        }
+
+        .drawer-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .drawer-body::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .drawer-body::-webkit-scrollbar-thumb {
+            background: var(--surface-4);
+            border-radius: 3px;
+        }
+
+        /* Drawer sections */
+        .d-sec {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-lg);
+            box-shadow: var(--shadow-xs);
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .d-sec-hdr {
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .d-sec-hdr-icon {
+            color: var(--accent);
+            display: flex;
+            background: rgba(79, 110, 247, .1);
+            padding: 6px;
+            border-radius: var(--r-sm);
+        }
+
+        .d-sec-title {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            color: var(--ink);
+        }
+
+        .d-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px 16px;
+            padding: 20px;
+        }
+
+        .d-field-full {
+            grid-column: 1/-1;
+        }
+
+        .d-lbl {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--ink-muted);
+            margin-bottom: 5px;
+        }
+
+        .d-val {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--ink);
+            line-height: 1.5;
+            word-break: break-word;
+        }
+
+        .d-val.mono {
+            font-family: var(--mono);
+            color: var(--ink-soft);
+            background: var(--surface-2);
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            display: inline-block;
+        }
+
+        /* Stat cards */
+        .stat-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            flex-shrink: 0;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-lg);
+            padding: 18px 20px;
+            box-shadow: var(--shadow-xs);
+            transition: transform var(--tr), box-shadow var(--tr);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--accent);
+            border-radius: 4px 0 0 4px;
+        }
+
+        .stat-card.sc-2::before {
+            background: var(--purple);
+        }
+
+        .stat-lbl {
+            font-size: 12px;
+            color: var(--ink-muted);
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .stat-val {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--ink);
+            font-family: var(--mono);
+            letter-spacing: -1px;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .stat-sub {
+            font-size: 12px;
+            color: var(--ink-soft);
+            font-weight: 500;
+        }
+
+        /* Products table inside drawer */
+        .products-tbl {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .products-tbl th {
+            padding: 10px 16px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--ink-muted);
+            background: var(--surface-2);
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        .products-tbl td {
+            padding: 11px 16px;
+            font-size: 13px;
+            color: var(--ink-soft);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .products-tbl tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .products-tbl tbody tr:hover td {
+            background: #f0f3ff;
+        }
+
+        .qty-badge {
+            font-family: var(--mono);
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent-dark);
+            background: var(--amber-bg);
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid #fde68a;
+        }
+
+        /* ── MODAL */
+        .modal-ov {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 17, 23, .45);
+            z-index: 600;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 24px 20px;
+            backdrop-filter: blur(3px);
+            overflow-y: auto;
+        }
+
+        .modal-ov.open {
+            display: flex;
+            animation: fadeOv .2s ease;
+        }
+
+        .modal {
+            background: var(--surface);
+            border-radius: var(--r-xl);
+            width: 100%;
+            max-width: 720px;
+            box-shadow: var(--shadow-xl);
+            animation: mSlide .22s cubic-bezier(.4, 0, .2, 1);
+            margin: auto;
+        }
+
+        @keyframes mSlide {
+            from {
+                opacity: 0;
+                transform: translateY(18px) scale(.97)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1)
+            }
+        }
+
+        .modal-hdr {
+            padding: 20px 24px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            color: var(--ink-muted);
+            border-radius: var(--r-sm);
+            padding: 6px;
+            display: flex;
+            transition: var(--tr);
+        }
+
+        .modal-close:hover {
+            background: var(--surface-3);
+        }
+
+        .modal-body {
+            padding: 20px 24px;
+        }
+
+        .modal-foot {
+            padding: 14px 24px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .form-grp {
+            margin-bottom: 14px;
+        }
+
+        .form-grp:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-lbl {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--ink-soft);
+            margin-bottom: 5px;
+        }
+
+        .req {
+            color: var(--red);
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            font-size: 13px;
+            font-family: var(--font);
+            color: var(--ink);
+            background: var(--surface);
+            outline: none;
+            transition: var(--tr);
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            font-size: 13px;
+            font-family: var(--font);
+            color: var(--ink);
+            background: var(--surface);
+            outline: none;
+            transition: var(--tr);
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-textarea:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .form-err {
+            display: none;
+            padding: 9px 12px;
+            background: var(--red-bg);
+            color: var(--red);
+            border: 1px solid #fca5a5;
+            border-radius: var(--r-sm);
+            font-size: 13px;
+            margin-bottom: 14px;
+        }
+
+        .form-err.show {
+            display: block;
+        }
+
+        .form-divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 18px 0 16px;
+        }
+
+        /* Subform */
+        .subform-hdr {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .subform-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        .subform-add {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            border: 1.5px dashed var(--accent);
+            border-radius: var(--r-sm);
+            background: rgba(79, 110, 247, .04);
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 600;
+            font-family: var(--font);
+            cursor: pointer;
+            transition: var(--tr);
+        }
+
+        .subform-add:hover {
+            background: rgba(79, 110, 247, .1);
+        }
+
+        .subform-wrap {
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-radius: var(--r-md);
+        }
+
+        .subform-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 560px;
+        }
+
+        .subform-table th {
+            padding: 9px 12px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--ink-muted);
+            background: var(--surface-2);
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        .subform-table td {
+            padding: 6px 8px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        .subform-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .sf-select,
+        .sf-input {
+            width: 100%;
+            padding: 7px 9px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            font-size: 12px;
+            font-family: var(--font);
+            color: var(--ink);
+            background: var(--surface);
+            outline: none;
+            transition: var(--tr);
+        }
+
+        .sf-select:focus,
+        .sf-input:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+
+        .sf-readonly {
+            padding: 7px 9px;
+            font-size: 12px;
+            font-family: var(--font);
+            color: var(--ink-muted);
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            min-width: 100px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sf-del-btn {
+            background: none;
+            border: 1px solid #fca5a5;
+            border-radius: var(--r-sm);
+            color: var(--red);
+            padding: 5px 8px;
+            cursor: pointer;
+            transition: var(--tr);
+            display: flex;
+            align-items: center;
+        }
+
+        .sf-del-btn:hover {
+            background: var(--red-bg);
+        }
+
+        .sf-empty {
+            padding: 24px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--ink-muted);
+            border-radius: var(--r-md);
+            border: 1.5px dashed var(--border);
+            background: var(--surface-2);
+        }
+
+        /* Global error */
+        .g-err {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            background: var(--red-bg);
+            border: 1px solid #fca5a5;
+            color: var(--red);
+            padding: 10px 14px;
+            border-radius: var(--r-md);
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        .g-err.show {
+            display: flex;
+        }
+
+        /* Toast */
+        .toast-shelf {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9000;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: var(--ink);
+            color: #fff;
+            padding: 11px 16px;
+            border-radius: var(--r-md);
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            min-width: 240px;
+            pointer-events: auto;
+            animation: toastIn .28s ease;
+        }
+
+        .toast.ok .dot {
+            background: #34d399;
+        }
+
+        .toast.err .dot {
+            background: #f87171;
+        }
+
+        .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        /* Preview Modal */
+        .preview-ov {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 17, 23, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .preview-ov.open {
+            display: flex;
+            animation: fadeIn .24s ease;
+        }
+
+        .preview-card {
+            background: var(--surface);
+            width: 100%;
+            max-width: 1000px;
+            height: 90vh;
+            border-radius: var(--r-xl);
+            box-shadow: var(--shadow-xl);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .preview-hdr {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--surface);
+        }
+
+        .preview-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--ink);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .preview-body {
+            flex: 1;
+            overflow: auto;
+            background: var(--surface-2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .preview-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preview-content img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .preview-content iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .preview-loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            color: var(--ink-muted);
+        }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--surface-4);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin .8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .preview-ov { padding: 0; }
+            .preview-card { height: 100vh; border-radius: 0; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="loading-bar" id="loadingBar"></div>
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+        <div class="topbar-left">
+            <div class="app-icon">📋</div>
+            <div>
+                <div class="app-title">Tickets <span id="adminBadge" class="badge badge-admin"
+                        style="display:none; margin-left:8px; vertical-align:middle;">Super Admin</span></div>
+                <div class="app-subtitle">Ticket Module</div>
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="btn-icon" onclick="refreshData()" title="Refresh">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <polyline points="23 4 23 10 17 10" />
+                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+                </svg>
+            </button>
+            <button class="btn btn-primary" id="addBtn">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path d="M12 5v14M5 12h14" />
+                </svg>
+                Add Ticket
+            </button>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="g-err" id="gErr">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 8v4M12 16h.01" />
+            </svg>
+            <span id="gErrText"></span>
+        </div>
+
+        <!-- TOOLBAR -->
+        <div class="toolbar">
+            <div class="search-wrap">
+                <svg class="s-icon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+                    viewBox="0 0 24 24">
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.35-4.35" />
+                </svg>
+                <input class="search-input" id="searchInput" type="text"
+                    placeholder="Search by Order ID, branch, status…" oninput="handleSearch(this.value)">
+            </div>
+            <div class="spacer"></div>
+            <select class="sort-select" id="sortSelect" onchange="handleSort()">
+                <option value="">Sort: Default</option>
+                <option value="date_desc">Date Newest</option>
+                <option value="date_asc">Date Oldest</option>
+                <option value="orderid_asc">Order ID A→Z</option>
+                <option value="status">Status</option>
+            </select>
+        </div>
+
+        <!-- FILTER BAR -->
+        <div class="filter-bar" id="filterBar">
+            <span class="fb-label">
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                </svg>
+                Filters
+            </span>
+            <div class="fb-sep"></div>
+
+            <!-- Status -->
+            <div class="fd-wrap">
+                <button class="fd-btn" id="fb-status" onclick="toggleDropdown('status',event)">
+                    Status
+                    <svg class="fd-chevron" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5"
+                        viewBox="0 0 24 24">
+                        <path d="m6 9 6 6 6-6" />
+                    </svg>
+                </button>
+                <div class="fd-menu" id="fdm-status" onclick="event.stopPropagation()" style="min-width:180px;">
+                    <div class="fd-list" id="fdl-status">
+                        <div class="fd-empty">Loading…</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Branch -->
+            <div class="fd-wrap">
+                <button class="fd-btn" id="fb-branch" onclick="toggleDropdown('branch',event)">
+                    Branch
+                    <svg class="fd-chevron" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5"
+                        viewBox="0 0 24 24">
+                        <path d="m6 9 6 6 6-6" />
+                    </svg>
+                </button>
+                <div class="fd-menu" id="fdm-branch" onclick="event.stopPropagation()" style="min-width:230px;">
+                    <input class="fd-search" type="text" placeholder="Search branches…"
+                        oninput="searchBranches(this.value)" id="bs-branch">
+                    <div class="fd-list" id="fdl-branch">
+                        <div class="fd-empty">Loading…</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Date -->
+            <div class="fd-wrap">
+                <button class="fd-btn" id="fb-dateBtn" onclick="toggleDropdown('dateBtn',event)">
+                    Added Date
+                    <svg class="fd-chevron" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5"
+                        viewBox="0 0 24 24">
+                        <path d="m6 9 6 6 6-6" />
+                    </svg>
+                </button>
+                <div class="fd-menu" id="fdm-dateBtn" onclick="event.stopPropagation()">
+                    <div class="fd-list">
+                        <div class="fd-item" id="fdi-date-Today" onclick="toggleFilter('date','Today')">
+                            <div class="fd-check"></div><span class="fd-item-label">Today</span>
+                        </div>
+                        <div class="fd-item" id="fdi-date-Yesterday" onclick="toggleFilter('date','Yesterday')">
+                            <div class="fd-check"></div><span class="fd-item-label">Yesterday</span>
+                        </div>
+                        <div class="fd-item" id="fdi-date-Last 7 Days" onclick="toggleFilter('date','Last 7 Days')">
+                            <div class="fd-check"></div><span class="fd-item-label">Last 7 Days</span>
+                        </div>
+                        <div class="fd-item" id="fdi-date-Last 30 Days" onclick="toggleFilter('date','Last 30 Days')">
+                            <div class="fd-check"></div><span class="fd-item-label">Last 30 Days</span>
+                        </div>
+                        <div class="fd-item" id="fdi-date-This Month" onclick="toggleFilter('date','This Month')">
+                            <div class="fd-check"></div><span class="fd-item-label">This Month</span>
+                        </div>
+                        <div class="fd-item" id="fdi-date-This Year" onclick="toggleFilter('date','This Year')">
+                            <div class="fd-check"></div><span class="fd-item-label">This Year</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fb-sep"></div>
+            <button class="fd-clear" id="clearBtn" onclick="clearAll()">
+                <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path d="M18 6 6 18M6 6l12 12" />
+                </svg>
+                Clear All
+            </button>
+        </div>
+
+        <!-- Filter chips -->
+        <div class="filter-chips" id="filterChips"></div>
+
+        <!-- TABLE CARD -->
+        <div class="table-card">
+            <div class="tc-header">
+                <span class="rec-count" id="recCount"><strong>—</strong> tickets</span>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Sr. No</th>
+                            <th>Ticket ID</th>
+                            <th>Category</th>
+                            <th>Order</th>
+                            <th>Branch</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th id="actionsHeader" style="width:1px; display:none;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody"></tbody>
+                </table>
+            </div>
+            <div class="pagination" id="pgBar" style="display:none;">
+                <div style="display:flex;align-items:center;gap:12px;flex:1;">
+                    <span class="pg-info" id="pgInfo">—</span>
+                    <div class="pg-size-wrap">
+                        <label style="font-size:12px;color:var(--ink-muted);margin-right:6px;">Rows:</label>
+                        <select class="pg-size-select" onchange="changePageSize(this.value)">
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="pg-ctrl">
+                    <button class="pg-btn" id="pgPrev" disabled onclick="changePage(-1)">← Prev</button>
+                    <span id="pgNums" style="display:flex;gap:4px;"></span>
+                    <button class="pg-btn" id="pgNext" onclick="changePage(1)">Next →</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- DETAIL DRAWER -->
+    <div class="drawer-ov" id="drawerOv" onclick="handleDrawerOvClick(event)">
+        <div class="drawer" id="drawer">
+            <div class="drawer-hdr">
+
+                <div class="drawer-top">
+                    <div style="display:flex;gap:12px;align-items:flex-start;flex:1;">
+                        <div class="d-icon">🎫</div>
+                        <div style="flex:1;min-width:0;">
+                            <div class="d-name" id="dName">—</div>
+                            <div class="d-meta">
+                                <span class="d-id" id="dCat">—</span>
+                                <span id="dStatus"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="d-close" onclick="closeDrawer()">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
+                            <path d="M18 6 6 18M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="d-acts">
+                    <button class="btn btn-ghost" onclick="editFromDrawer()">
+                        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                        </svg>
+                        Edit
+                    </button>
+                    <button class="btn" style="background:var(--red-bg);color:var(--red);border:1px solid #fca5a5;"
+                        onclick="deleteFromDrawer()">
+                        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
+                            <polyline points="3 6 5 6 21 6" />
+                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                            <path d="M10 11v6M14 11v6" />
+                            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                        </svg>
+                        Delete
+                    </button>
+                </div>
+            </div>
+            <div class="drawer-body" id="drawerBody"></div>
+        </div>
+    </div>
+
+    <!-- ADD / EDIT MODAL -->
+    <div class="modal-ov" id="modalOv" onclick="handleModalOvClick(event)">
+        <div class="modal">
+            <div class="modal-hdr">
+                <div class="modal-title" id="modalTitle">Add Ticket</div>
+                <button class="modal-close" onclick="closeModal()">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M18 6 6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-err" id="formErr"></div>
+                <div class="form-row">
+                    <div class="form-grp">
+                        <label class="form-lbl">Category <span class="req">*</span></label>
+                        <select class="form-select" id="fCategory">
+                            <option value="">Select Category</option>
+                        </select>
+                    </div>
+                    <div class="form-grp">
+                        <label class="form-lbl">Order <span class="req">*</span></label>
+                        <select class="form-select" id="fOrder">
+                            <option value="">Select Order</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-grp">
+                        <label class="form-lbl">Branch</label>
+                        <select class="form-select" id="fBranch">
+                            <option value="">Select Branch</option>
+                        </select>
+                    </div>
+                    <div class="form-grp">
+                        <label class="form-lbl">Priority <span class="req">*</span></label>
+                        <select class="form-select" id="fPriority">
+                            <option value="High">High</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Low">Low</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-grp">
+                        <label class="form-lbl">Status <span class="req">*</span></label>
+                        <select class="form-select" id="fStatus">
+                            <option value="Pending">Pending</option>
+                            <option value="Open">Open</option>
+                            <option value="Close">Close</option>
+                            <option value="Resolved">Resolved</option>
+                        </select>
+                    </div>
+                    <div class="form-grp">
+                        <label class="form-lbl">Attachment</label>
+                        <input type="file" id="fAttachment" class="form-input" style="padding: 6px 12px;" multiple
+                            accept="*/*">
+                        <div style="font-size:11px; color:var(--ink-muted); margin-top:4px;">Max 10 files.</div>
+                    </div>
+                </div>
+                <div class="form-grp">
+                    <label class="form-lbl">Description</label>
+                    <textarea class="form-textarea" id="fDesc" placeholder="Enter ticket description…"></textarea>
+                </div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" id="submitBtn" onclick="submitForm()">
+                    <span id="submitTxt">Add Ticket</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DELETE CONFIRM MODAL -->
+    <div class="modal-ov" id="delModalOv" onclick="handleDelModalOvClick(event)">
+        <div class="modal" style="max-width:400px;text-align:center;">
+            <div class="modal-body" style="padding:36px 28px 28px;">
+                <div
+                    style="width:60px;height:60px;border-radius:50%;background:var(--red-bg);color:var(--red);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;">
+                    <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path
+                            d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                        <line x1="12" y1="9" x2="12" y2="13" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                    </svg>
+                </div>
+                <h3 style="font-size:18px;font-weight:700;color:var(--ink);margin-bottom:8px;">Delete Ticket</h3>
+                <p style="font-size:14px;color:var(--ink-soft);line-height:1.6;margin-bottom:24px;">Are you sure you
+                    want to delete this ticket? This action cannot be undone.</p>
+                <div style="display:flex;gap:12px;">
+                    <button class="btn btn-ghost" style="flex:1;justify-content:center;"
+                        onclick="closeDelModal()">Cancel</button>
+                    <button class="btn"
+                        style="flex:1;justify-content:center;background:var(--red);color:#fff;border:none;box-shadow:0 2px 8px rgba(220,38,38,.25);"
+                        onclick="doDelete()">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PREVIEW MODAL -->
+    <div class="preview-ov" id="previewModalOv" onclick="handlePreviewOvClick(event)">
+        <div class="preview-card">
+            <div class="preview-hdr">
+                <div class="preview-title">
+                    <span id="previewIcon">📎</span>
+                    <span id="previewFileName">File Preview</span>
+                </div>
+                <div style="display:flex; gap:12px;">
+                    <button class="btn btn-primary" id="previewDownloadBtn" style="height:32px; padding:0 12px; font-size:12px;">
+                        Download
+                    </button>
+                    <button class="btn-icon" onclick="closePreviewModal()" style="padding:4px;">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M18 6 6 18M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="preview-body">
+                <div id="previewLoader" class="preview-loader">
+                    <div class="spinner"></div>
+                    <div style="font-size:12px;">Loading preview...</div>
+                </div>
+                <div id="previewContent" class="preview-content"></div>
+                <!-- Hidden img for SDK setImageData -->
+                <img id="zdkHiddenImg" style="display:none;" />
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-shelf" id="toasts"></div>
+
+    <script>
+        // ─────────────────────────────────────────────
+        // CONFIG
+        // ─────────────────────────────────────────────
+        const CFG = {
+            appName: "order-management",
+            ticketReport: "All_Tickets",
+            categoryReport: "All_Ticket_Categories",
+            orderReport: "All_Orders",
+            branchReport: "All_Branches",
+            ticketForm: "Ticket_form",
+            f: {
+                ticketId: "Ticket_ID",
+                category: "Ticket_Category",
+                order: "Order",
+                branch: "Branch",
+                description: "Description",
+                priority: "Priority",
+                status: "Status",
+                attachment: "Attachment"
+            },
+            branchField: "Branch_Name",
+            categoryField: "category_name",
+            orderField: "Order_ID",
+            BATCH: 200,
+            roleReport: "All_Branch_User_Role_Mapping"
+        };
+
+        // ─────────────────────────────────────────────
+        // STATE
+        // ─────────────────────────────────────────────
+        const S = {
+            all: [],
+            branches: [],
+            categories: [],
+            orders: [],
+            statuses: ["Pending", "Open", "Close", "Resolved"],
+            priorities: ["High", "Medium", "Low"],
+            filtered: [],
+            page: 1,
+            pageSize: 10,
+            search: "",
+            sort: "",
+            filters: { status: [], branches: [], date: "" },
+            editId: null,
+            drawerRec: null,
+            openDrop: null,
+            delId: null,
+            isSuperAdmin: false
+        };
+
+        // ─────────────────────────────────────────────
+        // API HELPERS
+        // ─────────────────────────────────────────────
+        async function fetchAll(report) {
+            let all = [], cursor = null;
+            while (true) {
+                const params = { app_name: CFG.appName, report_name: report, max_records: CFG.BATCH };
+                if (cursor) params.record_cursor = cursor;
+                const r = await ZOHO.CREATOR.DATA.getRecords(params);
+                const rows = r?.data ?? [];
+                all = all.concat(rows);
+                if (rows.length < CFG.BATCH || !r.record_cursor) break;
+                cursor = r.record_cursor;
+            }
+            return all;
+        }
+
+        // ─────────────────────────────────────────────
+        // LOOKUPS
+        // ─────────────────────────────────────────────
+        function lookupId(v) {
+            if (!v) return "";
+            if (typeof v === "object") return String(v.ID || "");
+            return String(v);
+        }
+        function branchName(v) {
+            if (!v) return "—";
+            if (typeof v === "object") return v.display_value || v[CFG.branchField] || "—";
+            return S.branches.find(b => b.id === String(v))?.name ?? String(v);
+        }
+        function catName(v) {
+            if (!v) return "—";
+            if (typeof v === "object") return v.display_value || v[CFG.categoryField] || "—";
+            return S.categories.find(c => c.id === String(v))?.name ?? String(v);
+        }
+        function orderName(v) {
+            if (!v) return "—";
+            if (typeof v === "object") return v.display_value || v[CFG.orderField] || "—";
+            return S.orders.find(o => o.id === String(v))?.name ?? String(v);
+        }
+        // Static map for known statuses; unknown ones get auto-colored via hash
+        const _statusKnown = {
+            "Pending": "badge-pending",
+            "Open": "badge-partial",
+            "Close": "badge-cancelled",
+            "Resolved": "badge-delivered",
+            "High": "badge-partial",
+            "Medium": "badge-delivered",
+            "Low": "badge-cancelled"
+        };
+        function statusClass(s) {
+            if (_statusKnown[s]) return _statusKnown[s];
+            // Hash the string to consistently pick one of 8 palette slots
+            let h = 0;
+            for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+            return "badge-dyn-" + (h % 8);
+        }
+        function fmtDate(d) {
+            if (!d) return "—";
+            try {
+                const dt = new Date(d);
+                if (isNaN(dt)) return String(d);
+                return dt.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+            } catch { return String(d); }
+        }
+
+        function getFileUrl(val) {
+            if (!val) return "";
+            // Handle both object and string formats from Zoho
+            let str = typeof val === "object" ? (val.url || val.display_value || val.name || String(val)) : String(val);
+
+            let apiPath = str;
+            const apiIdx = str.indexOf("/api/");
+            if (apiIdx !== -1) {
+                apiPath = str.substring(apiIdx);
+            } else {
+                // If it's a relative path from older API versions
+                if (str.startsWith("/app/")) apiPath = str;
+                else return str; 
+            }
+
+            // Ensure filepath is present in the query string
+            if (!apiPath.includes("filepath=")) {
+                let rawName = typeof val === "object" ? (val.name || val.file_name || val.display_value || val.document_name) : "";
+                if (rawName) apiPath += (apiPath.includes("?") ? "&" : "?") + "filepath=/" + encodeURIComponent(rawName);
+            }
+
+            let base = "https://creatorapp.zoho.in"; // Default for .in
+            let envParam = "";
+            try {
+                // Try to get base from referrer
+                if (document.referrer) {
+                    const refUrl = new URL(document.referrer);
+                    if (refUrl.origin.includes("zoho")) base = refUrl.origin;
+                }
+                
+                // Get environment from query params
+                const p = ZOHO.CREATOR.UTIL.getQueryParams();
+                if (p && p.environment && p.environment.toLowerCase() !== "production") {
+                    envParam = "environment=" + p.environment;
+                }
+            } catch (e) { console.warn("Env check failed:", e); }
+
+            let finalUrl = base + apiPath;
+            if (envParam && !finalUrl.includes("environment=")) {
+                finalUrl += (finalUrl.includes("?") ? "&" : "?") + envParam;
+            }
+
+            return finalUrl;
+        }
+
+        function extractFileName(val) {
+            if (typeof val === "object" && (val.display_value || val.name || val.file_name)) {
+                return val.display_value || val.name || val.file_name;
+            }
+            if (typeof val === "string" && val.includes("filepath=")) {
+                const qsName = val.substring(val.indexOf("filepath=") + 9);
+                try {
+                    const decoded = decodeURIComponent(qsName);
+                    const uIdx = decoded.indexOf("_");
+                    return uIdx !== -1 ? decoded.substring(uIdx + 1) : decoded;
+                } catch (e) { return qsName; }
+            }
+            return "Attachment";
+        }
+
+        async function openAttachment(url, fileName, recId) {
+            const modal = document.getElementById("previewModalOv");
+            const content = document.getElementById("previewContent");
+            const loader = document.getElementById("previewLoader");
+            const titleEl = document.getElementById("previewFileName");
+            const iconEl = document.getElementById("previewIcon");
+            const downloadBtn = document.getElementById("previewDownloadBtn");
+            const hiddenImg = document.getElementById("zdkHiddenImg");
+
+            try {
+                const ext = fileName.split('.').pop().toLowerCase();
+                const isImage = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp', 'svg'].includes(ext);
+                const isPdf = ext === 'pdf';
+                const isText = ['csv', 'txt', 'json', 'log', 'xml', 'md'].includes(ext);
+
+                titleEl.textContent = fileName;
+                iconEl.textContent = isImage ? "🖼️" : (isPdf ? "📄" : (isText ? "📝" : "📎"));
+                content.innerHTML = "";
+                loader.style.display = "flex";
+                modal.classList.add("open");
+
+                const stopLoader = () => { loader.style.display = "none"; };
+
+                // Extract path for ZDK
+                let filePath = fileName;
+                const qsIdx = url.indexOf("filepath=");
+                if (qsIdx !== -1) filePath = decodeURIComponent(url.substring(qsIdx + 9).split("&")[0]);
+                const cleanPath = filePath.startsWith("/") ? filePath.substring(1) : filePath;
+
+                const initParams = await ZOHO.CREATOR.UTIL.getInitParams();
+                console.log("ZDK Init Params:", initParams);
+                console.log("Fetching via ZDK.readFile...", cleanPath);
+                
+                const fileConfig = {
+                    // Standard snake_case
+                    app_name: String(CFG.appName || ""),
+                    report_name: String(CFG.ticketReport || ""),
+                    id: String(recId),
+                    field_name: String(CFG.f.attachment || ""),
+                    file_path: String(cleanPath || ""),
+                    // CamelCase fallbacks - many SDK methods require these
+                    appName: String(CFG.appName || ""),
+                    reportName: String(CFG.ticketReport || ""),
+                    fieldName: String(CFG.f.attachment || ""),
+                    filePath: String(cleanPath || "")
+                };
+
+                if (isImage) {
+                    console.log("Using ZDK.setImageData (CamelCase Fix)...", fileConfig);
+                    hiddenImg.onload = () => {
+                        content.innerHTML = `<img src="${hiddenImg.src}" style="max-width:100%; max-height:100%; object-fit:contain; box-shadow:0 10px 30px rgba(0,0,0,0.1); border-radius:4px;">`;
+                        stopLoader();
+                        downloadBtn.onclick = () => {
+                            const a = document.createElement("a");
+                            a.href = hiddenImg.src;
+                            a.download = fileName;
+                            document.body.appendChild(a);
+                            a.click();
+                            setTimeout(() => a.remove(), 100);
+                        };
+                    };
+                    hiddenImg.onerror = (err) => {
+                        console.warn("ZDK.setImageData failed, trying iframe fallback:", err);
+                        // Final fallback: use iframe - browser often handles images in frames better
+                        content.innerHTML = `<iframe src="${url}" style="width:100%; height:100%; border:none;"></iframe>`;
+                        stopLoader();
+                    };
+                    // Try with and without #
+                    try {
+                        ZOHO.CREATOR.UTIL.setImageData("zdkHiddenImg", fileConfig);
+                    } catch (e) {
+                        ZOHO.CREATOR.UTIL.setImageData("#zdkHiddenImg", fileConfig);
+                    }
+                } else {
+                    // Use readFile for PDFs and Text
+                    console.log("Using ZDK.readFile for non-image data...");
+                    const response = await ZOHO.CREATOR.FILE.readFile(fileConfig);
+                    stopLoader();
+
+                    if (!response) throw new Error("No response from SDK");
+
+                    let blob = null;
+                    let textContent = null;
+                    const mime = isPdf ? "application/pdf" : "text/plain";
+
+                    if (response instanceof Blob || (response && response.size)) {
+                        blob = response;
+                    } else {
+                        let contentStr = typeof response === "string" ? response : (response.content || "");
+                        if (contentStr) {
+                            if (isPdf) {
+                                // PDF reconstruction from string - usually safer for PDFs than images
+                                const array = new Uint8Array(contentStr.length);
+                                for (let i = 0; i < contentStr.length; i++) array[i] = contentStr.charCodeAt(i) & 0xff;
+                                blob = new Blob([array], { type: mime });
+                            } else {
+                                textContent = contentStr;
+                            }
+                        }
+                    }
+
+                    if (blob) {
+                        const objUrl = URL.createObjectURL(blob);
+                        content.innerHTML = `<iframe src="${objUrl}" style="width:100%; height:100%; border:none;"></iframe>`;
+                        downloadBtn.onclick = () => {
+                            const a = document.createElement("a");
+                            a.href = objUrl;
+                            a.download = fileName;
+                            document.body.appendChild(a);
+                            a.click();
+                            setTimeout(() => a.remove(), 100);
+                        };
+                    } else if (textContent !== null) {
+                        content.innerHTML = `<pre style="width:100%; padding:20px; font-family:var(--mono); font-size:12px; background:#fff; overflow:auto;">${esc(textContent)}</pre>`;
+                    } else {
+                        content.innerHTML = `<div style="padding:40px; text-align:center;">Preview not available.</div>`;
+                    }
+                }
+
+            } catch (e) {
+                console.error("Attachment error:", e);
+                if (loader) loader.style.display = "none";
+                content.innerHTML = `<div style="padding:40px; text-align:center; color:var(--red);">Error loading preview. <br><a href="${url}" target="_blank" style="color:var(--accent); font-size:12px; text-decoration:underline;">Try opening in new tab</a></div>`;
+            }
+        }
+
+        function closePreviewModal() {
+            const modal = document.getElementById("previewModalOv");
+            const content = document.getElementById("previewContent");
+            modal.classList.remove("open");
+            // Clear content to stop any playing PDFs or release memory
+            content.innerHTML = "";
+        }
+
+        function handlePreviewOvClick(e) {
+            if (e.target === document.getElementById("previewModalOv")) closePreviewModal();
+        }
+
+        function renderAttachments(val, recId) {
+            if (!val) return `<span style="color:var(--ink-muted)">No attachment</span>`;
+            const items = Array.isArray(val) ? val : [val];
+            const links = items.map(item => {
+                const url = getFileUrl(item);
+                if (!url) return "";
+                const name = extractFileName(item);
+                // We use encodeURIComponent for the arguments to be extra safe in the onclick handler
+                return `<a href="javascript:void(0)" onclick="openAttachment(decodeURIComponent('${encodeURIComponent(url)}'), decodeURIComponent('${encodeURIComponent(name)}'), '${recId}')" style="display:inline-block; color:var(--accent); text-decoration:none; font-weight:600; font-size:13px; background:rgba(79, 110, 247, 0.08); padding:6px 12px; border-radius:8px; border:1px solid rgba(79, 110, 247, 0.15); transition:var(--tr); margin-bottom:4px;" onmouseover="this.style.background='rgba(79, 110, 247, 0.15)'" onmouseout="this.style.background='rgba(79, 110, 247, 0.08)'">📎 ${esc(name)}</a>`;
+            }).filter(Boolean);
+
+            if (links.length === 0) return `<span style="color:var(--ink-muted)">No attachment</span>`;
+            return `<div style="display:flex; flex-wrap:wrap; gap:8px;">${links.join("")}</div>`;
+        }
+        // ─────────────────────────────────────────────
+        // LOAD ALL
+        // ─────────────────────────────────────────────
+        async function loadAll() {
+            setLoading(true);
+            renderSkeleton();
+            try {
+                const [tickets, branches, categories, orders] = await Promise.all([
+                    fetchAll(CFG.ticketReport).catch(() => []),
+                    fetchAll(CFG.branchReport).catch(() => []),
+                    fetchAll(CFG.categoryReport).catch(() => []),
+                    fetchAll(CFG.orderReport).catch(() => [])
+                ]);
+
+                // ── Dynamic choices via META API ──────────────────────
+                try {
+                    const meta = await ZOHO.CREATOR.META.getFields({
+                        app_name: CFG.appName,
+                        form_name: CFG.ticketForm
+                    });
+                    if (meta && Array.isArray(meta.fields)) {
+                        // Handles choices in ANY format Zoho returns them
+                        const parseChoices = fld => {
+                            if (!fld || !fld.choices) return null;
+                            return fld.choices.map(c => {
+                                if (typeof c === "string") return c;
+                                // Try every known Zoho API property name
+                                return c.display_value ?? c.actual_value ?? c.value ??
+                                    c.name ?? c.label ?? c.choice_value ??
+                                    // Last resort: first string property in the object
+                                    Object.values(c).find(v => typeof v === "string" && v.trim()) ??
+                                    null;
+                            }).filter(Boolean);
+                        };
+                        const match = key => meta.fields.find(f =>
+                            f.link_name === key || f.display_name === key
+                        );
+                        const statusChoices = parseChoices(match(CFG.f.status));
+                        const prioChoices = parseChoices(match(CFG.f.priority));
+                        if (statusChoices && statusChoices.length) S.statuses = statusChoices;
+                        if (prioChoices && prioChoices.length) S.priorities = prioChoices;
+                    }
+                } catch (metaErr) {
+                    toast("Status options: using defaults (" + (metaErr?.message || "META unavailable") + ")", "err");
+                }
+
+                S.all = tickets;
+                S.branches = branches.map(r => ({ id: String(r.ID), name: r[CFG.branchField] || "—" }));
+                S.categories = categories
+                    .filter(r => (r.status || r.Status || "") === "Active")
+                    .map(r => ({ id: String(r.ID), name: r[CFG.categoryField] || r.Name || "—" }));
+                S.orders = orders.map(r => ({ id: String(r.ID), name: r[CFG.orderField] || r.Order_ID || "—" }));
+
+                populateFormDropdowns();
+                buildBranchFilterList();
+                buildStatusFilterList();
+                recompute();
+                hideErr();
+            } catch (e) {
+                showErr("Failed to load data: " + (e?.message ?? String(e)));
+                renderEmpty("Load failed — check SDK connection");
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        // ─────────────────────────────────────────────
+        // FILTER + SEARCH + SORT
+        // ─────────────────────────────────────────────
+        function recompute() {
+            const f = CFG.f, fl = S.filters;
+            let rows = [...S.all];
+
+            if (S.search) {
+                const q = S.search.toLowerCase();
+                rows = rows.filter(o =>
+                    (o[f.ticketId] || "").toLowerCase().includes(q) ||
+                    catName(o[f.category]).toLowerCase().includes(q) ||
+                    branchName(o[f.branch]).toLowerCase().includes(q) ||
+                    orderName(o[f.order]).toLowerCase().includes(q) ||
+                    (o[f.status] || "").toLowerCase().includes(q)
+                );
+            }
+
+            if (fl.status.length) rows = rows.filter(o => fl.status.includes(o[f.status] || "Pending"));
+            if (fl.branches.length) rows = rows.filter(o => fl.branches.includes(lookupId(o[f.branch])));
+            if (fl.date) {
+                const now = new Date();
+                const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+                rows = rows.filter(o => {
+                    if (!o.Added_Time) return false;
+                    try {
+                        const d = new Date(o.Added_Time);
+                        if (isNaN(d)) return false;
+                        const dDay = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+                        if (fl.date === "Today") return dDay.getTime() === today.getTime();
+                        if (fl.date === "Yesterday") {
+                            const yest = new Date(today); yest.setDate(yest.getDate() - 1);
+                            return dDay.getTime() === yest.getTime();
+                        }
+                        if (fl.date === "Last 7 Days") {
+                            const last7 = new Date(today); last7.setDate(last7.getDate() - 7);
+                            return dDay.getTime() >= last7.getTime() && dDay.getTime() <= today.getTime();
+                        }
+                        if (fl.date === "Last 30 Days") {
+                            const last30 = new Date(today); last30.setDate(last30.getDate() - 30);
+                            return dDay.getTime() >= last30.getTime() && dDay.getTime() <= today.getTime();
+                        }
+                        if (fl.date === "This Month") return dDay.getFullYear() === today.getFullYear() && dDay.getMonth() === today.getMonth();
+                        if (fl.date === "This Year") return dDay.getFullYear() === today.getFullYear();
+                        return false;
+                    } catch { return false; }
+                });
+            }
+
+            if (S.sort) rows.sort((a, b) => {
+                if (S.sort === "date_desc") return new Date(b.Added_Time || 0) - new Date(a.Added_Time || 0);
+                if (S.sort === "date_asc") return new Date(a.Added_Time || 0) - new Date(b.Added_Time || 0);
+                if (S.sort === "orderid_asc") return (a[f.ticketId] || "").localeCompare(b[f.ticketId] || "");
+                if (S.sort === "status") return (a[f.status] || "").localeCompare(b[f.status] || "");
+                return 0;
+            });
+
+            S.filtered = rows;
+            S.page = 1;
+            renderTable();
+            renderPagination();
+            updateFilterBtns();
+            renderChips();
+        }
+
+        // ─────────────────────────────────────────────
+        // TABLE RENDERING
+        // ─────────────────────────────────────────────
+        function renderTable() {
+            const tbody = document.getElementById("tbody");
+            const f = CFG.f;
+            const start = (S.page - 1) * S.pageSize;
+            const page = S.filtered.slice(start, start + S.pageSize);
+            const filtered = S.search || hasFilters();
+
+            document.getElementById("recCount").innerHTML =
+                `<strong>${S.filtered.length}</strong> ticket${S.filtered.length !== 1 ? "s" : ""}${filtered ? " (filtered)" : ""}`;
+
+            if (page.length === 0) {
+                renderEmpty(S.all.length === 0 ? "No tickets yet" : "No tickets match your filters");
+                return;
+            }
+
+            tbody.innerHTML = page.map((o, idx) => {
+                const id = o.ID;
+                const status = o[f.status] || "Pending";
+                const priority = o[f.priority] || "Medium";
+                const acts = S.isSuperAdmin ? `<td><div class="row-acts" onclick="event.stopPropagation()">
+                <button class="act-btn" onclick="openEdit('${id}')">Edit</button>
+                <button class="act-btn del" onclick="confirmDelete('${id}')">Delete</button>
+            </div></td>` : "";
+
+                return `<tr onclick="openDrawer('${id}')" data-id="${id}">
+            <td><span class="sn-mono">${start + idx + 1}</span></td>
+            <td class="col-orderid">${esc(o[f.ticketId] || "—")}</td>
+            <td>${esc(catName(o[f.category]))}</td>
+            <td>${esc(orderName(o[f.order]))}</td>
+            <td>${esc(branchName(o[f.branch]))}</td>
+            <td><span class="badge ${statusClass(priority)}">${esc(priority)}</span></td>
+            <td><span class="badge ${statusClass(status)}">${esc(status)}</span></td>
+            ${acts}
+        </tr>`;
+            }).join("");
+        }
+
+        function renderSkeleton(n = 7) {
+            const ws = ["5%", "15%", "15%", "15%", "15%", "10%", "10%", "0"];
+            if (!S.isSuperAdmin) ws.pop();
+            document.getElementById("tbody").innerHTML = Array.from({ length: n }, () =>
+                `<tr class="sk-row">${ws.map(w => `<td><div class="sk-cell" style="width:${w}"></div></td>`).join("")}</tr>`
+            ).join("");
+            document.getElementById("recCount").innerHTML = `<strong>—</strong> tickets`;
+        }
+        function renderEmpty(msg) {
+            const cols = S.isSuperAdmin ? 8 : 7;
+            document.getElementById("tbody").innerHTML = `<tr><td colspan="${cols}"><div class="t-empty">
+        <div class="t-empty-icon">📋</div>
+        <div class="t-empty-title">${esc(msg)}</div>
+        <div class="t-empty-sub">Try adjusting your search or filters</div>
+    </div></td></tr>`;
+            document.getElementById("pgBar").style.display = "none";
+        }
+
+        // ─────────────────────────────────────────────
+        // PAGINATION & FILTERS
+        // ─────────────────────────────────────────────
+        function renderPagination() {
+            const total = S.filtered.length;
+            const pages = Math.ceil(total / S.pageSize);
+            const bar = document.getElementById("pgBar");
+            if (total === 0) { bar.style.display = "none"; return; }
+            bar.style.display = "flex";
+            const s = (S.page - 1) * S.pageSize + 1, e = Math.min(S.page * S.pageSize, total);
+            document.getElementById("pgInfo").textContent = `Showing ${s}–${e} of ${total}`;
+            const ctrl = bar.querySelector(".pg-ctrl");
+            if (pages <= 1) { ctrl.style.display = "none"; return; }
+            ctrl.style.display = "flex";
+            document.getElementById("pgPrev").disabled = S.page <= 1;
+            document.getElementById("pgNext").disabled = S.page >= pages;
+            const nums = [];
+            for (let i = 1; i <= pages; i++) {
+                if (i === 1 || i === pages || Math.abs(i - S.page) <= 2) nums.push(i);
+                else if (nums[nums.length - 1] !== "…") nums.push("…");
+            }
+            document.getElementById("pgNums").innerHTML = nums.map(n =>
+                n === "…" ? `<span style="padding:5px 3px;font-size:12px;color:var(--ink-muted)">…</span>`
+                    : `<button class="pg-btn${n === S.page ? " active" : ""}" onclick="goPage(${n})">${n}</button>`
+            ).join("");
+        }
+        function changePage(d) {
+            const tp = Math.ceil(S.filtered.length / S.pageSize);
+            S.page = Math.max(1, Math.min(tp, S.page + d));
+            renderTable(); renderPagination();
+        }
+        function goPage(p) { S.page = p; renderTable(); renderPagination(); }
+        function changePageSize(size) { S.pageSize = parseInt(size, 10); S.page = 1; recompute(); }
+
+        function toggleDropdown(name, e) {
+            e?.stopPropagation();
+            const already = S.openDrop === name;
+            closeDropdowns();
+            if (!already) {
+                S.openDrop = name;
+                document.getElementById(`fdm-${name}`)?.classList.add("open");
+                document.getElementById(`fb-${name}`)?.classList.add("is-open");
+            }
+        }
+        function closeDropdowns() {
+            document.querySelectorAll(".fd-menu.open").forEach(m => m.classList.remove("open"));
+            document.querySelectorAll(".fd-btn.is-open").forEach(b => b.classList.remove("is-open"));
+            S.openDrop = null;
+        }
+        function toggleFilter(type, value) {
+            const fl = S.filters;
+            if (type === "status") {
+                fl.status = toggle(fl.status, value);
+                setItemSelected(`fdi-status-${value}`, fl.status.includes(value));
+            } else if (type === "branch") {
+                fl.branches = toggle(fl.branches, value);
+                setItemSelected(`fdi-branch-${value}`, fl.branches.includes(value));
+            } else if (type === "date") {
+                fl.date = fl.date === value ? "" : value;
+                document.querySelectorAll("[id^='fdi-date-']").forEach(el => el.classList.remove("selected"));
+                if (fl.date) setItemSelected(`fdi-date-${value}`, true);
+            }
+            recompute();
+        }
+        function toggle(arr, v) { return arr.includes(v) ? arr.filter(x => x !== v) : [...arr, v]; }
+        function setItemSelected(id, sel) { document.getElementById(id)?.classList.toggle("selected", sel); }
+        function clearAll() {
+            S.filters = { status: [], branches: [], date: "" };
+            S.search = "";
+            document.getElementById("searchInput").value = "";
+            document.querySelectorAll(".fd-item.selected").forEach(el => el.classList.remove("selected"));
+            recompute();
+        }
+        function hasFilters() { return S.filters.status.length || S.filters.branches.length || S.filters.date; }
+        function updateFilterBtns() {
+            const upd = (name, count) => {
+                const btn = document.getElementById(`fb-${name}`);
+                if (!btn) return;
+                btn.classList.toggle("has-value", count > 0);
+                const old = btn.querySelector(".fd-count");
+                if (old) old.remove();
+                if (count > 0) {
+                    const sp = document.createElement("span");
+                    sp.className = "fd-count"; sp.textContent = count;
+                    btn.insertBefore(sp, btn.querySelector(".fd-chevron"));
+                }
+            };
+            upd("status", S.filters.status.length);
+            upd("branch", S.filters.branches.length);
+            upd("dateBtn", S.filters.date ? 1 : 0);
+            document.getElementById("clearBtn").classList.toggle("visible", !!(hasFilters() || S.search));
+        }
+        function renderChips() {
+            const el = document.getElementById("filterChips");
+            const fl = S.filters;
+            const chips = [];
+            fl.status.forEach(s => chips.push({ label: `Status: ${s}`, rm: () => { fl.status = fl.status.filter(v => v !== s); setItemSelected(`fdi-status-${s}`, false); recompute(); } }));
+            fl.branches.forEach(id => {
+                const b = S.branches.find(x => x.id === id);
+                chips.push({ label: `Branch: ${b ? b.name : id}`, rm: () => { fl.branches = fl.branches.filter(v => v !== id); setItemSelected(`fdi-branch-${id}`, false); recompute(); } });
+            });
+            if (fl.date) {
+                chips.push({ label: `Added Date: ${fl.date}`, rm: () => { fl.date = ""; document.querySelectorAll("[id^='fdi-date-']").forEach(e => e.classList.remove("selected")); recompute(); } });
+            }
+            window._rmChip = chips.map(c => c.rm);
+            el.innerHTML = chips.map((c, i) => `<span class="chip">${esc(c.label)}<button class="chip-x" onclick="window._rmChip[${i}]()"><svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></span>`).join("");
+        }
+        function buildBranchFilterList(query = "") {
+            const el = document.getElementById("fdl-branch");
+            if (!el) return;
+            const items = query ? S.branches.filter(b => b.name.toLowerCase().includes(query.toLowerCase())) : S.branches;
+            if (!items.length) { el.innerHTML = `<div class="fd-empty">${query ? "No matches" : "None found"}</div>`; return; }
+            el.innerHTML = items.map(item => `
+        <div class="fd-item${S.filters.branches.includes(item.id) ? " selected" : ""}"
+             id="fdi-branch-${escA(item.id)}"
+             onclick="toggleFilter('branch','${escA(item.id)}')">
+            <div class="fd-check"></div>
+            <span class="fd-item-label">${esc(item.name)}</span>
+        </div>`).join("");
+        }
+        function searchBranches(q) { buildBranchFilterList(q); }
+
+        function buildStatusFilterList() {
+            const el = document.getElementById("fdl-status");
+            if (!el) return;
+            el.innerHTML = S.statuses.map(s => `
+        <div class="fd-item${S.filters.status.includes(s) ? " selected" : ""}"
+             id="fdi-status-${escA(s)}"
+             onclick="toggleFilter('status','${escA(s)}')">
+            <div class="fd-check"></div><span class="badge ${statusClass(s)}" style="font-size:11px;">${esc(s)}</span>
+        </div>`).join("");
+        }
+
+        function populateFormDropdowns() {
+            document.getElementById("fBranch").innerHTML = `<option value="">Select Branch</option>` + S.branches.map(b => `<option value="${escA(b.id)}">${esc(b.name)}</option>`).join("");
+            document.getElementById("fCategory").innerHTML = `<option value="">Select Category</option>` + S.categories.map(c => `<option value="${escA(c.id)}">${esc(c.name)}</option>`).join("");
+            document.getElementById("fOrder").innerHTML = `<option value="">Select Order</option>` + S.orders.map(o => `<option value="${escA(o.id)}">${esc(o.name)}</option>`).join("");
+            document.getElementById("fStatus").innerHTML = S.statuses.map(s => `<option value="${escA(s)}">${esc(s)}</option>`).join("");
+            document.getElementById("fPriority").innerHTML = S.priorities.map(p => `<option value="${escA(p)}">${esc(p)}</option>`).join("");
+        }
+
+        let _st;
+        function handleSearch(q) { S.search = q.trim(); clearTimeout(_st); _st = setTimeout(recompute, 120); }
+        function handleSort() { S.sort = document.getElementById("sortSelect").value; recompute(); }
+        function refreshData() { loadAll(); }
+
+        // ─────────────────────────────────────────────
+        // DRAWER
+        // ─────────────────────────────────────────────
+        async function openDrawer(recordId) {
+            const rec = S.all.find(x => String(x.ID) === String(recordId));
+            if (!rec) return;
+
+            S.drawerRec = rec;
+            const f = CFG.f;
+            const status = rec[f.status] || "Pending";
+            const priority = rec[f.priority] || "Medium";
+
+            document.getElementById("dName").textContent = rec[f.ticketId] || "—";
+            document.getElementById("dCat").textContent = catName(rec[f.category]);
+            document.getElementById("dStatus").innerHTML = `<span class="badge ${statusClass(status)}">${esc(status)}</span> <span class="badge ${statusClass(priority)}">${esc(priority)}</span>`;
+
+            document.querySelectorAll("tbody tr").forEach(r => r.classList.remove("selected"));
+            document.querySelector(`tbody tr[data-id="${recordId}"]`)?.classList.add("selected");
+            document.getElementById("drawerOv").classList.add("open");
+
+            // Hide actions in drawer if not admin
+            const actBox = document.querySelector(".d-acts");
+            if (actBox) actBox.style.display = S.isSuperAdmin ? "flex" : "none";
+
+            document.getElementById("drawerBody").innerHTML = `<div style="padding:40px;text-align:center;color:var(--ink-muted);font-size:13px;">Loading ticket details…</div>`;
+
+            let dRec = rec;
+            try {
+                const resp = await ZOHO.CREATOR.DATA.getRecordById({
+                    app_name: CFG.appName, report_name: CFG.ticketReport, id: String(recordId)
+                });
+                if (resp && resp.data) {
+                    dRec = resp.data;
+                    S.drawerRec = dRec;
+                }
+            } catch (e) {
+                console.warn("Could not fetch full record details:", e);
+            }
+
+            document.getElementById("drawerBody").innerHTML = `
+        <div class="d-sec">
+            <div class="d-sec-hdr">
+                <div class="d-sec-hdr-icon">🎫</div>
+                <div class="d-sec-title">Ticket Details</div>
+            </div>
+            <div class="d-grid">
+                <div><div class="d-lbl">Ticket ID</div><div class="d-val mono">${esc(dRec[f.ticketId] || "—")}</div></div>
+                <div><div class="d-lbl">Category</div><div class="d-val">${esc(catName(dRec[f.category]))}</div></div>
+                <div><div class="d-lbl">Order</div><div class="d-val">${esc(orderName(dRec[f.order]))}</div></div>
+                <div><div class="d-lbl">Branch</div><div class="d-val">${esc(branchName(dRec[f.branch]))}</div></div>
+                <div><div class="d-lbl">Priority</div><div class="d-val">${esc(dRec[f.priority] || priority)}</div></div>
+                <div><div class="d-lbl">Status</div><div class="d-val"><span class="badge ${statusClass(dRec[f.status] || status)}">${esc(dRec[f.status] || status)}</span></div></div>
+                ${dRec[f.description] ? `<div class="d-field-full"><div class="d-lbl">Description</div><div class="d-val" style="white-space:pre-wrap;">${esc(dRec[f.description])}</div></div>` : ""}
+            </div>
+        </div>
+        <div class="d-sec">
+            <div class="d-sec-hdr">
+                <div class="d-sec-hdr-icon">📎</div>
+                <div class="d-sec-title">Attachments</div>
+            </div>
+            <div class="d-grid" style="padding:10px 0;">
+                ${renderAttachments(dRec[f.attachment], dRec.ID)}
+            </div>
+        </div>
+        <div class="d-sec">
+            <div class="d-sec-hdr">
+                <div class="d-sec-hdr-icon">⏺</div>
+                <div class="d-sec-title">Record Info</div>
+            </div>
+            <div class="d-grid">
+                <div class="d-field-full"><div class="d-lbl">Record ID</div><div class="d-val mono">${esc(String(dRec.ID))}</div></div>
+                ${dRec.Added_Time ? `<div><div class="d-lbl">Created</div><div class="d-val">${fmtDate(dRec.Added_Time)}</div></div>` : ""}
+            </div>
+        </div>`;
+        }
+
+        function closeDrawer() {
+            document.getElementById("drawerOv").classList.remove("open");
+            document.querySelectorAll("tbody tr").forEach(r => r.classList.remove("selected"));
+            S.drawerRec = null;
+        }
+        function handleDrawerOvClick(e) { if (e.target === document.getElementById("drawerOv")) closeDrawer(); }
+        function editFromDrawer() { if (S.drawerRec) { const id = S.drawerRec.ID; closeDrawer(); openEdit(id); } }
+        function deleteFromDrawer() { if (S.drawerRec) { const id = S.drawerRec.ID; closeDrawer(); confirmDelete(id); } }
+
+        // ─────────────────────────────────────────────
+        // MODAL
+        // ─────────────────────────────────────────────
+        function openAdd() {
+            S.editId = null;
+            document.getElementById("modalTitle").textContent = "Add Ticket";
+            document.getElementById("submitTxt").textContent = "Add Ticket";
+            document.getElementById("fCategory").value = "";
+            document.getElementById("fOrder").value = "";
+            document.getElementById("fBranch").value = "";
+            document.getElementById("fPriority").value = "Medium";
+            document.getElementById("fStatus").value = "Pending";
+            document.getElementById("fDesc").value = "";
+            document.getElementById("fAttachment").value = "";
+            hideFormErr();
+            document.getElementById("modalOv").classList.add("open");
+        }
+
+        function openEdit(id) {
+            const o = S.all.find(x => String(x.ID) === String(id));
+            if (!o) return;
+            const f = CFG.f;
+            S.editId = id;
+
+            document.getElementById("fCategory").value = lookupId(o[f.category]);
+            document.getElementById("fOrder").value = lookupId(o[f.order]);
+            document.getElementById("fBranch").value = lookupId(o[f.branch]);
+            document.getElementById("fPriority").value = o[f.priority] || "Medium";
+            document.getElementById("fStatus").value = o[f.status] || "Pending";
+            document.getElementById("fDesc").value = o[f.description] || "";
+            document.getElementById("fAttachment").value = "";
+
+            document.getElementById("modalTitle").textContent = "Edit Ticket";
+            document.getElementById("submitTxt").textContent = "Update Ticket";
+            hideFormErr();
+            document.getElementById("modalOv").classList.add("open");
+        }
+
+        function closeModal() { document.getElementById("modalOv").classList.remove("open"); S.editId = null; }
+        function handleModalOvClick(e) { if (e.target === document.getElementById("modalOv")) closeModal(); }
+
+        // File upload helper
+        async function uploadFileToZoho(fldName, recId) {
+            const fileEl = document.getElementById("fAttachment");
+            if (!fileEl.files || fileEl.files.length === 0) return;
+
+            const files = Array.from(fileEl.files).slice(0, 10);
+            for (const fileObj of files) {
+                try {
+                    await ZOHO.CREATOR.FILE.uploadFile({
+                        app_name: CFG.appName,
+                        report_name: CFG.ticketReport,
+                        id: String(recId),
+                        field_name: fldName,
+                        file: fileObj
+                    });
+                } catch (e) {
+                    console.warn(`File upload failed for ${fileObj.name}:`, e?.message);
+                }
+            }
+        }
+
+        async function submitForm() {
+            const category = document.getElementById("fCategory").value;
+            const order = document.getElementById("fOrder").value;
+            const branch = document.getElementById("fBranch").value;
+            const priority = document.getElementById("fPriority").value;
+            const status = document.getElementById("fStatus").value;
+            const desc = document.getElementById("fDesc").value;
+
+            if (!category) { showFormErr("Category is required."); return; }
+            if (!order) { showFormErr("Order is required."); return; }
+            if (!priority) { showFormErr("Priority is required."); return; }
+            if (!status) { showFormErr("Status is required."); return; }
+
+            const ff = CFG.f;
+            const data = {};
+            data[ff.category] = category;
+            data[ff.order] = order;
+            if (branch) data[ff.branch] = branch;
+            data[ff.priority] = priority;
+            data[ff.status] = status;
+            data[ff.description] = desc;
+
+            document.getElementById("submitBtn").disabled = true;
+            setLoading(true);
+            try {
+                let recId = S.editId;
+                if (S.editId) {
+                    const resp = await ZOHO.CREATOR.DATA.updateRecordById({
+                        app_name: CFG.appName, report_name: CFG.ticketReport,
+                        id: S.editId, payload: { data }
+                    });
+                    if (resp && resp.code !== 3000) throw new Error(resp.message || JSON.stringify(resp));
+                    if (document.getElementById("fAttachment").files.length > 0) {
+                        await uploadFileToZoho(ff.attachment, S.editId);
+                    }
+                    toast("Ticket updated ✓", "ok");
+                } else {
+                    const resp = await ZOHO.CREATOR.DATA.addRecords({
+                        app_name: CFG.appName, form_name: CFG.ticketForm, payload: { data }
+                    });
+                    if (resp && resp.code !== 3000) throw new Error(resp.message || JSON.stringify(resp));
+                    recId = resp?.data?.ID;
+                    if (document.getElementById("fAttachment").files.length > 0 && recId) {
+                        await uploadFileToZoho(ff.attachment, recId);
+                    }
+                    toast("Ticket added ✓", "ok");
+                }
+                closeModal();
+                loadAll();
+            } catch (err) {
+                const msg = err?.message || err?.error || (typeof err === "string" ? err : JSON.stringify(err));
+                showFormErr(msg || "Save failed");
+                toast("Error saving ticket", "err");
+            } finally {
+                document.getElementById("submitBtn").disabled = false;
+                setLoading(false);
+            }
+        }
+
+        // ─────────────────────────────────────────────
+        // DELETE & UTILS
+        // ─────────────────────────────────────────────
+        function confirmDelete(id) { S.delId = id; document.getElementById("delModalOv").classList.add("open"); }
+        function closeDelModal() { document.getElementById("delModalOv").classList.remove("open"); S.delId = null; }
+        function handleDelModalOvClick(e) { if (e.target === document.getElementById("delModalOv")) closeDelModal(); }
+
+        async function doDelete() {
+            if (!S.delId) return;
+            const id = S.delId;
+            closeDelModal(); setLoading(true);
+            try {
+                await ZOHO.CREATOR.DATA.deleteRecordById({
+                    app_name: CFG.appName, report_name: CFG.ticketReport, id: id
+                });
+                S.all = S.all.filter(o => String(o.ID) !== String(id));
+                toast("Ticket deleted", "ok");
+                closeDrawer(); recompute();
+            } catch (e) {
+                const msg = e?.message || e?.error || e?.responseText || (typeof e === "string" ? e : JSON.stringify(e));
+                toast("Delete failed: " + msg, "err");
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        function setLoading(v) { document.getElementById("loadingBar").classList.toggle("active", v); }
+        function showErr(msg) { document.getElementById("gErrText").textContent = msg; document.getElementById("gErr").classList.add("show"); }
+        function hideErr() { document.getElementById("gErr").classList.remove("show"); }
+        function showFormErr(m) { const e = document.getElementById("formErr"); e.textContent = m; e.classList.add("show"); }
+        function hideFormErr() { document.getElementById("formErr").classList.remove("show"); }
+
+        function toast(msg, type = "ok") {
+            try {
+                const shelf = document.getElementById("toasts");
+                if (!shelf) { console.warn("Toast missing shelf:", msg); return; }
+                const t = document.createElement("div");
+                t.className = "toast " + type;
+                t.innerHTML = "<span class=\"dot\"></span>" + esc(msg);
+                shelf.appendChild(t);
+                setTimeout(() => {
+                    t.style.cssText = "opacity:0;transform:translateY(6px);transition:.22s";
+                    setTimeout(() => { if (t.parentNode) t.remove(); }, 240);
+                }, 3000);
+            } catch (e) {
+                console.error("Toast error:", e);
+            }
+        }
+        function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+        function escA(s) { return String(s).replace(/'/g, "\\'"); }
+
+        async function init() {
+            document.getElementById("addBtn").addEventListener("click", openAdd);
+            document.addEventListener("click", () => closeDropdowns());
+            document.addEventListener("keydown", e => {
+                if (e.key !== "Escape") return;
+                closeModal(); closeDrawer(); closeDropdowns(); closeDelModal(); closePreviewModal();
+            });
+
+            try {
+                // 1. Initialize SDK (v2 style)
+                const initParams = await ZOHO.CREATOR.UTIL.getInitParams() || {};
+                const loginUser = initParams.loginUser || "";
+                console.log("Logged in User (Tickets):", loginUser);
+
+                // 2. Fetch Role from Mapping Module
+                if (loginUser) {
+                    try {
+                        const allMappedUsers = await fetchAll(CFG.roleReport);
+                        const emailToMatch = loginUser.toLowerCase().trim();
+
+                        S.isSuperAdmin = allMappedUsers.some(m => {
+                            const u = m.User;
+                            if (!u) return false;
+                            const currentEmail = (typeof u === "string" ? u : (u.email || u.display_value || "")).toLowerCase().trim();
+                            return currentEmail === emailToMatch && m.Role === "Super Admin";
+                        });
+
+                        if (S.isSuperAdmin) console.log("Access Granted (Tickets): Super Admin detected");
+                    } catch (apiErr) {
+                        console.error("Permission check failed in Tickets:", apiErr);
+                    }
+                }
+
+                // 3. UI Status Update
+                const badge = document.getElementById("adminBadge");
+                const actHdr = document.getElementById("actionsHeader");
+
+                if (badge) badge.style.display = S.isSuperAdmin ? "inline-block" : "none";
+                if (actHdr) actHdr.style.display = S.isSuperAdmin ? "table-cell" : "none";
+
+                await loadAll();
+            } catch (e) {
+                showErr("SDK init failed: " + (e?.message ?? String(e)));
+                document.getElementById("tbody").innerHTML = `<tr><td colspan="8"><div class="t-empty">
+            <div class="t-empty-icon">⚠️</div>
+            <div class="t-empty-title">SDK initialisation failed</div>
+            <div class="t-empty-sub">${esc(e?.message ?? String(e))}</div>
+        </div></td></tr>`;
+            }
+        }
+        document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", init) : init();
+
+    </script>
+</body>
+
+</html>

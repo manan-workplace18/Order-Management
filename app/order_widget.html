@@ -1,0 +1,3969 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Management</title>
+    <script src="https://js.zohostatic.com/creator/widgets/version/1.0/widgetsdk-min.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --ink: #0f1117;
+            --ink-soft: #3d4252;
+            --ink-muted: #7c8296;
+            --ink-ghost: #b0b6c8;
+            --surface: #ffffff;
+            --surface-2: #f4f5f8;
+            --surface-3: #eceef3;
+            --surface-4: #e2e5ed;
+            --accent: #4f6ef7;
+            --accent-dark: #3d5ce6;
+            --accent-glow: rgba(79, 110, 247, .18);
+            --green: #059669;
+            --green-bg: #d1fae5;
+            --red: #dc2626;
+            --red-bg: #fee2e2;
+            --amber: #d97706;
+            --amber-bg: #fef3c7;
+            --blue: #2563eb;
+            --blue-bg: #dbeafe;
+            --purple: #7c3aed;
+            --border: #e2e5ed;
+            --border-focus: #4f6ef7;
+            --r-sm: 6px;
+            --r-md: 10px;
+            --r-lg: 16px;
+            --r-xl: 22px;
+            --shadow-xs: 0 1px 2px rgba(15, 17, 23, .06);
+            --shadow-sm: 0 2px 6px rgba(15, 17, 23, .08);
+            --shadow-lg: 0 12px 40px rgba(15, 17, 23, .14);
+            --shadow-xl: 0 24px 64px rgba(15, 17, 23, .18);
+            --font: 'DM Sans', sans-serif;
+            --mono: 'DM Mono', monospace;
+            --tr: 200ms cubic-bezier(.4, 0, .2, 1);
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--surface-2);
+            color: var(--ink);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-size: 14px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            overflow: hidden;
+        }
+
+        /* ── TOPBAR */
+        .topbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-xs);
+            flex-shrink: 0;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .app-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #4f6ef7, #7c3aed);
+            border-radius: var(--r-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            box-shadow: 0 2px 8px rgba(79, 110, 247, .3);
+        }
+
+        .app-title {
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: -.2px;
+        }
+
+        .app-subtitle {
+            font-size: 12px;
+            color: var(--ink-muted);
+            margin-top: 1px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Loading bar */
+        .loading-bar {
+            height: 2px;
+            background: linear-gradient(90deg, #4f6ef7, #7c3aed, #4f6ef7);
+            background-size: 200% 100%;
+            animation: lbar 1.2s linear infinite;
+            position: fixed;
+            top: 56px;
+            left: 0;
+            right: 0;
+            z-index: 999;
+            display: none;
+        }
+
+        .loading-bar.active {
+            display: block;
+        }
+
+        @keyframes lbar {
+            0% {
+                background-position: 200% 0
+            }
+
+            100% {
+                background-position: -200% 0
+            }
+        }
+
+        .main {
+            padding: 20px 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ── BUTTONS */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: var(--r-md);
+            font-size: 13px;
+            font-weight: 600;
+            font-family: var(--font);
+            cursor: pointer;
+            transition: var(--tr);
+            white-space: nowrap;
+            outline: none;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(79, 110, 247, .3);
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(79, 110, 247, .4);
+        }
+
+        .btn-primary:active {
+            transform: none;
+        }
+
+        .btn-primary:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--ink-soft);
+            border: 1px solid var(--border);
+        }
+
+        .btn-ghost:hover {
+            background: var(--surface-3);
+            color: var(--ink);
+        }
+
+        .btn-icon {
+            padding: 7px;
+            background: var(--surface);
+            color: var(--ink-muted);
+            border: 1px solid var(--border);
+            border-radius: var(--r-md);
+            cursor: pointer;
+            transition: var(--tr);
+            display: flex;
+        }
+
+        .btn-icon:hover {
+            background: var(--surface-3);
+            color: var(--ink);
+        }
+
+        /* ── TOOLBAR */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+
+        .search-wrap {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+            max-width: 340px;
+        }
+
+        .search-wrap .s-icon {
+            position: absolute;
+            left: 11px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--ink-ghost);
+            pointer-events: none;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 8px 12px 8px 34px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-md);
+            font-size: 13px;
+            font-family: var(--font);
+            background: var(--surface);
+            color: var(--ink);
+            outline: none;
+            transition: var(--tr);
+        }
+
+        .search-input:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .search-input::placeholder {
+            color: var(--ink-ghost);
+        }
+
+        .spacer {
+            flex: 1;
+        }
+
+        .sort-select {
+            padding: 7px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-md);
+            font-size: 12px;
+            font-family: var(--font);
+            color: var(--ink-soft);
+            background: var(--surface);
+            outline: none;
+            cursor: pointer;
+            transition: var(--tr);
+        }
+
+        /* ── FILTER BAR */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 10px;
+            padding: 10px 14px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-lg);
+            box-shadow: var(--shadow-xs);
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 10;
+            flex-shrink: 0;
+        }
+
+        .fb-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--ink-muted);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .fb-sep {
+            width: 1px;
+            height: 18px;
+            background: var(--border);
+            margin: 0 2px;
+        }
+
+        .fd-wrap {
+            position: relative;
+        }
+
+        .fd-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            background: var(--surface);
+            font-size: 12px;
+            font-weight: 600;
+            font-family: var(--font);
+            color: var(--ink-soft);
+            cursor: pointer;
+            transition: var(--tr);
+            white-space: nowrap;
+        }
+
+        .fd-btn:hover {
+            background: var(--surface-2);
+            color: var(--ink);
+            border-color: var(--ink-ghost);
+        }
+
+        .fd-btn.has-value {
+            background: rgba(79, 110, 247, .08);
+            border-color: var(--accent);
+            color: var(--accent-dark);
+        }
+
+        .fd-btn.is-open {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+
+        .fd-count {
+            background: var(--accent);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            min-width: 16px;
+            height: 16px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+        }
+
+        .fd-chevron {
+            transition: transform var(--tr);
+            opacity: .5;
+        }
+
+        .fd-btn.is-open .fd-chevron {
+            transform: rotate(180deg);
+        }
+
+        .fd-menu {
+            position: absolute;
+            top: calc(100% + 5px);
+            left: 0;
+            min-width: 210px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-md);
+            box-shadow: var(--shadow-lg);
+            z-index: 400;
+            display: none;
+            padding: 6px;
+        }
+
+        .fd-menu.open {
+            display: block;
+            animation: dropIn .14s ease;
+        }
+
+        @keyframes dropIn {
+            from {
+                opacity: 0;
+                transform: translateY(-5px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .fd-search {
+            width: 100%;
+            padding: 7px 10px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            font-size: 12px;
+            font-family: var(--font);
+            color: var(--ink);
+            background: var(--surface-2);
+            outline: none;
+            margin-bottom: 5px;
+        }
+
+        .fd-search:focus {
+            border-color: var(--border-focus);
+            background: var(--surface);
+        }
+
+        .fd-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .fd-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .fd-list::-webkit-scrollbar-thumb {
+            background: var(--surface-4);
+            border-radius: 2px;
+        }
+
+        .fd-item {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 7px 8px;
+            border-radius: var(--r-sm);
+            cursor: pointer;
+            user-select: none;
+            transition: background var(--tr);
+        }
+
+        .fd-item:hover {
+            background: var(--surface-2);
+        }
+
+        .fd-item.selected {
+            background: rgba(79, 110, 247, .06);
+        }
+
+        .fd-check {
+            width: 15px;
+            height: 15px;
+            border: 1.5px solid var(--border);
+            border-radius: 3px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--tr);
+        }
+
+        .fd-item.selected .fd-check {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .fd-item.selected .fd-check::after {
+            content: '';
+            width: 8px;
+            height: 5px;
+            border-left: 2px solid #fff;
+            border-bottom: 2px solid #fff;
+            transform: rotate(-45deg) translateY(-1px);
+            display: block;
+        }
+
+        .fd-item-label {
+            font-size: 12px;
+            color: var(--ink);
+            flex: 1;
+        }
+
+        .fd-empty {
+            padding: 12px;
+            text-align: center;
+            font-size: 11px;
+            color: var(--ink-ghost);
+        }
+
+        /* ── SEARCHABLE SELECT (Custom) */
+        .ss-wrap {
+            position: relative;
+            width: 100%;
+        }
+
+        .ss-btn {
+            width: 100%;
+            padding: 8px 12px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 13px;
+            cursor: pointer;
+            transition: var(--tr);
+        }
+
+        .ss-btn:hover {
+            border-color: var(--ink-ghost);
+        }
+
+        .ss-btn.active {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+
+        .ss-label {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--ink);
+        }
+
+        .ss-label.placeholder {
+            color: var(--ink-ghost);
+        }
+
+        .ss-menu {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            right: 0;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-md);
+            box-shadow: var(--shadow-lg);
+            z-index: 500;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .ss-menu.open {
+            display: flex;
+            animation: dropIn 120ms ease-out;
+        }
+
+        .ss-wrap.open-up .ss-menu {
+            top: auto;
+            bottom: calc(100% + 4px);
+            animation: dropUp 120ms ease-out;
+        }
+
+        @keyframes dropUp {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .ss-search-wrap {
+            padding: 8px;
+            border-bottom: 1px solid var(--surface-3);
+            background: var(--surface-2);
+        }
+
+        .ss-search {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            font-size: 12px;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .ss-search:focus {
+            border-color: var(--accent);
+            background: #fff;
+        }
+
+        .ss-list {
+            max-height: 180px;
+            overflow-y: auto;
+            padding: 4px;
+        }
+
+        .ss-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .ss-list::-webkit-scrollbar-thumb {
+            background: var(--surface-4);
+            border-radius: 2px;
+        }
+
+        .ss-opt {
+            padding: 7px 10px;
+            font-size: 13px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 100ms;
+        }
+
+        .ss-opt:hover {
+            background: var(--surface-2);
+        }
+
+        .ss-opt.selected {
+            background: var(--accent-glow);
+            color: var(--accent-dark);
+            font-weight: 600;
+        }
+
+        .ss-opt.hidden {
+            display: none;
+        }
+
+        .ss-empty {
+            padding: 10px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--ink-muted);
+        }
+
+        .fd-clear {
+            display: none;
+            align-items: center;
+            gap: 4px;
+            padding: 5px 10px;
+            border: 1px solid #fca5a5;
+            border-radius: var(--r-sm);
+            background: var(--red-bg);
+            color: var(--red);
+            font-size: 12px;
+            font-weight: 600;
+            font-family: var(--font);
+            cursor: pointer;
+            transition: var(--tr);
+        }
+
+        .fd-clear:hover {
+            background: #fecaca;
+        }
+
+        .fd-clear.visible {
+            display: inline-flex;
+        }
+
+        /* ── FILTER CHIPS */
+        .filter-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .filter-chips:empty {
+            display: none;
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px 4px 12px;
+            background: rgba(79, 110, 247, .1);
+            border: 1px solid rgba(79, 110, 247, .25);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--accent);
+            animation: chipIn .18s ease;
+        }
+
+        @keyframes chipIn {
+            from {
+                opacity: 0;
+                transform: scale(.85)
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1)
+            }
+        }
+
+        .chip-x {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--accent);
+            opacity: .6;
+            display: flex;
+            padding: 0;
+            transition: var(--tr);
+        }
+
+        .chip-x:hover {
+            opacity: 1;
+        }
+
+        /* ── TABLE CARD */
+        .table-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-lg);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .tc-header {
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .rec-count {
+            font-size: 12px;
+            color: var(--ink-muted);
+            font-weight: 500;
+        }
+
+        .rec-count strong {
+            color: var(--ink-soft);
+            font-weight: 700;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+            overflow-y: auto;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .table-wrap::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .table-wrap::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .table-wrap::-webkit-scrollbar-thumb {
+            background: var(--surface-4);
+            border-radius: 3px;
+        }
+
+        .table-wrap::-webkit-scrollbar-thumb:hover {
+            background: var(--ink-ghost);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead tr {
+            background: var(--surface-2);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+
+        th {
+            padding: 10px 16px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--ink-muted);
+            white-space: nowrap;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background var(--tr);
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: #f7f8fb;
+        }
+
+        tbody tr.selected {
+            background: rgba(79, 110, 247, .05);
+        }
+
+        td {
+            padding: 12px 16px;
+            font-size: 13px;
+            color: var(--ink-soft);
+            vertical-align: middle;
+        }
+
+        td.col-orderid {
+            font-weight: 700;
+            color: var(--ink);
+            font-family: var(--mono);
+        }
+
+        .sn-mono {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--ink-muted);
+            background: var(--surface-2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+        }
+
+        .items-pill {
+            font-family: var(--mono);
+            font-size: 12px;
+            font-weight: 600;
+            background: var(--surface-2);
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            color: var(--ink-soft);
+        }
+
+        /* Status badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .3px;
+            text-transform: uppercase;
+        }
+
+        .badge::before {
+            content: '';
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .badge-pending {
+            background: var(--amber-bg);
+            color: var(--amber);
+        }
+
+        .badge-admin {
+            background: #fff9db;
+            color: #f08c00;
+            border: 1px solid #ffe066;
+            box-shadow: 0 2px 4px rgba(240, 140, 0, 0.1);
+        }
+
+        .badge-pending::before {
+            background: var(--amber);
+        }
+
+        .badge-partial {
+            background: var(--blue-bg);
+            color: var(--blue);
+        }
+
+        .badge-partial::before {
+            background: var(--blue);
+        }
+
+        .badge-cancelled {
+            background: var(--red-bg);
+            color: var(--red);
+        }
+
+        .badge-cancelled::before {
+            background: var(--red);
+        }
+
+        .badge-delivered {
+            background: var(--green-bg);
+            color: var(--green);
+        }
+
+        .badge-delivered::before {
+            background: var(--green);
+        }
+
+        /* Auto-assigned palette for dynamic statuses */
+        .badge-dyn-0 {
+            background: #ede9fe;
+            color: #7c3aed;
+        }
+
+        .badge-dyn-0::before {
+            background: #7c3aed;
+        }
+
+        .badge-dyn-1 {
+            background: #ccfbf1;
+            color: #0f766e;
+        }
+
+        .badge-dyn-1::before {
+            background: #0f766e;
+        }
+
+        .badge-dyn-2 {
+            background: #ffedd5;
+            color: #c2410c;
+        }
+
+        .badge-dyn-2::before {
+            background: #c2410c;
+        }
+
+        .badge-dyn-3 {
+            background: #fce7f3;
+            color: #be185d;
+        }
+
+        .badge-dyn-3::before {
+            background: #be185d;
+        }
+
+        .badge-dyn-4 {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .badge-dyn-4::before {
+            background: #0369a1;
+        }
+
+        .badge-dyn-5 {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .badge-dyn-5::before {
+            background: #15803d;
+        }
+
+        .badge-dyn-6 {
+            background: #fef9c3;
+            color: #a16207;
+        }
+
+        .badge-dyn-6::before {
+            background: #a16207;
+        }
+
+        .badge-dyn-7 {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .badge-dyn-7::before {
+            background: #475569;
+        }
+
+        .row-acts {
+            display: flex;
+            gap: 4px;
+        }
+
+        .act-btn {
+            padding: 5px 10px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            background: var(--surface);
+            font-size: 11px;
+            font-weight: 600;
+            font-family: var(--font);
+            color: var(--ink-soft);
+            cursor: pointer;
+            transition: var(--tr);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            min-height: 26px;
+        }
+
+        .act-btn:hover {
+            background: var(--surface-3);
+        }
+
+        .act-btn.del {
+            color: var(--red);
+            border-color: #fca5a5;
+        }
+
+        .act-btn.del:hover {
+            background: var(--red-bg);
+            border-color: var(--red);
+        }
+
+        /* Skeleton */
+        @keyframes shimmer {
+            0% {
+                background-position: -600px 0
+            }
+
+            100% {
+                background-position: 600px 0
+            }
+        }
+
+        .sk-row td {
+            padding: 13px 16px;
+        }
+
+        .sk-cell {
+            height: 13px;
+            border-radius: 4px;
+            background: linear-gradient(90deg, var(--surface-3) 25%, var(--surface-4) 50%, var(--surface-3) 75%);
+            background-size: 600px 100%;
+            animation: shimmer 1.4s infinite;
+        }
+
+        /* Empty */
+        .t-empty {
+            padding: 60px 20px;
+            text-align: center;
+            color: var(--ink-muted);
+        }
+
+        .t-empty-icon {
+            font-size: 44px;
+            margin-bottom: 12px;
+        }
+
+        .t-empty-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--ink-soft);
+            margin-bottom: 4px;
+        }
+
+        .t-empty-sub {
+            font-size: 13px;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 11px 20px;
+            border-top: 1px solid var(--border);
+            background: var(--surface-2);
+            gap: 16px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+
+        .pg-info {
+            font-size: 12px;
+            color: var(--ink-muted);
+        }
+
+        .pg-size-wrap {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .pg-size-select {
+            padding: 5px 10px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            background: var(--surface);
+            font-size: 12px;
+            font-weight: 500;
+            font-family: var(--font);
+            color: var(--ink-soft);
+            cursor: pointer;
+            outline: none;
+            transition: var(--tr);
+        }
+
+        .pg-size-select:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+
+        .pg-ctrl {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .pg-btn {
+            padding: 5px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            background: var(--surface);
+            font-size: 12px;
+            font-weight: 600;
+            font-family: var(--font);
+            color: var(--ink-soft);
+            cursor: pointer;
+            transition: var(--tr);
+        }
+
+        .pg-btn:hover:not(:disabled) {
+            background: var(--surface-3);
+            color: var(--ink);
+        }
+
+        .pg-btn:disabled {
+            opacity: .4;
+            cursor: not-allowed;
+        }
+
+        .pg-btn.active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+
+        /* ── DETAIL DRAWER */
+        .drawer-ov {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 17, 23, .4);
+            z-index: 500;
+            backdrop-filter: blur(4px);
+        }
+
+        .drawer-ov.open {
+            display: block;
+            animation: fadeOv .25s ease;
+        }
+
+        @keyframes fadeOv {
+            from {
+                opacity: 0
+            }
+
+            to {
+                opacity: 1
+            }
+        }
+
+        .drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 620px;
+            background: #fafbfe;
+            box-shadow: -8px 0 32px rgba(15, 17, 23, .12);
+            display: flex;
+            flex-direction: column;
+            z-index: 501;
+            transform: translateX(100%);
+            transition: transform 350ms cubic-bezier(.16, 1, .3, 1);
+        }
+
+        .drawer-ov.open .drawer {
+            transform: translateX(0);
+        }
+
+        .drawer-hdr {
+            padding: 24px 28px 20px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+            box-shadow: var(--shadow-xs);
+            position: relative;
+            z-index: 10;
+        }
+
+        .drawer-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .d-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #4f6ef7, #7c3aed);
+            border-radius: var(--r-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 6px 16px rgba(79, 110, 247, .3);
+        }
+
+        .d-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--ink);
+            letter-spacing: -.3px;
+            margin-bottom: 6px;
+            font-family: var(--mono);
+        }
+
+        .d-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .d-id {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--ink-soft);
+            background: var(--surface-3);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .d-close {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            color: var(--ink-muted);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--tr);
+            flex-shrink: 0;
+            box-shadow: var(--shadow-xs);
+        }
+
+        .d-close:hover {
+            background: var(--surface-2);
+            color: var(--ink);
+            transform: rotate(90deg);
+        }
+
+        .d-acts {
+            display: flex;
+            gap: 10px;
+        }
+
+        .d-acts .btn {
+            flex: 1;
+            justify-content: center;
+            padding: 10px 16px;
+            border-radius: var(--r-md);
+            font-size: 13px;
+        }
+
+        .drawer-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .drawer-body::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .drawer-body::-webkit-scrollbar-thumb {
+            background: var(--surface-4);
+            border-radius: 3px;
+        }
+
+        /* Drawer sections */
+        .d-sec {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-lg);
+            box-shadow: var(--shadow-xs);
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .d-sec-hdr {
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .d-sec-hdr-icon {
+            color: var(--accent);
+            display: flex;
+            background: rgba(79, 110, 247, .1);
+            padding: 6px;
+            border-radius: var(--r-sm);
+        }
+
+        .d-sec-title {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            color: var(--ink);
+        }
+
+        .d-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px 16px;
+            padding: 20px;
+        }
+
+        .d-field-full {
+            grid-column: 1/-1;
+        }
+
+        .d-lbl {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--ink-muted);
+            margin-bottom: 5px;
+        }
+
+        .d-val {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--ink);
+            line-height: 1.5;
+            word-break: break-word;
+        }
+
+        .d-val.mono {
+            font-family: var(--mono);
+            color: var(--ink-soft);
+            background: var(--surface-2);
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            display: inline-block;
+        }
+
+        /* Stat cards */
+        .stat-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            flex-shrink: 0;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-lg);
+            padding: 18px 20px;
+            box-shadow: var(--shadow-xs);
+            transition: transform var(--tr), box-shadow var(--tr);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--accent);
+            border-radius: 4px 0 0 4px;
+        }
+
+        .stat-card.sc-2::before {
+            background: var(--purple);
+        }
+
+        .stat-lbl {
+            font-size: 12px;
+            color: var(--ink-muted);
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .stat-val {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--ink);
+            font-family: var(--mono);
+            letter-spacing: -1px;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .stat-sub {
+            font-size: 12px;
+            color: var(--ink-soft);
+            font-weight: 500;
+        }
+
+        /* Products table inside drawer */
+        .products-tbl {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .products-tbl th {
+            padding: 10px 16px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--ink-muted);
+            background: var(--surface-2);
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        .products-tbl td {
+            padding: 11px 16px;
+            font-size: 13px;
+            color: var(--ink-soft);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .products-tbl tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .products-tbl tbody tr:hover td {
+            background: #f0f3ff;
+        }
+
+        .qty-badge {
+            font-family: var(--mono);
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent-dark);
+            background: var(--amber-bg);
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid #fde68a;
+        }
+
+        /* ── MODAL */
+        .modal-ov {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 17, 23, .45);
+            z-index: 600;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 24px 20px;
+            backdrop-filter: blur(3px);
+            overflow-y: auto;
+        }
+
+        .modal-ov.open {
+            display: flex;
+            animation: fadeOv .2s ease;
+        }
+
+        .modal {
+            background: var(--surface);
+            border-radius: var(--r-xl);
+            width: 100%;
+            max-width: 720px;
+            box-shadow: var(--shadow-xl);
+            animation: mSlide .22s cubic-bezier(.4, 0, .2, 1);
+            margin: auto;
+        }
+
+        @keyframes mSlide {
+            from {
+                opacity: 0;
+                transform: translateY(18px) scale(.97)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1)
+            }
+        }
+
+        .modal-hdr {
+            padding: 20px 24px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            color: var(--ink-muted);
+            border-radius: var(--r-sm);
+            padding: 6px;
+            display: flex;
+            transition: var(--tr);
+        }
+
+        .modal-close:hover {
+            background: var(--surface-3);
+        }
+
+        .modal-body {
+            padding: 20px 24px;
+        }
+
+        .modal-foot {
+            padding: 14px 24px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .form-grp {
+            margin-bottom: 14px;
+        }
+
+        .form-grp:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-lbl {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--ink-soft);
+            margin-bottom: 5px;
+        }
+
+        .req {
+            color: var(--red);
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            font-size: 13px;
+            font-family: var(--font);
+            color: var(--ink);
+            background: var(--surface);
+            outline: none;
+            transition: var(--tr);
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            font-size: 13px;
+            font-family: var(--font);
+            color: var(--ink);
+            background: var(--surface);
+            outline: none;
+            transition: var(--tr);
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-textarea:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .form-err {
+            display: none;
+            padding: 9px 12px;
+            background: var(--red-bg);
+            color: var(--red);
+            border: 1px solid #fca5a5;
+            border-radius: var(--r-sm);
+            font-size: 13px;
+            margin-bottom: 14px;
+        }
+
+        .form-err.show {
+            display: block;
+        }
+
+        .form-divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 18px 0 16px;
+        }
+
+        /* Subform */
+        .subform-hdr {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .subform-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        .subform-add {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            border: 1.5px dashed var(--accent);
+            border-radius: var(--r-sm);
+            background: rgba(79, 110, 247, .04);
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 600;
+            font-family: var(--font);
+            cursor: pointer;
+            transition: var(--tr);
+        }
+
+        .subform-add:hover {
+            background: rgba(79, 110, 247, .1);
+        }
+
+        .subform-wrap {
+            border: 1px solid var(--border);
+            border-radius: var(--r-md);
+            min-height: 120px;
+            overflow: visible; /* CRITICAL: Allow dropdown to pop out */
+            position: relative;
+            background: var(--surface);
+        }
+
+        .subform-table {
+            width: 100%;
+            border-collapse: separate; /* Changed for border radius */
+            border-spacing: 0;
+            min-width: 560px;
+        }
+
+        .subform-table th:first-child { border-top-left-radius: var(--r-md); }
+        .subform-table th:last-child { border-top-right-radius: var(--r-md); }
+
+        .subform-table th {
+            padding: 9px 12px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--ink-muted);
+            background: var(--surface-2);
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        .subform-table td {
+            padding: 6px 8px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        .subform-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .sf-select,
+        .sf-input {
+            width: 100%;
+            padding: 7px 9px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            font-size: 12px;
+            font-family: var(--font);
+            color: var(--ink);
+            background: var(--surface);
+            outline: none;
+            transition: var(--tr);
+        }
+
+        .sf-select:focus,
+        .sf-input:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+
+        .sf-readonly {
+            padding: 7px 9px;
+            font-size: 12px;
+            font-family: var(--font);
+            color: var(--ink-muted);
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            min-width: 100px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sf-del-btn {
+            background: none;
+            border: 1px solid #fca5a5;
+            border-radius: var(--r-sm);
+            color: var(--red);
+            padding: 5px 8px;
+            cursor: pointer;
+            transition: var(--tr);
+            display: flex;
+            align-items: center;
+        }
+
+        .sf-del-btn:hover {
+            background: var(--red-bg);
+        }
+
+        .sf-empty {
+            padding: 24px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--ink-muted);
+            border-radius: var(--r-md);
+            border: 1.5px dashed var(--border);
+            background: var(--surface-2);
+        }
+
+        /* Global error */
+        .g-err {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            background: var(--red-bg);
+            border: 1px solid #fca5a5;
+            color: var(--red);
+            padding: 10px 14px;
+            border-radius: var(--r-md);
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        .g-err.show {
+            display: flex;
+        }
+
+        /* Toast */
+        .toast-shelf {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9000;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: var(--ink);
+            color: #fff;
+            padding: 11px 16px;
+            border-radius: var(--r-md);
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            min-width: 240px;
+            pointer-events: auto;
+            animation: toastIn .28s ease;
+        }
+
+        .toast.ok .dot {
+            background: #34d399;
+        }
+
+        .toast.err .dot {
+            background: #f87171;
+        }
+
+        .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        @media(max-width:768px) {
+            .main {
+                padding: 14px 16px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .drawer {
+                width: 100%;
+            }
+
+            .d-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="loading-bar" id="loadingBar"></div>
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+        <div class="topbar-left">
+            <div class="app-icon">📋</div>
+            <div>
+                <div class="app-title">Orders</div>
+                <div class="app-subtitle">order-management</div>
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="btn-icon" onclick="refreshData()" title="Refresh">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <polyline points="23 4 23 10 17 10" />
+                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+                </svg>
+            </button>
+            <button class="btn btn-primary" id="addBtn">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path d="M12 5v14M5 12h14" />
+                </svg>
+                Add Order
+            </button>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="g-err" id="gErr">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 8v4M12 16h.01" />
+            </svg>
+            <span id="gErrText"></span>
+        </div>
+
+        <!-- TOOLBAR -->
+        <div class="toolbar">
+            <div class="search-wrap">
+                <svg class="s-icon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+                    viewBox="0 0 24 24">
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.35-4.35" />
+                </svg>
+                <input class="search-input" id="searchInput" type="text"
+                    placeholder="Search by Order ID, branch, status…" oninput="handleSearch(this.value)">
+            </div>
+            <div class="spacer"></div>
+            <select class="sort-select" id="sortSelect" onchange="handleSort()">
+                <option value="">Sort: Default</option>
+                <option value="date_desc">Date Newest</option>
+                <option value="date_asc">Date Oldest</option>
+                <option value="orderid_asc">Order ID A→Z</option>
+                <option value="status">Status</option>
+            </select>
+        </div>
+
+        <!-- FILTER BAR -->
+        <div class="filter-bar" id="filterBar">
+            <span class="fb-label">
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                </svg>
+                Filters
+            </span>
+            <div class="fb-sep"></div>
+
+            <!-- Status -->
+            <div class="fd-wrap">
+                <button class="fd-btn" id="fb-status" onclick="toggleDropdown('status',event)">
+                    Status
+                    <svg class="fd-chevron" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5"
+                        viewBox="0 0 24 24">
+                        <path d="m6 9 6 6 6-6" />
+                    </svg>
+                </button>
+                <div class="fd-menu" id="fdm-status" onclick="event.stopPropagation()" style="min-width:180px;">
+                    <div class="fd-list" id="fdl-status">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Branch -->
+            <div class="fd-wrap">
+                <button class="fd-btn" id="fb-branch" onclick="toggleDropdown('branch',event)">
+                    Branch
+                    <svg class="fd-chevron" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5"
+                        viewBox="0 0 24 24">
+                        <path d="m6 9 6 6 6-6" />
+                    </svg>
+                </button>
+                <div class="fd-menu" id="fdm-branch" onclick="event.stopPropagation()" style="min-width:230px;">
+                    <input class="fd-search" type="text" placeholder="Search branches…"
+                        oninput="searchBranches(this.value)" id="bs-branch">
+                    <div class="fd-list" id="fdl-branch">
+                        <div class="fd-empty">Loading…</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Date -->
+            <div class="fd-wrap">
+                <button class="fd-btn" id="fb-dateBtn" onclick="toggleDropdown('dateBtn',event)">
+                    Order Date
+                    <svg class="fd-chevron" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5"
+                        viewBox="0 0 24 24">
+                        <path d="m6 9 6 6 6-6" />
+                    </svg>
+                </button>
+                <div class="fd-menu" id="fdm-dateBtn" onclick="event.stopPropagation()">
+                    <div class="fd-list">
+                        <div class="fd-item" id="fdi-date-Today" onclick="toggleFilter('date','Today')">
+                            <div class="fd-check"></div><span class="fd-item-label">Today</span>
+                        </div>
+                        <div class="fd-item" id="fdi-date-Yesterday" onclick="toggleFilter('date','Yesterday')">
+                            <div class="fd-check"></div><span class="fd-item-label">Yesterday</span>
+                        </div>
+                        <div class="fd-item" id="fdi-date-Last 7 Days" onclick="toggleFilter('date','Last 7 Days')">
+                            <div class="fd-check"></div><span class="fd-item-label">Last 7 Days</span>
+                        </div>
+                        <div class="fd-item" id="fdi-date-Last 30 Days" onclick="toggleFilter('date','Last 30 Days')">
+                            <div class="fd-check"></div><span class="fd-item-label">Last 30 Days</span>
+                        </div>
+                        <div class="fd-item" id="fdi-date-This Month" onclick="toggleFilter('date','This Month')">
+                            <div class="fd-check"></div><span class="fd-item-label">This Month</span>
+                        </div>
+                        <div class="fd-item" id="fdi-date-This Year" onclick="toggleFilter('date','This Year')">
+                            <div class="fd-check"></div><span class="fd-item-label">This Year</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fb-sep"></div>
+            <button class="fd-clear" id="clearBtn" onclick="clearAll()">
+                <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path d="M18 6 6 18M6 6l12 12" />
+                </svg>
+                Clear All
+            </button>
+        </div>
+
+        <!-- Filter chips -->
+        <div class="filter-chips" id="filterChips"></div>
+
+        <!-- TABLE CARD -->
+        <div class="table-card">
+            <div class="tc-header">
+                <span class="rec-count" id="recCount"><strong>—</strong> orders</span>
+                <div id="adminBadge" class="badge badge-admin" style="display:none;margin-left:auto;font-size:10px;">
+                    <svg width="10" height="10" fill="currentColor" viewBox="0 0 24 24" style="margin-right:2px;">
+                        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" />
+                    </svg>
+                    Admin
+                </div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Sr. No</th>
+                            <th>Order ID</th>
+                            <th>Order Date</th>
+                            <th>Branch</th>
+                            <th>Status</th>
+                            <th>Items</th>
+                            <th id="actionsHeader" style="width:1px; display:none;">Actions</th>
+                            <th id="raiseHeader" style="width:1px; display:none;">Support</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody"></tbody>
+                </table>
+            </div>
+            <div class="pagination" id="pgBar" style="display:none;">
+                <div style="display:flex;align-items:center;gap:12px;flex:1;">
+                    <span class="pg-info" id="pgInfo">—</span>
+                    <div class="pg-size-wrap">
+                        <label style="font-size:12px;color:var(--ink-muted);margin-right:6px;">Rows:</label>
+                        <select class="pg-size-select" onchange="changePageSize(this.value)">
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="pg-ctrl">
+                    <button class="pg-btn" id="pgPrev" disabled onclick="changePage(-1)">← Prev</button>
+                    <span id="pgNums" style="display:flex;gap:4px;"></span>
+                    <button class="pg-btn" id="pgNext" onclick="changePage(1)">Next →</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- DETAIL DRAWER -->
+    <div class="drawer-ov" id="drawerOv" onclick="handleDrawerOvClick(event)">
+        <div class="drawer" id="drawer">
+            <div class="drawer-hdr">
+                <div class="drawer-top">
+                    <div style="display:flex;gap:12px;align-items:flex-start;flex:1;">
+                        <div class="d-icon">📋</div>
+                        <div style="flex:1;min-width:0;">
+                            <div class="d-name" id="dName">—</div>
+                            <div class="d-meta">
+                                <span class="d-id" id="dDate">—</span>
+                                <span id="dStatus"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <button id="dRaiseTicket" class="btn btn-ghost"
+                            style="display:none; font-size:12px; height:32px; padding:0 12px; border-radius:10px; border:1.5px solid var(--accent); color:var(--accent); font-weight:600;"
+                            onclick="openRaiseTicketFromDrawer()">
+                            Raise Ticket
+                        </button>
+                        <button class="d-close" onclick="closeDrawer()">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                                viewBox="0 0 24 24">
+                                <path d="M18 6 6 18M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="d-acts">
+                    <button class="btn btn-ghost" id="dSendBtn" onclick="sendFromDrawer()"
+                        style="border:1px solid var(--border);">
+                        Send Order
+                    </button>
+                    <button class="btn btn-ghost" id="dCancelBtn" onclick="cancelFromDrawer()"
+                        style="color:var(--red); border:1px solid #fca5a5;">
+                        Cancel Order
+                    </button>
+                    <div style="width:1px; height:24px; background:var(--border); margin:0 8px;"></div>
+                    <button class="btn btn-ghost" onclick="editFromDrawer()">
+                        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                        </svg>
+                        Edit
+                    </button>
+                    <button class="btn" style="background:var(--red-bg);color:var(--red);border:1px solid #fca5a5;"
+                        onclick="deleteFromDrawer()">
+                        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
+                            <polyline points="3 6 5 6 21 6" />
+                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                            <path d="M10 11v6M14 11v6" />
+                            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                        </svg>
+                        Delete
+                    </button>
+                </div>
+            </div>
+            <div class="drawer-body" id="drawerBody"></div>
+        </div>
+    </div>
+
+    </div>
+
+    <!-- ADD / EDIT MODAL -->
+    <div class="modal-ov" id="modalOv" onclick="handleModalOvClick(event)">
+        <div class="modal">
+            <div class="modal-hdr">
+                <div class="modal-title" id="modalTitle">Add Order</div>
+                <button class="modal-close" onclick="closeModal()">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M18 6 6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-err" id="formErr"></div>
+                <div class="form-row">
+                    <div class="form-grp">
+                        <label class="form-lbl">Order Date <span class="req">*</span></label>
+                        <input class="form-input" type="date" id="fDate">
+                    </div>
+                    <div class="form-grp">
+                        <label class="form-lbl">Status <span class="req">*</span></label>
+                        <select class="form-select" id="fStatus"></select>
+                    </div>
+                </div>
+                <div class="form-grp">
+                    <label class="form-lbl">Branch <span class="req">*</span></label>
+                    <select class="form-select" id="fBranch">
+                        <option value="">Select Branch</option>
+                    </select>
+                </div>
+
+                <hr class="form-divider">
+
+                <!-- Products Subform -->
+                <div class="subform-hdr">
+                    <div class="subform-title">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24" style="display:inline;vertical-align:middle;margin-right:5px;">
+                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                            <line x1="3" y1="6" x2="21" y2="6" />
+                            <path d="M16 10a4 4 0 0 1-8 0" />
+                        </svg>
+                        Products Selection
+                    </div>
+                    <button class="subform-add" onclick="addRow()">
+                        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"
+                            viewBox="0 0 24 24">
+                            <path d="M12 5v14M5 12h14" />
+                        </svg>
+                        Add Row
+                    </button>
+                </div>
+                <div id="subformWrap"></div>
+
+                <hr class="form-divider">
+
+                <div class="form-grp">
+                    <label class="form-lbl">Manual Product Request</label>
+                    <textarea class="form-textarea" id="fManual"
+                        placeholder="Enter any manual product notes or requests…"></textarea>
+                </div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" id="submitBtn" onclick="submitForm()">
+                    <span id="submitTxt">Add Order</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DELETE CONFIRM MODAL -->
+    <div class="modal-ov" id="delModalOv" onclick="handleDelModalOvClick(event)">
+        <div class="modal" style="max-width:400px;text-align:center;">
+            <div class="modal-body" style="padding:36px 28px 28px;">
+                <div
+                    style="width:60px;height:60px;border-radius:50%;background:var(--red-bg);color:var(--red);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;">
+                    <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path
+                            d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                        <line x1="12" y1="9" x2="12" y2="13" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                    </svg>
+                </div>
+                <h3 style="font-size:18px;font-weight:700;color:var(--ink);margin-bottom:8px;">Delete Order</h3>
+                <p style="font-size:14px;color:var(--ink-soft);line-height:1.6;margin-bottom:24px;">Are you sure you
+                    want to delete this order? This action cannot be undone.</p>
+                <div style="display:flex;gap:12px;">
+                    <button class="btn btn-ghost" style="flex:1;justify-content:center;"
+                        onclick="closeDelModal()">Cancel</button>
+                    <button class="btn"
+                        style="flex:1;justify-content:center;background:var(--red);color:#fff;border:none;box-shadow:0 2px 8px rgba(220,38,38,.25);"
+                        onclick="doDelete()">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SEND ORDER MODAL -->
+    <div class="modal-ov" id="sendModalOv" onclick="handleSendModalOvClick(event)">
+        <div class="modal" style="max-width:560px; padding:32px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+                <h2 style="font-size:28px; font-weight:700; color:var(--ink); margin:0;">Send Order</h2>
+                <button class="modal-close" onclick="closeSendModal()" style="padding:4px;">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M18 6 6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="modal-body" style="padding:0;">
+                <div id="sendFormErr" class="form-err"></div>
+
+                <div
+                    style="background:#f4f5f8; border-radius:10px; padding:20px; margin-bottom:28px; display:flex; flex-direction:column; gap:12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:14px; color:var(--ink-soft);">Order ID</span>
+                        <span id="sendOrderId"
+                            style="font-size:14px; font-weight:700; color:var(--ink); font-family:var(--mono);">—</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:14px; color:var(--ink-soft);">Branch</span>
+                        <span id="sendBranchName" style="font-size:14px; font-weight:700; color:var(--ink);">—</span>
+                    </div>
+                </div>
+
+                <div
+                    style="margin-bottom:12px; display:grid; grid-template-columns: 2fr 1fr 1fr; padding:0 8px; font-size:13px; color:var(--ink-muted); font-weight:500;">
+                    <div>Product Name</div>
+                    <div style="text-align:center;">Ordered Qty</div>
+                    <div style="text-align:right;">Sent Qty</div>
+                </div>
+                <hr style="border:none; border-top:1px solid #e2e5ed; margin:0 0 12px 0;">
+
+                <div id="sendItemsBody" style="display:flex; flex-direction:column; gap:8px; margin-bottom:24px;"></div>
+
+                <div class="form-grp">
+                    <label
+                        style="font-size:15px; font-weight:700; color:var(--ink); margin-bottom:10px; display:block;">Notes</label>
+                    <textarea id="fSendNotes"
+                        style="width:100%; min-height:100px; padding:12px; border:1px solid #e2e5ed; border-radius:8px; font-family:inherit; font-size:14px; resize:vertical;"
+                        placeholder="Enter any dispatch notes..."></textarea>
+                </div>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:32px;">
+                <button class="btn btn-primary" id="confirmSendBtn" onclick="confirmSend()"
+                    style="background:#8b8cf9; border:none; padding:10px 24px; font-size:14px; font-weight:600; border-radius:6px; min-width:140px;">
+                    Confirm Send
+                </button>
+                <button class="btn" onclick="closeSendModal()"
+                    style="background:#fff; color:var(--ink); border:1px solid #e2e5ed; padding:10px 24px; font-size:14px; font-weight:500; border-radius:6px;">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RAISE TICKET MODAL -->
+    <div class="modal-ov" id="ticketModalOv">
+        <div class="modal">
+            <div class="modal-hdr">
+                <div class="modal-title">Raise Ticket</div>
+                <button class="modal-close" onclick="closeTicketModal()">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M18 6 6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-err" id="ticketFormErr"></div>
+
+                <div class="form-row">
+                    <div class="form-grp">
+                        <label class="form-lbl">Order <span class="req">*</span></label>
+                        <input type="text" id="tk-order" class="form-input" readonly
+                            style="background:var(--surface-2);">
+                    </div>
+                    <div class="form-grp">
+                        <label class="form-lbl">Branch <span class="req">*</span></label>
+                        <input type="text" id="tk-branch" class="form-input" readonly
+                            style="background:var(--surface-2);">
+                    </div>
+                </div>
+
+                <div class="form-grp">
+                    <label class="form-lbl">Ticket Category <span class="req">*</span></label>
+                    <select id="tk-category" class="form-select">
+                        <option value="">Select Category</option>
+                    </select>
+                </div>
+
+                <div class="form-grp">
+                    <label class="form-lbl">Description</label>
+                    <textarea id="tk-desc" class="form-input" style="height:80px; resize:none;"
+                        placeholder="Describe the issue..."></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-grp">
+                        <label class="form-lbl">Priority <span class="req">*</span></label>
+                        <select id="tk-priority" class="form-select">
+                            <option value="High" selected>High</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Low">Low</option>
+                        </select>
+                    </div>
+                    <div class="form-grp">
+                        <label class="form-lbl">Status</label>
+                        <input type="text" class="form-input" value="Pending" readonly
+                            style="background:var(--surface-2);">
+                    </div>
+                </div>
+
+                <div class="form-grp">
+                    <label class="form-lbl">Attachment</label>
+                    <input type="file" id="tk-attachment" class="form-input" multiple>
+                    <div style="font-size:11px; color:var(--ink-muted); margin-top:4px;">Up to 10 files allowed</div>
+                </div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn btn-ghost" onclick="closeTicketModal()">Cancel</button>
+                <button class="btn btn-primary" id="tk-submitBtn" onclick="submitTicket()">Submit Ticket</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-shelf" id="toasts"></div>
+
+    <script>
+        // ─────────────────────────────────────────────
+        // CONFIG
+        // ─────────────────────────────────────────────
+        const CFG = {
+            appName: "order-management",
+            orderReport: "All_Orders",
+            branchReport: "All_Branches",
+            productReport: "All_Products",
+            brandReport: "All_Brands",
+            assetTypeReport: "All_Asset_Types",
+            orderForm: "Order",
+            f: {
+                orderId: "Order_ID",
+                date: "order_date",
+                status: "Status",
+                branch: "Branch",
+                products: "Products_Selection",
+                manual: "Manual_Product_Request",
+                sf: {
+                    product: "Product",
+                    brand: "Brand",
+                    assetType: "Asset_Type",
+                    qty: "Ordered_Qty",
+                    sentQty: "Sent_Qty"
+                }
+            },
+            branchField: "Branch_Name",
+            productField: "Product_Name",
+            brandField: "Brand_Name",
+            assetField: "Asset_Type_Name",
+            BATCH: 200,
+            roleReport: "All_Branch_User_Role_Mapping",
+            ticketForm: "Ticket_form",
+            ticketReport: "All_Tickets",
+            categoryReport: "All_Ticket_Categories"
+        };
+
+        // ─────────────────────────────────────────────
+        // STATE
+        // ─────────────────────────────────────────────
+        const S = {
+            all: [],
+            isSuperAdmin: false,
+            branches: [],
+            products: [],
+            brands: [],
+            assets: [],
+            filtered: [],
+            page: 1,
+            pageSize: 10,
+            search: "",
+            sort: "",
+            statuses: ["Pending", "Partial Sent", "Cancelled", "Delivered"],
+            filters: { status: [], branches: [], date: "" },
+            editId: null,
+            drawerRec: null,
+            openDrop: null,
+            delId: null,
+            modalRows: [],   // [{rowId, productId, brandId, assetId, qty}]
+            tCategories: [],
+            ticketId: null // current order for ticket
+        };
+
+        // ─────────────────────────────────────────────
+        // API HELPERS
+        // ─────────────────────────────────────────────
+        async function fetchAll(report) {
+            let all = [], page = 1;
+            try {
+                while (true) {
+                    const r = await ZOHO.CREATOR.API.getAllRecords({
+                        appName: CFG.appName,
+                        reportName: report,
+                        page: page,
+                        pageSize: CFG.BATCH
+                    });
+                    const rows = r?.data ?? [];
+                    all = all.concat(rows);
+                    if (rows.length < CFG.BATCH) break;
+                    page++;
+                }
+                return all;
+            } catch (e) {
+                console.error("Fetch all failed for " + report, e);
+                return [];
+            }
+        }
+
+        // ─────────────────────────────────────────────
+        // LOOKUPS
+        // ─────────────────────────────────────────────
+        function lookupId(v) {
+            if (!v) return "";
+            if (typeof v === "object") {
+                // Check all common Zoho identifier properties
+                const id = v.ID || v.value || v.actual_value || v.id || "";
+                return id ? String(id) : "";
+            }
+            // If it's a string, it might be the ID directly or an empty value
+            return String(v).trim();
+        }
+        function branchName(v) {
+            if (!v) return "—";
+            if (typeof v === "object") return v.display_value || v[CFG.branchField] || "—";
+            return S.branches.find(b => b.id === String(v))?.name ?? String(v);
+        }
+        function productName(v) {
+            if (!v) return "—";
+            if (typeof v === "object") return v.display_value || v[CFG.productField] || "—";
+            return S.products.find(p => p.id === String(v))?.name ?? String(v);
+        }
+        function brandName(v) {
+            if (!v) return "—";
+            if (typeof v === "object") return v.display_value || v[CFG.brandField] || "—";
+            return S.brands.find(b => b.id === String(v))?.name ?? String(v);
+        }
+        function assetName(v) {
+            if (!v) return "—";
+            if (typeof v === "object") return v.display_value || v[CFG.assetField] || "—";
+            return S.assets.find(a => a.id === String(v))?.name ?? String(v);
+        }
+
+        const _statusKnown = {
+            "Pending": "badge-pending",
+            "Partial Sent": "badge-partial",
+            "Cancelled": "badge-cancelled",
+            "Delivered": "badge-delivered"
+        };
+        function statusClass(s) {
+            if (_statusKnown[s]) return _statusKnown[s];
+            let h = 0;
+            for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+            return "badge-dyn-" + (h % 8);
+        }
+        function fmtDate(d) {
+            if (!d) return "—";
+            try {
+                const dt = new Date(d);
+                if (isNaN(dt)) return String(d);
+                return dt.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+            } catch { return String(d); }
+        }
+        // Convert yyyy-MM-dd (HTML input) → dd-MMM-yyyy (Zoho Creator format)
+        function toZohoDate(isoDate) {
+            if (!isoDate) return "";
+            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const [y, m, d] = isoDate.split("-");
+            if (!y || !m || !d) return isoDate;
+            return `${d}-${months[parseInt(m, 10) - 1]}-${y}`;
+        }
+
+        // ─────────────────────────────────────────────
+        // LOAD ALL
+        // ─────────────────────────────────────────────
+        async function loadAll() {
+            setLoading(true);
+            renderSkeleton();
+            try {
+                const [orders, branches, products, brands, assets, categories] = await Promise.all([
+                    fetchAll(CFG.orderReport),
+                    fetchAll(CFG.branchReport),
+                    fetchAll(CFG.productReport),
+                    fetchAll(CFG.brandReport),
+                    fetchAll(CFG.assetTypeReport),
+                    fetchAll(CFG.categoryReport).catch(() => ({ data: [] }))
+                ]);
+
+                S.all = orders;
+                const catData = categories?.data || categories || [];
+                S.tCategories = catData
+                    .filter(c => (c.status || c.Status || "") === "Active")
+                    .map(c => ({ id: String(c.ID), name: c.category_name || c.Name || "—" }));
+                S.branches = branches.map(r => ({ id: String(r.ID), name: r[CFG.branchField] || "—" }));
+                S.products = products
+                    .map(r => ({
+                        id: String(r.ID),
+                        name: (r[CFG.productField] || r.Name || "—").trim(),
+                        brandId: lookupId(r.Brand),
+                        assetId: lookupId(r.Asset_Type),
+                        maxQty: r.Max_Order_Quantity ? parseInt(r.Max_Order_Quantity, 10) : 0,
+                        status: (r.Status || r.status || "Active").trim()
+                    }));
+                S.brands = brands.map(r => ({ id: String(r.ID), name: r[CFG.brandField] || "—" }));
+                S.assets = assets.map(r => ({ id: String(r.ID), name: r[CFG.assetField] || "—" }));
+
+                populateFormDropdowns();
+                buildBranchFilterList();
+                buildStatusFilterList();
+                recompute();
+                hideErr();
+            } catch (e) {
+                showErr("Failed to load data: " + (e?.message ?? String(e)));
+                renderEmpty("Load failed — check SDK connection");
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        // ─────────────────────────────────────────────
+        // FILTER + SEARCH + SORT
+        // ─────────────────────────────────────────────
+        function recompute() {
+            const f = CFG.f, fl = S.filters;
+            let rows = [...S.all];
+
+            if (S.search) {
+                const q = S.search.toLowerCase();
+                rows = rows.filter(o =>
+                    (o[f.orderId] || "").toLowerCase().includes(q) ||
+                    branchName(o[f.branch]).toLowerCase().includes(q) ||
+                    (o[f.status] || "").toLowerCase().includes(q)
+                );
+            }
+
+            if (fl.status.length) rows = rows.filter(o => fl.status.includes(o[f.status] || "Pending"));
+            if (fl.branches.length) rows = rows.filter(o => fl.branches.includes(lookupId(o[f.branch])));
+            if (fl.date) {
+                const now = new Date();
+                const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+                rows = rows.filter(o => {
+                    if (!o[f.date]) return false;
+                    try {
+                        const d = new Date(o[f.date]);
+                        if (isNaN(d)) return false;
+                        const dDay = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
+                        if (fl.date === "Today") {
+                            return dDay.getTime() === today.getTime();
+                        } else if (fl.date === "Yesterday") {
+                            const yesterday = new Date(today);
+                            yesterday.setDate(yesterday.getDate() - 1);
+                            return dDay.getTime() === yesterday.getTime();
+                        } else if (fl.date === "Last 7 Days") {
+                            const last7 = new Date(today);
+                            last7.setDate(last7.getDate() - 7);
+                            return dDay.getTime() >= last7.getTime() && dDay.getTime() <= today.getTime();
+                        } else if (fl.date === "Last 30 Days") {
+                            const last30 = new Date(today);
+                            last30.setDate(last30.getDate() - 30);
+                            return dDay.getTime() >= last30.getTime() && dDay.getTime() <= today.getTime();
+                        } else if (fl.date === "This Month") {
+                            return dDay.getFullYear() === today.getFullYear() && dDay.getMonth() === today.getMonth();
+                        }
+                        else if (fl.date === "This Year") {
+                            return dDay.getFullYear() === today.getFullYear();
+                        }
+                        return false;
+                    } catch { return false; }
+                });
+            }
+
+            if (S.sort) rows.sort((a, b) => {
+                if (S.sort === "date_desc") return new Date(b[f.date] || 0) - new Date(a[f.date] || 0);
+                if (S.sort === "date_asc") return new Date(a[f.date] || 0) - new Date(b[f.date] || 0);
+                if (S.sort === "orderid_asc") return (a[f.orderId] || "").localeCompare(b[f.orderId] || "");
+                if (S.sort === "status") return (a[f.status] || "").localeCompare(b[f.status] || "");
+                return 0;
+            });
+
+            S.filtered = rows;
+            S.page = 1;
+            renderTable();
+            renderPagination();
+            updateFilterBtns();
+            renderChips();
+        }
+
+        // ─────────────────────────────────────────────
+        // TABLE RENDERING
+        // ─────────────────────────────────────────────
+        function renderTable() {
+            const tbody = document.getElementById("tbody");
+            const f = CFG.f;
+            const start = (S.page - 1) * S.pageSize;
+            const page = S.filtered.slice(start, start + S.pageSize);
+            const filtered = S.search || hasFilters();
+
+            document.getElementById("recCount").innerHTML =
+                `<strong>${S.filtered.length}</strong> order${S.filtered.length !== 1 ? "s" : ""}${filtered ? " (filtered)" : ""}`;
+
+            if (page.length === 0) {
+                renderEmpty(S.all.length === 0 ? "No orders yet" : "No orders match your filters");
+                return;
+            }
+
+            tbody.innerHTML = page.map((o, idx) => {
+                const status = o[f.status] || "Pending";
+                const id = escA(String(o.ID));
+                const lines = Array.isArray(o[f.products]) ? o[f.products].length : 0;
+                const isFinal = status === "Delivered" || status === "Cancelled";
+
+                const acts = S.isSuperAdmin ? `<td><div class="row-acts" onclick="event.stopPropagation()">
+                        <button class="act-btn" style="color:${isFinal ? "var(--ink-ghost)" : "var(--ink)"}; border-color:${isFinal ? "transparent" : "var(--border)"};" 
+                                ${isFinal ? "disabled" : ""} onclick="openSendModal('${id}')">Send</button>
+                        <button class="act-btn" style="color:${isFinal ? "var(--ink-ghost)" : "var(--red)"}; border-color:${isFinal ? "transparent" : "#fca5a5"};" 
+                                ${isFinal ? "disabled" : ""} onclick="updateStatus('${id}', 'Cancelled')">Cancel</button>
+                        <div style="width:1px; height:14px; background:var(--border); margin:0 4px;"></div>
+                        <button class="act-btn" ${isFinal ? "disabled style='opacity:0.5; cursor:not-allowed;'" : ""} onclick="openEdit('${id}')" title="Edit">
+                            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                            </svg>
+                        </button>
+                        <button class="act-btn del" onclick="confirmDelete('${id}')" title="Delete">
+                            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6M14 11v6" /><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                            </svg>
+                        </button>
+                </div></td>` : "";
+
+                const raiseTd = S.isSuperAdmin ? "" : `<td>
+                    <button class="act-btn" onclick="openRaiseTicket('${id}'); event.stopPropagation();" style="color:var(--accent); border-color:var(--accent); font-weight:600; white-space:nowrap; padding:4px 12px; border-radius:16px;">Raise Ticket</button>
+                </td>`;
+                return `<tr onclick="openDrawer('${id}')" data-id="${id}">
+            <td><span class="sn-mono">${start + idx + 1}</span></td>
+            <td class="col-orderid">${esc(o[f.orderId] || "—")}</td>
+            <td class="col-date">${fmtDate(o["Order_Date"] || o["order_date"] || o["Date"] || o.Added_Time)}</td>
+            <td>${esc(branchName(o[f.branch]))}</td>
+            <td><span class="badge ${statusClass(status)}">${esc(status)}</span></td>
+            <td><span class="items-pill">${lines} item${lines !== 1 ? "s" : ""}</span></td>
+            ${acts}
+            ${raiseTd}
+        </tr>`;
+            }).join("");
+        }
+
+        function renderSkeleton(n = 7) {
+            const ws = ["10%", "14%", "16%", "18%", "14%", "10%", "18%"];
+
+            document.getElementById("tbody").innerHTML = Array.from({ length: n }, () =>
+                `<tr class="sk-row">${ws.map(w => `<td><div class="sk-cell" style="width:${w}"></div></td>`).join("")}</tr>`
+            ).join("");
+            document.getElementById("recCount").innerHTML = `<strong>—</strong> orders`;
+        }
+
+        function renderEmpty(msg) {
+            const cols = 7;
+            document.getElementById("tbody").innerHTML = `<tr><td colspan="${cols}"><div class="t-empty">
+        <div class="t-empty-icon">📋</div>
+        <div class="t-empty-title">${esc(msg)}</div>
+        <div class="t-empty-sub">Try adjusting your search or filters</div>
+    </div></td></tr>`;
+            document.getElementById("pgBar").style.display = "none";
+        }
+
+        // ─────────────────────────────────────────────
+        // PAGINATION
+        // ─────────────────────────────────────────────
+        function renderPagination() {
+            const total = S.filtered.length;
+            const pages = Math.ceil(total / S.pageSize);
+            const bar = document.getElementById("pgBar");
+            if (total === 0) { bar.style.display = "none"; return; }
+            bar.style.display = "flex";
+            const s = (S.page - 1) * S.pageSize + 1, e = Math.min(S.page * S.pageSize, total);
+            document.getElementById("pgInfo").textContent = `Showing ${s}–${e} of ${total}`;
+            const ctrl = bar.querySelector(".pg-ctrl");
+            if (pages <= 1) { ctrl.style.display = "none"; return; }
+            ctrl.style.display = "flex";
+            document.getElementById("pgPrev").disabled = S.page <= 1;
+            document.getElementById("pgNext").disabled = S.page >= pages;
+            const nums = [];
+            for (let i = 1; i <= pages; i++) {
+                if (i === 1 || i === pages || Math.abs(i - S.page) <= 2) nums.push(i);
+                else if (nums[nums.length - 1] !== "…") nums.push("…");
+            }
+            document.getElementById("pgNums").innerHTML = nums.map(n =>
+                n === "…"
+                    ? `<span style="padding:5px 3px;font-size:12px;color:var(--ink-muted)">…</span>`
+                    : `<button class="pg-btn${n === S.page ? " active" : ""}" onclick="goPage(${n})">${n}</button>`
+            ).join("");
+        }
+        function changePage(d) {
+            const tp = Math.ceil(S.filtered.length / S.pageSize);
+            S.page = Math.max(1, Math.min(tp, S.page + d));
+            renderTable(); renderPagination();
+        }
+        function goPage(p) { S.page = p; renderTable(); renderPagination(); }
+        function changePageSize(size) { S.pageSize = parseInt(size, 10); S.page = 1; recompute(); }
+
+        // ─────────────────────────────────────────────
+        // FILTER DROPDOWNS
+        // ─────────────────────────────────────────────
+        function toggleDropdown(name, e) {
+            e?.stopPropagation();
+            const already = S.openDrop === name;
+            closeDropdowns();
+            if (!already) {
+                S.openDrop = name;
+                document.getElementById(`fdm-${name}`)?.classList.add("open");
+                document.getElementById(`fb-${name}`)?.classList.add("is-open");
+            }
+        }
+        function closeDropdowns() {
+            document.querySelectorAll(".fd-menu.open").forEach(m => m.classList.remove("open"));
+            document.querySelectorAll(".fd-btn.is-open").forEach(b => b.classList.remove("is-open"));
+            S.openDrop = null;
+        }
+        function toggleFilter(type, value) {
+            const fl = S.filters;
+            if (type === "status") {
+                fl.status = toggle(fl.status, value);
+                setItemSelected(`fdi-status-${value}`, fl.status.includes(value));
+            } else if (type === "branch") {
+                fl.branches = toggle(fl.branches, value);
+                setItemSelected(`fdi-branch-${value}`, fl.branches.includes(value));
+            } else if (type === "date") {
+                if (fl.date === value) {
+                    fl.date = "";
+                } else {
+                    fl.date = value;
+                }
+                document.querySelectorAll("[id^='fdi-date-']").forEach(el => el.classList.remove("selected"));
+                if (fl.date) setItemSelected(`fdi-date-${value}`, true);
+            }
+            recompute();
+        }
+        function toggle(arr, v) { return arr.includes(v) ? arr.filter(x => x !== v) : [...arr, v]; }
+        function setItemSelected(id, sel) { document.getElementById(id)?.classList.toggle("selected", sel); }
+        function filterDate(val) { S.filters.date = val; recompute(); }
+        function clearAll() {
+            S.filters = { status: [], branches: [], date: "" };
+            S.search = "";
+            document.getElementById("searchInput").value = "";
+            document.querySelectorAll(".fd-item.selected").forEach(el => el.classList.remove("selected"));
+            recompute();
+        }
+        function hasFilters() { return S.filters.status.length || S.filters.branches.length || S.filters.date; }
+        function updateFilterBtns() {
+            const upd = (name, count) => {
+                const btn = document.getElementById(`fb-${name}`);
+                if (!btn) return;
+                btn.classList.toggle("has-value", count > 0);
+                const old = btn.querySelector(".fd-count");
+                if (old) old.remove();
+                if (count > 0) {
+                    const sp = document.createElement("span");
+                    sp.className = "fd-count"; sp.textContent = count;
+                    btn.insertBefore(sp, btn.querySelector(".fd-chevron"));
+                }
+            };
+            upd("status", S.filters.status.length);
+            upd("branch", S.filters.branches.length);
+            upd("dateBtn", S.filters.date ? 1 : 0);
+            document.getElementById("clearBtn").classList.toggle("visible", !!(hasFilters() || S.search));
+        }
+        function renderChips() {
+            const el = document.getElementById("filterChips");
+            const fl = S.filters;
+            const chips = [];
+            fl.status.forEach(s => chips.push({ label: `Status: ${s}`, rm: () => { fl.status = fl.status.filter(v => v !== s); setItemSelected(`fdi-status-${s}`, false); recompute(); } }));
+            fl.branches.forEach(id => {
+                const b = S.branches.find(x => x.id === id);
+                chips.push({ label: `Branch: ${b ? b.name : id}`, rm: () => { fl.branches = fl.branches.filter(v => v !== id); setItemSelected(`fdi-branch-${id}`, false); recompute(); } });
+            });
+            if (fl.date) {
+                chips.push({
+                    label: `Date: ${fl.date}`,
+                    rm: () => { fl.date = ""; document.querySelectorAll("[id^='fdi-date-']").forEach(el => el.classList.remove("selected")); recompute(); }
+                });
+            }
+            window._rmChip = chips.map(c => c.rm);
+            el.innerHTML = chips.map((c, i) => `<span class="chip">${esc(c.label)}<button class="chip-x" onclick="window._rmChip[${i}]()"><svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></span>`).join("");
+        }
+
+        // ─────────────────────────────────────────────
+        // FILTER LIST POPULATION
+        // ─────────────────────────────────────────────
+        function buildBranchFilterList(query = "") {
+            const el = document.getElementById("fdl-branch");
+            if (!el) return;
+            const items = query ? S.branches.filter(b => b.name.toLowerCase().includes(query.toLowerCase())) : S.branches;
+            if (!items.length) { el.innerHTML = `<div class="fd-empty">${query ? "No matches" : "None found"}</div>`; return; }
+            el.innerHTML = items.map(item => `
+        <div class="fd-item${S.filters.branches.includes(item.id) ? " selected" : ""}"
+             id="fdi-branch-${escA(item.id)}"
+             onclick="toggleFilter('branch','${escA(item.id)}')">
+            <div class="fd-check"></div>
+            <span class="fd-item-label">${esc(item.name)}</span>
+        </div>`).join("");
+        }
+        function searchBranches(q) { buildBranchFilterList(q); }
+
+        function buildStatusFilterList() {
+            const el = document.getElementById("fdl-status");
+            if (!el) return;
+            el.innerHTML = S.statuses.map(s => `
+        <div class="fd-item${S.filters.status.includes(s) ? " selected" : ""}"
+             id="fdi-status-${escA(s)}"
+             onclick="toggleFilter('status','${escA(s)}')">
+            <div class="fd-check"></div>
+            <span class="badge ${statusClass(s)}" style="font-size:11px;">${esc(s)}</span>
+        </div>`).join("");
+        }
+
+        // ─────────────────────────────────────────────
+        // FORM DROPDOWNS
+        // ─────────────────────────────────────────────
+        function populateFormDropdowns() {
+            const fBranch = document.getElementById("fBranch");
+            fBranch.innerHTML = `<option value="">Select Branch</option>` +
+                S.branches.map(b => `<option value="${escA(b.id)}">${esc(b.name)}</option>`).join("");
+
+            const fStatus = document.getElementById("fStatus");
+            if (fStatus) {
+                fStatus.innerHTML = S.statuses.map(s => `<option value="${escA(s)}">${esc(s)}</option>`).join("");
+            }
+        }
+
+        // ─────────────────────────────────────────────
+        // SUBFORM ROWS
+        // ─────────────────────────────────────────────
+        function addRow() {
+            S.modalRows.push({ rowId: "", productId: "", brandId: "", assetId: "", qty: "" });
+            renderSubform();
+        }
+        function removeRow(idx) {
+            S.modalRows.splice(idx, 1);
+            renderSubform();
+        }
+        function onProductChange(idx, productId) {
+            const prod = S.products.find(p => p.id === productId);
+            const row = S.modalRows[idx];
+            row.productId = productId;
+            row.brandId = prod?.brandId || "";
+            row.assetId = prod?.assetId || "";
+
+            // Validate existing qty against new product max
+            if (row.qty && prod && prod.maxQty > 0 && parseInt(row.qty, 10) > prod.maxQty) {
+                toast(`Maximum order qty for ${prod.name} is ${prod.maxQty}`, "err");
+                row.qty = "";
+            }
+            renderSubform();
+        }
+        function onQtyChange(idx, val) {
+            const row = S.modalRows[idx];
+            const qtyNum = parseInt(val, 10);
+            const prod = S.products.find(p => p.id === row.productId);
+
+            if (prod && prod.maxQty > 0 && qtyNum > prod.maxQty) {
+                toast(`Maximum order qty for ${prod.name} is ${prod.maxQty}`, "err");
+                row.qty = "";
+                // Direct DOM update to clear the input and stop typing
+                const inputs = document.querySelectorAll("#subformWrap .sf-input");
+                if (inputs[idx]) {
+                    inputs[idx].value = "";
+                    inputs[idx].blur();
+                }
+                return;
+            }
+            row.qty = val;
+        }
+
+        function renderSubform() {
+            const wrap = document.getElementById("subformWrap");
+            if (S.modalRows.length === 0) {
+                wrap.innerHTML = `<div class="sf-empty">No products added. Click <strong>"Add Row"</strong> above to get started.</div>`;
+                return;
+            }
+
+            const activeProducts = S.products.filter(p => p.status === "Active");
+            const activeOptionsHTML = activeProducts.map(p => `
+                <div class="ss-opt" onclick="selectSS(IDX, '${escA(p.id)}')">
+                    ${esc(p.name)}
+                </div>
+            `).join("");
+
+            wrap.innerHTML = `<div class="subform-wrap"><table class="subform-table">
+        <thead><tr>
+            <th>Product <span style="color:var(--red)">*</span></th>
+            <th>Brand</th>
+            <th>Asset Type</th>
+            <th>Ordered Qty <span style="color:var(--red)">*</span></th>
+            <th></th>
+        </tr></thead>
+        <tbody>${S.modalRows.map((row, idx) => {
+                const prod = S.products.find(p => p.id === row.productId);
+                const bName = row.brandId ? (S.brands.find(b => b.id === row.brandId)?.name || "—") : "—";
+                const aName = row.assetId ? (S.assets.find(a => a.id === row.assetId)?.name || "—") : "—";
+                
+                // If current product is inactive, we must include it in the dropdown for this row
+                let rowOpts = activeOptionsHTML.replace(/IDX/g, idx);
+                if (prod && prod.status !== "Active") {
+                    rowOpts = `<div class="ss-opt selected" onclick="selectSS(${idx}, '${escA(prod.id)}')">${esc(prod.name)}</div>` + rowOpts;
+                }
+                
+                const ssId = `ss-${idx}`;
+                return `<tr>
+                <td style="min-width:240px;">
+                    <div class="ss-wrap" id="${ssId}">
+                        <div class="ss-btn ${row.productId ? "" : "placeholder"}" onclick="toggleSS('${ssId}', event)">
+                            <span class="ss-label">${prod ? esc(prod.name) : "Select Product"}</span>
+                            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+                        </div>
+                        <div class="ss-menu">
+                            <div class="ss-search-wrap" onclick="event.stopPropagation()">
+                                <input type="text" class="ss-search" placeholder="Search product..." oninput="filterSS('${ssId}', this.value)">
+                            </div>
+                            <div class="ss-list">
+                                ${rowOpts}
+                                ${activeProducts.length === 0 && (!prod || prod.status !== "Active") ? `<div class="ss-empty">No products found</div>` : ""}
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                <td style="min-width:120px;"><div class="sf-readonly">${esc(bName)}</div></td>
+                <td style="min-width:130px;"><div class="sf-readonly">${esc(aName)}</div></td>
+                <td style="min-width:120px;">
+                    <input class="sf-input" type="number" min="1" value="${esc(String(row.qty))}" oninput="onQtyChange(${idx},this.value)" placeholder="Qty">
+                    ${prod && prod.maxQty > 0 ? `<div style="font-size:10px;color:var(--ink-muted);margin-top:2px;">Max: ${prod.maxQty}</div>` : ""}
+                </td>
+                <td><button class="sf-del-btn" onclick="removeRow(${idx})">
+                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                </button></td>
+            </tr>`;
+            }).join("")}</tbody>
+    </table></div>`;
+        }
+
+        // ─────────────────────────────────────────────
+        // SEARCH & SORT
+        // ─────────────────────────────────────────────
+        let _st;
+        function handleSearch(q) {
+            S.search = q.trim();
+            clearTimeout(_st);
+            _st = setTimeout(recompute, 120);
+        }
+        function handleSort() { S.sort = document.getElementById("sortSelect").value; recompute(); }
+        function refreshData() { loadAll(); }
+
+        // ─────────────────────────────────────────────
+        // DETAIL DRAWER
+        // ─────────────────────────────────────────────
+        async function openDrawer(recordId) {
+            const defaultRec = S.all.find(x => String(x.ID) === String(recordId));
+            if (!defaultRec) return;
+
+            // Show drawer immediately with skeleton data
+            S.drawerRec = defaultRec;
+            const f = CFG.f;
+            let status = defaultRec[f.status] || "Pending";
+            const isFinal = status === "Delivered" || status === "Cancelled";
+
+            const dSend = document.getElementById("dSendBtn");
+            const dCancel = document.getElementById("dCancelBtn");
+            if (dSend) {
+                dSend.disabled = isFinal;
+                dSend.style.opacity = isFinal ? "0.5" : "1";
+                dSend.style.pointerEvents = isFinal ? "none" : "auto";
+            }
+            if (dCancel) {
+                dCancel.disabled = isFinal;
+                dCancel.style.opacity = isFinal ? "0.5" : "1";
+                dCancel.style.pointerEvents = isFinal ? "none" : "auto";
+            }
+
+            document.getElementById("dName").textContent = defaultRec[f.orderId] || "—";
+            document.getElementById("dDate").textContent = fmtDate(defaultRec[f.date]);
+            document.getElementById("dStatus").innerHTML = `<span class="badge ${statusClass(status)}">${esc(status)}</span>`;
+
+            document.getElementById("drawerBody").innerHTML = `<div style="padding:40px;text-align:center;color:var(--ink-muted);font-size:13px;">Loading order details…</div>`;
+
+            document.querySelectorAll("tbody tr").forEach(r => r.classList.remove("selected"));
+            document.querySelector(`tbody tr[data-id="${recordId}"]`)?.classList.add("selected");
+            document.getElementById("drawerOv").classList.add("open");
+
+            // Always show actions box (for Raise Ticket), but conditionally show admin buttons
+            const actBox = document.querySelector(".d-acts");
+            if (actBox) {
+                actBox.style.display = "flex";
+                // Inject admin buttons if needed
+                actBox.innerHTML = `
+                    ${S.isSuperAdmin ? `
+                        <button class="btn btn-ghost" ${isFinal ? "disabled style='opacity:0.5; cursor:not-allowed;'" : ""} onclick="editFromDrawer()">
+                            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                            Edit
+                        </button>
+                        <button class="btn" style="background:var(--red-bg);color:var(--red);border:1px solid #fca5a5;" onclick="deleteFromDrawer()">
+                            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                            Delete
+                        </button>
+                    ` : ""}
+                `;
+            }
+
+            // Show/Hide header Raise Ticket button based on role
+            const hRaise = document.getElementById("dRaiseTicket");
+            if (hRaise) hRaise.style.display = S.isSuperAdmin ? "none" : "inline-block";
+
+            // Fetch the full record
+            let rec = defaultRec;
+            let dErr = "";
+            try {
+                const resp = await ZOHO.CREATOR.API.getRecordById({
+                    appName: CFG.appName, reportName: CFG.orderReport, id: recordId
+                });
+                if (resp && resp.data) {
+                    rec = resp.data;
+                    S.drawerRec = rec;
+                } else {
+                    dErr = "resp is valid but no resp.data: " + JSON.stringify(resp);
+                }
+            } catch (e) {
+                dErr = e && e.message ? e.message : JSON.stringify(e);
+            }
+
+            // Subform rows from getRecordById come as {display_value:'ProductName,AssetType,BrandName,Qty', ID:'...'}
+            const rawLines = Array.isArray(rec[f.products]) ? rec[f.products] : [];
+            const lines = rawLines.map(l => {
+                const pName = productName(l[f.sf.product]);
+                const bName = brandName(l[f.sf.brand]);
+                const aName = assetName(l[f.sf.assetType]);
+                const qVal = l[f.sf.qty] || "0";
+
+                // Exhaustive lookup for Sent Qty
+                const getSent = () => {
+                    const keys = Object.keys(l);
+
+                    // 1. Try Config Field (Direct or Lookup)
+                    const direct = l[f.sf.sentQty];
+                    if (direct !== undefined && direct !== null && String(direct).trim() !== "") {
+                        return (typeof direct === "object") ? (direct.display_value || direct.ID || "0") : direct;
+                    }
+
+                    // 2. Fuzzy Key Search
+                    const match = keys.find(k => {
+                        const lowK = k.toLowerCase().replace(/_/g, "");
+                        return lowK === "sentqty" || lowK === "sentquantity" || lowK.includes("sent") || lowK.includes("fulfilled");
+                    });
+                    if (match && l[match] !== undefined && l[match] !== null && String(l[match]).trim() !== "") {
+                        const mVal = l[match];
+                        return (typeof mVal === "object") ? (mVal.display_value || mVal.ID || "0") : mVal;
+                    }
+
+                    // 3. Display Value Parsing (Fallback)
+                    const parts = (l.display_value || "").split(",").map(s => s.trim());
+                    if (parts.length >= 5) return parts[4]; // 5th column in subform report
+
+                    // 4. Heuristic: Any extra number that isn't the ordered qty or ID
+                    const extra = keys.find(k => {
+                        const val = l[k];
+                        return typeof val === "number" && k !== f.sf.qty && k !== "ID" && k !== "Ordered_Qty";
+                    });
+                    if (extra) return l[extra];
+
+                    // 5. Safety: If Delivered, it shouldn't be blank
+                    const orderStatus = rec[f.status] || "";
+                    if (orderStatus === "Delivered" || orderStatus === "Partial Sent") return "0";
+
+                    return "—";
+                };
+
+                const sVal = getSent();
+
+                if (pName !== "—" || qVal !== "0") {
+                    return {
+                        rowId: String(l.ID || ""),
+                        productName: pName,
+                        brandName: bName,
+                        assetName: aName,
+                        qty: qVal,
+                        sentQty: sVal
+                    };
+                }
+
+                // Fallback to display_value parsing
+                const parts = (l.display_value || "").split(",").map(s => s.trim());
+                return {
+                    rowId: String(l.ID || ""),
+                    productName: parts[0] || "—",
+                    assetName: parts[1] || "—",
+                    brandName: parts[2] || "—",
+                    qty: parts[3] || "0",
+                    sentQty: parts[4] || "—"
+                };
+            });
+            const ptbl = lines.length > 0
+                ? `<table class="products-tbl">
+            <thead><tr><th>#</th><th>Product</th><th>Brand</th><th>Asset Type</th><th>Ordered Qty</th>${S.isSuperAdmin ? `<th>Sent Qty</th>` : ""}</tr></thead>
+            <tbody>${lines.map((l, i) => `<tr>
+                    <td><span class="sn-mono">${i + 1}</span></td>
+                    <td style="font-weight:600;color:var(--ink);">${esc(l.productName)}</td>
+                    <td>${esc(l.brandName)}</td>
+                    <td>${esc(l.assetName)}</td>
+                    <td><span class="qty-badge">${esc(l.qty)}</span></td>
+                    ${S.isSuperAdmin ? `<td>${l.sentQty === "—" ? `<span style="color:var(--ink-ghost); font-family:var(--mono); padding-left:12px;">—</span>` : `<span class="qty-badge" style="background:var(--blue-bg); color:var(--blue); border-color:#bfdbfe;">${esc(String(l.sentQty))}</span>`}</td>` : ""}
+                </tr>`).join("")}</tbody>
+            </table>`
+                : `<div style="padding:24px;text-align:center;font-size:13px;color:var(--ink-muted);">No products in this order</div>`;
+
+            status = rec[f.status] || "Pending";
+            document.getElementById("drawerBody").innerHTML = `
+        <div class="stat-cards">
+            <div class="stat-card">
+                <div class="stat-lbl">Total Items</div>
+                <div class="stat-val">${lines.length}</div>
+                <div class="stat-sub">product lines</div>
+            </div>
+            <div class="stat-card sc-2">
+                <div class="stat-lbl">Branch</div>
+                <div class="stat-val" style="font-size:14px;letter-spacing:0;font-weight:600;margin-top:4px;">${esc(branchName(rec[f.branch]))}</div>
+                <div class="stat-sub">assigned branch</div>
+            </div>
+        </div>
+
+        <div class="d-sec">
+            <div class="d-sec-hdr">
+                <div class="d-sec-hdr-icon">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                </div>
+                <div class="d-sec-title">Order Details</div>
+            </div>
+            <div class="d-grid">
+                <div><div class="d-lbl">Order ID</div><div class="d-val mono">${esc(rec[f.orderId] || "—")}</div></div>
+                <div><div class="d-lbl">Order Date</div><div class="d-val">${fmtDate(rec[f.date])}</div></div>
+                <div><div class="d-lbl">Status</div><div class="d-val"><span class="badge ${statusClass(status)}">${esc(status)}</span></div></div>
+                <div><div class="d-lbl">Branch</div><div class="d-val">${esc(branchName(rec[f.branch]))}</div></div>
+                ${rec[f.manual] ? `<div class="d-field-full"><div class="d-lbl">Manual Request</div><div class="d-val" style="white-space:pre-wrap;">${esc(rec[f.manual])}</div></div>` : ""}
+            </div>
+        </div>
+
+        <div class="d-sec">
+            <div class="d-sec-hdr">
+                <div class="d-sec-hdr-icon">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                </div>
+                <div class="d-sec-title">Products (${lines.length})</div>
+            </div>
+            ${ptbl}
+        </div>
+
+        <div class="d-sec">
+            <div class="d-sec-hdr">
+                <div class="d-sec-hdr-icon">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <div class="d-sec-title">Record Info</div>
+            </div>
+            <div class="d-grid">
+                <div class="d-field-full"><div class="d-lbl">Record ID</div><div class="d-val mono">${esc(String(rec.ID))}</div></div>
+                ${rec.Added_Time ? `<div><div class="d-lbl">Created</div><div class="d-val">${esc(rec.Added_Time)}</div></div>` : ""}
+                ${rec.Modified_Time ? `<div><div class="d-lbl">Modified</div><div class="d-val">${esc(rec.Modified_Time)}</div></div>` : ""}
+            </div>
+        </div>`;
+        }
+
+        function closeDrawer() {
+            document.getElementById("drawerOv").classList.remove("open");
+            document.querySelectorAll("tbody tr").forEach(r => r.classList.remove("selected"));
+            S.drawerRec = null;
+        }
+        function handleDrawerOvClick(e) { if (e.target === document.getElementById("drawerOv")) closeDrawer(); }
+        function editFromDrawer() { if (S.drawerRec) { const id = S.drawerRec.ID; closeDrawer(); openEdit(id); } }
+        function deleteFromDrawer() { if (S.drawerRec) { const id = S.drawerRec.ID; closeDrawer(); confirmDelete(id); } }
+        function sendFromDrawer() { if (S.drawerRec) { openSendModal(S.drawerRec.ID); } }
+        function cancelFromDrawer() { if (S.drawerRec) { updateStatus(S.drawerRec.ID, "Cancelled"); } }
+
+        async function updateStatus(id, newStatus) {
+            setLoading(true);
+            try {
+                const data = {};
+                data[CFG.f.status] = newStatus;
+                const resp = await ZOHO.CREATOR.API.updateRecord({
+                    appName: CFG.appName, reportName: CFG.orderReport,
+                    id: id, data: { data }
+                });
+                if (resp && resp.code !== 3000) throw new Error(resp.message || JSON.stringify(resp));
+                toast(`Order ${newStatus} ✓`, "ok");
+                loadAll();
+                if (S.drawerRec && String(S.drawerRec.ID) === String(id)) closeDrawer();
+            } catch (err) {
+                toast("Update failed", "err");
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        // ─────────────────────────────────────────────
+        // SEND MODAL LOGIC
+        // ─────────────────────────────────────────────
+        async function openSendModal(id) {
+            setLoading(true);
+            try {
+                const resp = await ZOHO.CREATOR.API.getRecordById({
+                    appName: CFG.appName, reportName: CFG.orderReport, id: id
+                });
+                if (!resp || !resp.data) throw new Error("Order details not found");
+                const rec = resp.data;
+                S.sendRec = rec;
+
+                document.getElementById("sendOrderId").textContent = rec[CFG.f.orderId] || "—";
+                document.getElementById("sendBranchName").textContent = branchName(rec[CFG.f.branch]);
+                document.getElementById("fSendNotes").value = "";
+                document.getElementById("sendFormErr").textContent = "";
+
+                const itemsBody = document.getElementById("sendItemsBody");
+                const sf = CFG.f.sf;
+
+                // Auto-detect subform
+                let products = Array.isArray(rec[CFG.f.products]) ? rec[CFG.f.products] : [];
+                if (products.length === 0 || typeof products[0] !== "object") {
+                    for (const k in rec) {
+                        if (Array.isArray(rec[k]) && rec[k].length > 0 && typeof rec[k][0] === "object") {
+                            products = rec[k];
+                            break;
+                        }
+                    }
+                }
+                S.sendItems = products.map((p, i) => {
+                    const sf = CFG.f.sf;
+                    const getF = (searchTerms) => {
+                        const keys = Object.keys(p);
+                        for (const term of searchTerms) {
+                            const lowTerm = term.toLowerCase().replace(/_/g, " ");
+                            let match = keys.find(k => k.toLowerCase().replace(/_/g, " ") === lowTerm);
+                            if (match) return p[match];
+                            match = keys.find(k => k.toLowerCase().replace(/_/g, " ").includes(lowTerm));
+                            if (match) return p[match];
+                        }
+                        return null;
+                    };
+                    const rawProd = getF([sf.product, "Product", "Product_Name", "Item", "Product_Name_Selection"]);
+                    const rawQty = getF([sf.qty, "Ordered_Qty", "Qty", "Quantity", "Ordered"]);
+
+                    let name = productName(rawProd);
+                    let ordered = parseInt(rawQty || 0, 10);
+
+                    if (name === "—" || ordered === 0) {
+                        const parts = (p.display_value || "").split(",").map(s => s.trim());
+                        if (parts.length >= 4) {
+                            if (name === "—") name = parts[0];
+                            if (ordered === 0) ordered = parseInt(parts[3] || 0, 10);
+                        }
+                    }
+                    if (name === "—") {
+                        for (const k in p) {
+                            const pn = productName(p[k]);
+                            if (pn !== "—") { name = pn; break; }
+                        }
+                    }
+                    if (ordered === 0) {
+                        for (const k in p) {
+                            const val = parseInt(p[k], 10);
+                            if (!isNaN(val) && val > 0 && val < 10000 && String(p[k]).length < 8) {
+                                ordered = val; break;
+                            }
+                        }
+                    }
+                    // Store enriched data
+                    const pMatch = S.products.find(x => x.name === name);
+                    return {
+                        rowId: lookupId(p),
+                        prodId: pMatch?.id || lookupId(rawProd),
+                        brandId: pMatch?.brandId || "",
+                        assetId: pMatch?.assetId || "",
+                        name: name,
+                        ordered: ordered,
+                        original: p
+                    };
+                });
+
+                itemsBody.innerHTML = S.sendItems.map((item, i) => `
+                    <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; align-items:center; padding:0 8px;">
+                        <div style="font-size:14px; color:var(--ink-soft);">${esc(item.name)}</div>
+                        <div style="text-align:center; font-size:14px; color:var(--ink-soft);">${item.ordered}</div>
+                        <div style="text-align:right;">
+                            <input type="number" class="send-qty-input" 
+                                   data-idx="${i}" data-ordered="${item.ordered}" 
+                                   value="${item.ordered}" min="0" max="${item.ordered}" 
+                                   style="width:80px; padding:8px; text-align:center; border:1px solid #e2e5ed; border-radius:6px; font-size:14px; font-family:inherit;">
+                        </div>
+                    </div>
+                `).join("");
+
+                document.getElementById("sendModalOv").classList.add("open");
+            } catch (e) {
+                toast("Error: " + e.message, "err");
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        function closeSendModal() {
+            document.getElementById("sendModalOv").classList.remove("open");
+            S.sendRec = null;
+        }
+        function handleSendModalOvClick(e) { if (e.target === document.getElementById("sendModalOv")) closeSendModal(); }
+
+
+        async function confirmSend() {
+            if (!S.sendRec || !S.sendItems) return;
+            const rec = S.sendRec;
+            const products = S.sendItems;
+            const inputs = document.querySelectorAll(".send-qty-input");
+            const subform = [];
+            const ff = CFG.f;
+            const sf = ff.sf;
+
+            // Validate and build subform data
+            for (const input of inputs) {
+                const idx = parseInt(input.dataset.idx, 10);
+                const sent = parseInt(input.value, 10);
+                const ordered = parseInt(input.dataset.ordered, 10);
+
+                if (isNaN(sent) || sent < 0) {
+                    document.getElementById("sendFormErr").textContent = "Invalid quantity entered.";
+                    return;
+                }
+                if (sent > ordered) {
+                    document.getElementById("sendFormErr").textContent = "Sent quantity cannot exceed ordered quantity.";
+                    return;
+                }
+
+                const item = products[idx];
+                const p = item.original;
+
+                const newRow = {};
+                // Targeting the existing row ID removed per user request
+                // if (item.rowId) newRow.ID = item.rowId; 
+
+                // ✅ REVERT TO PLAIN STRING IDs (matching your working Edit console)
+                newRow[sf.product] = item.prodId;
+
+                const findIdInRow = (searchTerms, excludeVal = "") => {
+                    const keys = Object.keys(p);
+                    for (const term of searchTerms) {
+                        const lowTerm = term.toLowerCase().replace(/_/g, " ");
+                        const match = keys.find(k => k.toLowerCase().replace(/_/g, " ").includes(lowTerm));
+                        if (match && p[match]) {
+                            const val = lookupId(p[match]);
+                            if (val && val !== excludeVal) return val;
+                        }
+                    }
+                    return "";
+                };
+
+                // ✅ Mirror Brand and Asset from our enriched data
+                if (item.brandId) newRow[sf.brand] = item.brandId;
+                if (item.assetId) newRow[sf.assetType] = item.assetId;
+
+                newRow[sf.qty] = parseInt(item.ordered || 0, 10);
+                newRow[sf.sentQty] = parseInt(sent || 0, 10);
+
+                if (newRow[sf.product]) subform.push(newRow);
+            }
+
+            // ✅ Helper to ensure exact Zoho Date Format (DD-MMM-YYYY)
+            const fmtZoho = (d) => {
+                if (!d) return "";
+                try {
+                    const dt = new Date(d);
+                    if (isNaN(dt)) return String(d);
+                    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                    const day = String(dt.getDate()).padStart(2, "0");
+                    const mon = months[dt.getMonth()];
+                    const year = dt.getFullYear();
+                    return `${day}-${mon}-${year}`;
+                } catch { return String(d); }
+            };
+
+            const notes = document.getElementById("fSendNotes").value.trim();
+            const zDate = fmtZoho(rec[ff.date]);
+
+            // ✅ MIRROR WORKING PAYLOAD EXACTLY (from your log)
+            const updatePayload = {
+                [ff.status]: "Delivered",
+                [ff.products]: subform,
+                [ff.branch]: lookupId(rec[ff.branch]),
+                "Date": zDate,
+                "Order_Date": zDate,
+                "order_date": zDate
+            };
+
+            const manualKey = ff.manual || "Manual_Product_Request";
+            if (notes) {
+                const existing = rec[manualKey] || "";
+                updatePayload[manualKey] = (existing ? existing + "\n" : "") + "Dispatch Notes: " + notes;
+            }
+
+            console.log("CRITICAL: Final Payload to Zoho:", JSON.stringify(updatePayload, null, 2));
+
+            document.getElementById("confirmSendBtn").disabled = true;
+            setLoading(true);
+            try {
+                const resp = await ZOHO.CREATOR.API.updateRecord({
+                    appName: CFG.appName,
+                    reportName: CFG.orderReport,
+                    id: rec.ID,
+                    data: { data: updatePayload }
+                });
+
+                console.log("CRITICAL: Raw Zoho Response:", resp);
+
+                if (resp && resp.code === 3000) {
+                    toast("Order marked as Delivered ✓", "ok");
+                    closeSendModal();
+                    if (S.drawerRec && String(S.drawerRec.ID) === String(rec.ID)) closeDrawer();
+                    loadAll();
+                } else {
+                    const errMsg = resp.message || JSON.stringify(resp);
+                    throw new Error(errMsg);
+                }
+            } catch (err) {
+                console.error("CRITICAL: API Failure:", err);
+                document.getElementById("sendFormErr").textContent = "Update Failed: " + (err.message || "Unknown error");
+                toast("Failed to update order", "err");
+            } finally {
+                document.getElementById("confirmSendBtn").disabled = false;
+                setLoading(false);
+            }
+        }
+
+        // ─────────────────────────────────────────────
+        // ADD / EDIT MODAL
+        // ─────────────────────────────────────────────
+        function todayISO() { return new Date().toISOString().split("T")[0]; }
+
+        function openAdd() {
+            S.editId = null; S.modalRows = [];
+            document.getElementById("modalTitle").textContent = "Add Order";
+            document.getElementById("submitTxt").textContent = "Add Order";
+            document.getElementById("fDate").value = todayISO();
+            document.getElementById("fStatus").value = "Pending";
+            document.getElementById("fBranch").value = "";
+            document.getElementById("fManual").value = "";
+            renderSubform(); hideFormErr();
+            document.getElementById("modalOv").classList.add("open");
+        }
+
+        async function openEdit(id) {
+            if (!S.isSuperAdmin) { toast("Permission denied", "err"); return; }
+            const o = S.all.find(x => String(x.ID) === String(id));
+            if (!o) return;
+            const f = CFG.f;
+            S.editId = id;
+
+            let dateVal = "";
+            if (o[f.date]) {
+                try { const d = new Date(o[f.date]); if (!isNaN(d)) dateVal = d.toISOString().split("T")[0]; }
+                catch { }
+            }
+
+            document.getElementById("fDate").value = dateVal;
+            document.getElementById("fStatus").value = o[f.status] || "Pending";
+            document.getElementById("fBranch").value = lookupId(o[f.branch]);
+            document.getElementById("fManual").value = o[f.manual] || "";
+
+            // Open modal immediately with basic fields
+            S.modalRows = [];
+            document.getElementById("modalTitle").textContent = "Edit Order";
+            document.getElementById("submitTxt").textContent = "Update Order";
+            document.getElementById("subformWrap").innerHTML =
+                `<div class="sf-empty" style="font-size:13px;color:var(--ink-muted);">Loading products…</div>`;
+            hideFormErr();
+            document.getElementById("modalOv").classList.add("open");
+
+            // Fetch the full record to get subform (Products_Selection) rows
+            setLoading(true);
+            try {
+                const resp = await ZOHO.CREATOR.API.getRecordById({
+                    appName: CFG.appName,
+                    reportName: CFG.orderReport,
+                    id: id
+                });
+                const full = resp?.data;
+                const rawLines = full && Array.isArray(full[f.products]) ? full[f.products] : [];
+                // Rows come as {display_value:'ProductName,AssetType,BrandName,Qty', ID:'...'}
+                // Reverse-lookup IDs by matching names from cached lists
+                S.modalRows = rawLines.map(l => {
+                    // Helper to check for a field with various naming conventions (Product, Product_Name, etc)
+                    const getF = (key) => {
+                        const lowKey = key.toLowerCase();
+                        const exactKey = Object.keys(l).find(k => k.toLowerCase() === lowKey);
+                        if (exactKey) return l[exactKey];
+                        // Try with underscores if spaces failed or vice versa
+                        const altKey = Object.keys(l).find(k => k.toLowerCase().replace(/_/g, " ") === lowKey.replace(/_/g, " "));
+                        return altKey ? l[altKey] : null;
+                    };
+
+                    const rawP = getF(f.sf.product);
+                    const rawB = getF(f.sf.brand);
+                    const rawA = getF(f.sf.assetType);
+                    const rawQ = getF(f.sf.qty);
+
+                    const pId = lookupId(rawP);
+                    const bId = lookupId(rawB);
+                    const aId = lookupId(rawA);
+                    const qVal = rawQ ?? "";
+
+                    if (pId) {
+                        return {
+                            rowId: String(l.ID || ""),
+                            productId: pId,
+                            brandId: bId,
+                            assetId: aId,
+                            qty: String(qVal)
+                        };
+                    }
+
+                    // Fallback to display_value parsing (e.g. "Product, Asset, Brand, Qty")
+                    const parts = (l.display_value || "").split(",").map(s => s.trim());
+                    const pName = parts[0] || "";
+                    const aName = parts[1] || "";
+                    const bName = parts[2] || "";
+                    const qtyFallback = parts[3] || "";
+
+                    const prod = S.products.find(p => p.name.toLowerCase().trim() === pName.toLowerCase().trim());
+                    const brand = S.brands.find(b => b.name.toLowerCase().trim() === bName.toLowerCase().trim());
+                    const asset = S.assets.find(a => a.name.toLowerCase().trim() === aName.toLowerCase().trim());
+
+                    return {
+                        rowId: String(l.ID || ""),
+                        productId: prod ? prod.id : "",
+                        brandId: bId || (brand ? brand.id : ""),
+                        assetId: aId || (asset ? asset.id : ""),
+                        qty: String(qVal || qtyFallback)
+                    };
+                });
+            } catch (e) {
+                S.modalRows = [];
+            } finally {
+                setLoading(false);
+                renderSubform();
+            }
+        }
+
+
+        function closeModal() {
+            document.getElementById("modalOv").classList.remove("open");
+            S.editId = null; S.modalRows = [];
+        }
+        function handleModalOvClick(e) { if (e.target === document.getElementById("modalOv")) closeModal(); }
+
+        async function submitForm() {
+            const date = document.getElementById("fDate").value;
+            const status = document.getElementById("fStatus").value;
+            const branch = document.getElementById("fBranch").value;
+
+            if (!date) { showFormErr("Order Date is required."); return; }
+            if (!branch) { showFormErr("Branch is required."); return; }
+            if (S.modalRows.length === 0) { showFormErr("Please add at least one product row."); return; }
+
+            for (let i = 0; i < S.modalRows.length; i++) {
+                const r = S.modalRows[i];
+                if (!r.productId) { showFormErr(`Row ${i + 1}: select a Product.`); return; }
+                if (!r.qty || parseInt(r.qty, 10) < 1) { showFormErr(`Row ${i + 1}: Ordered Qty must be ≥ 1.`); return; }
+            }
+
+            const sf = CFG.f.sf;
+            const ff = CFG.f;
+
+            // Build subform rows — DO NOT include row ID; Zoho replaces entire subform on update
+            const productsData = S.modalRows.map(r => {
+                const row = {};
+                row[sf.product] = r.productId;
+                if (r.brandId) row[sf.brand] = r.brandId;
+                if (r.assetId) row[sf.assetType] = r.assetId;
+                row[sf.qty] = parseInt(r.qty, 10);
+                return row;
+            });
+
+            const data = {};
+            const zd = toZohoDate(date);
+            data["Order_Date"] = zd;
+            data["order_date"] = zd;
+            data["Date"] = zd;
+            data[ff.status] = status;
+            data[ff.branch] = branch;
+            data[ff.products] = productsData;
+            const manual = document.getElementById("fManual").value.trim();
+            if (manual) data[ff.manual] = manual;
+            else data[ff.manual] = "";
+
+            document.getElementById("submitBtn").disabled = true;
+            setLoading(true);
+            console.log("Saving Order Data:", data);
+            try {
+                if (S.editId) {
+                    const resp = await ZOHO.CREATOR.API.updateRecord({
+                        appName: CFG.appName, reportName: CFG.orderReport,
+                        id: S.editId, data: { data }
+                    });
+                    if (resp && resp.code !== 3000) {
+                        throw new Error(resp.message || JSON.stringify(resp));
+                    }
+                    toast("Order updated ✓", "ok");
+                } else {
+                    const resp = await ZOHO.CREATOR.API.addRecord({
+                        appName: CFG.appName, formName: CFG.orderForm, data: { data }
+                    });
+                    console.log("Add Record Response:", resp);
+                    if (resp && resp.code !== 3000) {
+                        throw new Error(resp.message || JSON.stringify(resp));
+                    }
+                    toast("Order added ✓", "ok");
+                }
+                closeModal();
+                loadAll();   // Refresh from server so subform data is current
+            } catch (err) {
+                const msg = err?.message || err?.error || (typeof err === "string" ? err : JSON.stringify(err));
+                showFormErr(msg || "Save failed");
+                toast("Error saving order", "err");
+            } finally {
+                document.getElementById("submitBtn").disabled = false;
+                setLoading(false);
+            }
+        }
+
+        // ─────────────────────────────────────────────
+        // SEARCHABLE SELECT LOGIC
+        // ─────────────────────────────────────────────
+        function toggleSS(id, e) {
+            e?.stopPropagation();
+            const wrap = document.getElementById(id);
+            const menu = wrap.querySelector(".ss-menu");
+            const btn = wrap.querySelector(".ss-btn");
+            const isOpen = menu.classList.contains("open");
+
+            // Close all other SS menus
+            document.querySelectorAll(".ss-menu.open").forEach(m => {
+                if (m !== menu) {
+                    m.classList.remove("open");
+                    const w = m.closest(".ss-wrap");
+                    if (w) {
+                        w.querySelector(".ss-btn").classList.remove("active");
+                        w.classList.remove("open-up");
+                    }
+                }
+            });
+
+            if (isOpen) {
+                menu.classList.remove("open");
+                btn.classList.remove("active");
+                wrap.classList.remove("open-up");
+            } else {
+                // Check space below
+                const rect = btn.getBoundingClientRect();
+                const spaceBelow = window.innerHeight - rect.bottom;
+                const menuHeight = 220; // max-height 180 + search 40
+                
+                if (spaceBelow < menuHeight && rect.top > menuHeight) {
+                    wrap.classList.add("open-up");
+                } else {
+                    wrap.classList.remove("open-up");
+                }
+
+                menu.classList.add("open");
+                btn.classList.add("active");
+                const input = wrap.querySelector(".ss-search");
+                input.value = "";
+                filterSS(id, "");
+                setTimeout(() => input.focus(), 10);
+            }
+        }
+
+        function filterSS(id, q) {
+            const wrap = document.getElementById(id);
+            const query = q.toLowerCase().trim();
+            const opts = wrap.querySelectorAll(".ss-opt");
+            let found = 0;
+
+            opts.forEach(opt => {
+                const text = opt.textContent.toLowerCase();
+                const visible = text.includes(query);
+                opt.classList.toggle("hidden", !visible);
+                if (visible) found++;
+            });
+
+            const empty = wrap.querySelector(".ss-empty");
+            if (empty) empty.style.display = found === 0 ? "block" : "none";
+        }
+
+        function selectSS(idx, prodId) {
+            onProductChange(idx, prodId);
+            // Menus are closed by onProductChange -> renderSubform or by global click
+        }
+
+        // Global click to close SS menus
+        window.addEventListener("click", () => {
+            document.querySelectorAll(".ss-menu.open").forEach(m => m.classList.remove("open"));
+            document.querySelectorAll(".ss-btn.active").forEach(b => b.classList.remove("active"));
+        });
+
+        // ─────────────────────────────────────────────
+        // DELETE
+        // ─────────────────────────────────────────────
+        function confirmDelete(id) {
+            if (!S.isSuperAdmin) { toast("Permission denied", "err"); return; }
+            S.delId = id;
+            document.getElementById("delModalOv").classList.add("open");
+        }
+        function closeDelModal() {
+            document.getElementById("delModalOv").classList.remove("open");
+            S.delId = null;
+        }
+        function handleDelModalOvClick(e) { if (e.target === document.getElementById("delModalOv")) closeDelModal(); }
+
+        async function doDelete() {
+            if (!S.isSuperAdmin) return;
+            if (!S.delId) return;
+            const id = S.delId;
+            closeDelModal(); setLoading(true);
+            try {
+                await ZOHO.CREATOR.API.deleteRecord({
+                    appName: CFG.appName, reportName: CFG.orderReport, criteria: `(ID == ${id})`
+                });
+                S.all = S.all.filter(o => String(o.ID) !== String(id));
+                toast("Order deleted", "ok");
+                closeDrawer(); recompute();
+            } catch (e) {
+                const msg = e?.message || e?.error || e?.responseText || (typeof e === "string" ? e : JSON.stringify(e));
+                toast("Delete failed: " + msg, "err");
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        // ─────────────────────────────────────────────
+        // UI UTILITIES
+        // ─────────────────────────────────────────────
+        function setLoading(v) { document.getElementById("loadingBar").classList.toggle("active", v); }
+        function showErr(msg) { document.getElementById("gErrText").textContent = msg; document.getElementById("gErr").classList.add("show"); }
+        function hideErr() { document.getElementById("gErr").classList.remove("show"); }
+        function showFormErr(m) { const e = document.getElementById("formErr"); e.textContent = m; e.classList.add("show"); }
+        function hideFormErr() { document.getElementById("formErr").classList.remove("show"); }
+
+        function toast(msg, type = "ok") {
+            const shelf = document.getElementById("toasts");
+            const t = document.createElement("div");
+            t.className = `toast ${type}`;
+            t.innerHTML = `<span class="dot"></span>${esc(msg)}`;
+            shelf.appendChild(t);
+            setTimeout(() => { t.style.cssText = "opacity:0;transform:translateY(6px);transition:.22s"; setTimeout(() => t.remove(), 240); }, 3000);
+        }
+        function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+        function escA(s) { return String(s).replace(/'/g, "\\'"); }
+
+        // ─────────────────────────────────────────────
+        // BOOT
+        // ─────────────────────────────────────────────
+        // ─────────────────────────────────────────────
+        // RAISE TICKET LOGIC
+        // ─────────────────────────────────────────────
+        function openRaiseTicketFromDrawer() {
+            if (S.drawerRec) openRaiseTicket(S.drawerRec.ID);
+        }
+
+        function openRaiseTicket(orderId) {
+            const o = S.all.find(x => String(x.ID) === String(orderId));
+            if (!o) return;
+
+            S.ticketId = orderId;
+            document.getElementById("tk-order").value = o[CFG.f.orderId] || "—";
+            document.getElementById("tk-branch").value = branchName(o[CFG.f.branch]);
+
+            const catSel = document.getElementById("tk-category");
+            catSel.innerHTML = `<option value="">Select Category</option>` +
+                S.tCategories.map(c => `<option value="${escA(c.id)}">${esc(c.name)}</option>`).join("");
+
+            document.getElementById("tk-desc").value = "";
+            document.getElementById("tk-priority").value = "High";
+            document.getElementById("tk-attachment").value = "";
+            document.getElementById("ticketFormErr").textContent = "";
+            document.getElementById("ticketFormErr").classList.remove("show");
+
+            document.getElementById("ticketModalOv").classList.add("open");
+        }
+
+        function closeTicketModal() {
+            document.getElementById("ticketModalOv").classList.remove("open");
+            S.ticketId = null;
+        }
+
+        async function submitTicket() {
+            const catId = document.getElementById("tk-category").value;
+            const desc = document.getElementById("tk-desc").value.trim();
+            const prio = document.getElementById("tk-priority").value;
+            const files = document.getElementById("tk-attachment").files;
+            const err = document.getElementById("ticketFormErr");
+
+            if (!catId) { err.textContent = "Please select a category."; err.classList.add("show"); return; }
+            const o = S.all.find(x => String(x.ID) === String(S.ticketId));
+            if (!o) { toast("Order not found", "err"); return; }
+
+            setLoading(true);
+            const btn = document.getElementById("tk-submitBtn");
+            btn.disabled = true;
+            err.classList.remove("show");
+
+            try {
+                // Step 1: Create the record WITHOUT attachments
+                const payload = {
+                    Ticket_Category: String(catId),
+                    Order: String(S.ticketId),
+                    Branch: lookupId(o[CFG.f.branch]),
+                    Description: desc,
+                    Priority: prio,
+                    Status: "Pending"
+                };
+
+                console.log("RAISE TICKET: Step 1 - Creating Record:", payload);
+
+                const resp = await ZOHO.CREATOR.API.addRecord({
+                    appName: CFG.appName,
+                    formName: CFG.ticketForm,
+                    data: { data: payload }
+                });
+
+                console.log("RAISE TICKET: Step 1 Response:", resp);
+
+                if (resp && resp.code === 3000) {
+                    const newId = resp.data.ID;
+
+                    // Step 2: Upload Attachments if any
+                    if (files && files.length > 0) {
+                        toast("Ticket created. Uploading attachments...", "ok");
+
+                        for (let i = 0; i < files.length; i++) {
+                            try {
+                                const upResp = await ZOHO.CREATOR.API.uploadFile({
+                                    appName: CFG.appName,
+                                    reportName: CFG.ticketReport, // File upload needs report name
+                                    id: newId,
+                                    fieldName: "Attachment",
+                                    file: files[i]
+                                });
+                                console.log(`RAISE TICKET: File ${i + 1} upload response:`, upResp);
+                            } catch (upErr) {
+                                console.error(`RAISE TICKET: File ${i + 1} failed:`, upErr);
+                            }
+                        }
+                    }
+
+                    toast("Ticket raised successfully! ✓", "ok");
+                    closeTicketModal();
+                } else {
+                    const msg = resp.message || (resp.error ? JSON.stringify(resp.error) : `Error ${resp.code || 'Unknown'}`);
+                    throw new Error(msg);
+                }
+            } catch (e) {
+                console.error("RAISE TICKET: Failure:", e);
+                err.textContent = "Submission Failed: " + (e.message || String(e));
+                err.classList.add("show");
+            } finally {
+                setLoading(false);
+                btn.disabled = false;
+            }
+        }
+        function handleTicketModalOvClick(e) { if (e.target === document.getElementById("ticketModalOv")) closeTicketModal(); }
+        document.getElementById("ticketModalOv").addEventListener("click", handleTicketModalOvClick);
+
+        async function init() {
+            document.getElementById("addBtn").addEventListener("click", openAdd);
+            document.addEventListener("click", () => closeDropdowns());
+            document.addEventListener("keydown", e => {
+                if (e.key !== "Escape") return;
+                closeModal(); closeDrawer(); closeDropdowns(); closeDelModal(); closeTicketModal();
+            });
+            try {
+                await ZOHO.CREATOR.init();
+                const initParams = await ZOHO.CREATOR.UTIL.getInitParams() || {};
+                const loginUser = initParams.loginUser || "";
+                if (loginUser) {
+                    try {
+                        const allMappedUsers = await fetchAll(CFG.roleReport);
+                        const emailToMatch = loginUser.toLowerCase().trim();
+                        S.isSuperAdmin = allMappedUsers.some(m => {
+                            const u = m.User;
+                            if (!u) return false;
+                            const currentEmail = (typeof u === "string" ? u : (u.email || u.display_value || "")).toLowerCase().trim();
+                            return currentEmail === emailToMatch && m.Role === "Super Admin";
+                        });
+                    } catch (apiErr) { console.error("Permission check failed:", apiErr); }
+                }
+                // UI Status Update
+                const badge = document.getElementById("adminBadge");
+                const actHdr = document.getElementById("actionsHeader");
+                const rHdr = document.getElementById("raiseHeader");
+                if (badge) badge.style.display = S.isSuperAdmin ? "inline-block" : "none";
+                if (actHdr) actHdr.style.display = S.isSuperAdmin ? "table-cell" : "none";
+                if (rHdr) rHdr.style.display = S.isSuperAdmin ? "none" : "table-cell";
+
+                await loadAll();
+            } catch (e) { showErr("SDK init failed: " + (e?.message ?? String(e))); }
+        }
+        document.readyState === "loading"
+            ? document.addEventListener("DOMContentLoaded", init)
+            : init();
+    </script>
+</body>
+
+</html>

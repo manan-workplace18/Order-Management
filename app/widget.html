@@ -1,0 +1,2726 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Management</title>
+    <script src="https://js.zohostatic.com/creator/widgets/version/1.0/widgetsdk-min.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --ink: #0f1117;
+            --ink-soft: #3d4252;
+            --ink-muted: #7c8296;
+            --ink-ghost: #b0b6c8;
+            --surface: #ffffff;
+            --surface-2: #f4f5f8;
+            --surface-3: #eceef3;
+            --surface-4: #e2e5ed;
+            --accent: #4f6ef7;
+            --accent-2: #7c3aed;
+            --accent-glow: rgba(79, 110, 247, .18);
+            --green: #059669;
+            --green-bg: #d1fae5;
+            --red: #dc2626;
+            --red-bg: #fee2e2;
+            --border: #e2e5ed;
+            --border-focus: #4f6ef7;
+            --r-sm: 6px;
+            --r-md: 10px;
+            --r-lg: 16px;
+            --r-xl: 22px;
+            --shadow-xs: 0 1px 2px rgba(15, 17, 23, .06);
+            --shadow-sm: 0 2px 6px rgba(15, 17, 23, .08);
+            --shadow-lg: 0 12px 40px rgba(15, 17, 23, .14);
+            --shadow-xl: 0 24px 64px rgba(15, 17, 23, .18);
+            --font: 'DM Sans', sans-serif;
+            --mono: 'DM Mono', monospace;
+            --tr: 200ms cubic-bezier(.4, 0, .2, 1);
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--surface-2);
+            color: var(--ink);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-size: 14px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            overflow: hidden;
+        }
+
+        /* ── TOPBAR ─────────────────────────────────── */
+        .topbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-xs);
+            flex-shrink: 0;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .app-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            border-radius: var(--r-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            box-shadow: 0 2px 8px var(--accent-glow);
+        }
+
+        .app-title {
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: -.2px;
+        }
+
+        .app-subtitle {
+            font-size: 12px;
+            color: var(--ink-muted);
+            margin-top: 1px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Top loading bar */
+        .loading-bar {
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2), var(--accent));
+            background-size: 200% 100%;
+            animation: lbar 1.2s linear infinite;
+            position: fixed;
+            top: 56px;
+            left: 0;
+            right: 0;
+            z-index: 999;
+            display: none;
+        }
+
+        .loading-bar.active {
+            display: block;
+        }
+
+        @keyframes lbar {
+            0% {
+                background-position: 200% 0
+            }
+
+            100% {
+                background-position: -200% 0
+            }
+        }
+
+        .main {
+            padding: 20px 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ── BUTTONS ────────────────────────────────── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: var(--r-md);
+            font-size: 13px;
+            font-weight: 600;
+            font-family: var(--font);
+            cursor: pointer;
+            transition: var(--tr);
+            white-space: nowrap;
+            outline: none;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(79, 110, 247, .3);
+        }
+
+        .btn-primary:hover {
+            background: #3d5ce6;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(79, 110, 247, .4);
+        }
+
+        .btn-primary:active {
+            transform: none;
+        }
+
+        .btn-primary:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--ink-soft);
+            border: 1px solid var(--border);
+        }
+
+        .btn-ghost:hover {
+            background: var(--surface-3);
+            color: var(--ink);
+        }
+
+        .btn-icon {
+            padding: 7px;
+            background: var(--surface);
+            color: var(--ink-muted);
+            border: 1px solid var(--border);
+            border-radius: var(--r-md);
+            cursor: pointer;
+            transition: var(--tr);
+            display: flex;
+        }
+
+        .btn-icon:hover {
+            background: var(--surface-3);
+            color: var(--ink);
+        }
+
+        /* ── TOOLBAR ────────────────────────────────── */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+
+        .search-wrap {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+            max-width: 340px;
+        }
+
+        .search-wrap .s-icon {
+            position: absolute;
+            left: 11px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--ink-ghost);
+            pointer-events: none;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 8px 12px 8px 34px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-md);
+            font-size: 13px;
+            font-family: var(--font);
+            background: var(--surface);
+            color: var(--ink);
+            outline: none;
+            transition: var(--tr);
+        }
+
+        .search-input:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .search-input::placeholder {
+            color: var(--ink-ghost);
+        }
+
+        .spacer {
+            flex: 1;
+        }
+
+        .sort-select {
+            padding: 7px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-md);
+            font-size: 12px;
+            font-family: var(--font);
+            color: var(--ink-soft);
+            background: var(--surface);
+            outline: none;
+            cursor: pointer;
+            transition: var(--tr);
+        }
+
+        .sort-select:focus {
+            border-color: var(--border-focus);
+        }
+
+        /* ── FILTER BAR (Zoho-style inline) ─────────── */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 10px;
+            padding: 10px 14px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-lg);
+            box-shadow: var(--shadow-xs);
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 10;
+            flex-shrink: 0;
+        }
+
+        .fb-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--ink-muted);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .fb-sep {
+            width: 1px;
+            height: 18px;
+            background: var(--border);
+            margin: 0 2px;
+        }
+
+        /* Filter dropdown wrapper */
+        .fd-wrap {
+            position: relative;
+        }
+
+        /* Filter button */
+        .fd-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            background: var(--surface);
+            font-size: 12px;
+            font-weight: 600;
+            font-family: var(--font);
+            color: var(--ink-soft);
+            cursor: pointer;
+            transition: var(--tr);
+            white-space: nowrap;
+        }
+
+        .fd-btn:hover {
+            background: var(--surface-2);
+            color: var(--ink);
+            border-color: var(--ink-ghost);
+        }
+
+        .fd-btn.has-value {
+            background: rgba(79, 110, 247, .08);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .fd-btn.is-open {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+
+        .fd-count {
+            background: var(--accent);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            min-width: 16px;
+            height: 16px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+        }
+
+        .fd-chevron {
+            transition: transform var(--tr);
+            opacity: .5;
+        }
+
+        .fd-btn.is-open .fd-chevron {
+            transform: rotate(180deg);
+        }
+
+        /* Dropdown menu */
+        .fd-menu {
+            position: absolute;
+            top: calc(100% + 5px);
+            left: 0;
+            min-width: 210px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-md);
+            box-shadow: var(--shadow-lg);
+            z-index: 400;
+            display: none;
+            padding: 6px;
+        }
+
+        .fd-menu.right {
+            left: auto;
+            right: 0;
+        }
+
+        .fd-menu.open {
+            display: block;
+            animation: dropIn .14s ease;
+        }
+
+        @keyframes dropIn {
+            from {
+                opacity: 0;
+                transform: translateY(-5px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        /* Dropdown search input */
+        .fd-search {
+            width: 100%;
+            padding: 7px 10px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            font-size: 12px;
+            font-family: var(--font);
+            color: var(--ink);
+            background: var(--surface-2);
+            outline: none;
+            margin-bottom: 5px;
+        }
+
+        .fd-search:focus {
+            border-color: var(--border-focus);
+            background: var(--surface);
+        }
+
+        /* Scrollable list */
+        .fd-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .fd-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .fd-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .fd-list::-webkit-scrollbar-thumb {
+            background: var(--surface-4);
+            border-radius: 2px;
+        }
+
+        /* ── FIX: Pure div-based checkboxes (no label/input conflict) ── */
+        .fd-item {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 7px 8px;
+            border-radius: var(--r-sm);
+            cursor: pointer;
+            user-select: none;
+            transition: background var(--tr);
+        }
+
+        .fd-item:hover {
+            background: var(--surface-2);
+        }
+
+        .fd-item.selected {
+            background: rgba(79, 110, 247, .06);
+        }
+
+        .fd-check {
+            width: 15px;
+            height: 15px;
+            border: 1.5px solid var(--border);
+            border-radius: 3px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--tr);
+        }
+
+        .fd-item.selected .fd-check {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .fd-item.selected .fd-check::after {
+            content: '';
+            width: 8px;
+            height: 5px;
+            border-left: 2px solid #fff;
+            border-bottom: 2px solid #fff;
+            transform: rotate(-45deg) translateY(-1px);
+            display: block;
+        }
+
+        .fd-item-label {
+            font-size: 12px;
+            color: var(--ink);
+            flex: 1;
+        }
+
+        .fd-empty {
+            padding: 10px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--ink-muted);
+        }
+
+        /* Qty range inside dropdown */
+        .fd-range {
+            padding: 4px 2px;
+        }
+
+        .fd-range-title {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--ink-muted);
+            margin-bottom: 6px;
+        }
+
+        .fd-range-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .fd-num {
+            width: 100%;
+            padding: 7px 9px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            font-size: 12px;
+            font-family: var(--font);
+            color: var(--ink);
+            background: var(--surface);
+            outline: none;
+        }
+
+        .fd-num:focus {
+            border-color: var(--border-focus);
+        }
+
+        .fd-apply {
+            width: 100%;
+            padding: 7px;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: var(--r-sm);
+            font-size: 12px;
+            font-weight: 700;
+            font-family: var(--font);
+            cursor: pointer;
+            transition: var(--tr);
+        }
+
+        .fd-apply:hover {
+            background: #3d5ce6;
+        }
+
+        /* Clear filters btn */
+        .fd-clear {
+            display: none;
+            align-items: center;
+            gap: 4px;
+            padding: 5px 10px;
+            border: 1px solid #fca5a5;
+            border-radius: var(--r-sm);
+            background: var(--red-bg);
+            color: var(--red);
+            font-size: 12px;
+            font-weight: 600;
+            font-family: var(--font);
+            cursor: pointer;
+            transition: var(--tr);
+        }
+
+        .fd-clear:hover {
+            background: #fecaca;
+        }
+
+        .fd-clear.visible {
+            display: inline-flex;
+        }
+
+        /* Active filter chips */
+        .filter-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .filter-chips:empty {
+            display: none;
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px 4px 12px;
+            background: rgba(79, 110, 247, .1);
+            border: 1px solid rgba(79, 110, 247, .25);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--accent);
+            animation: chipIn .18s ease;
+        }
+
+        @keyframes chipIn {
+            from {
+                opacity: 0;
+                transform: scale(.85)
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1)
+            }
+        }
+
+        .chip-x {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--accent);
+            opacity: .6;
+            display: flex;
+            padding: 0;
+            transition: var(--tr);
+        }
+
+        .chip-x:hover {
+            opacity: 1;
+        }
+
+        /* ── TABLE CARD ──────────────────────────────── */
+        .table-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-lg);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .tc-header {
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .rec-count {
+            font-size: 12px;
+            color: var(--ink-muted);
+            font-weight: 500;
+        }
+
+        .rec-count strong {
+            color: var(--ink-soft);
+            font-weight: 700;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+            overflow-y: auto;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .table-wrap::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .table-wrap::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .table-wrap::-webkit-scrollbar-thumb {
+            background: var(--surface-4);
+            border-radius: 3px;
+        }
+
+        .table-wrap::-webkit-scrollbar-thumb:hover {
+            background: var(--ink-ghost);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead tr {
+            background: var(--surface-2);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+
+        th {
+            padding: 10px 16px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--ink-muted);
+            white-space: nowrap;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background var(--tr);
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: #f7f8fb;
+        }
+
+        tbody tr.selected {
+            background: rgba(79, 110, 247, .05);
+        }
+
+        td {
+            padding: 12px 16px;
+            font-size: 13px;
+            color: var(--ink-soft);
+            vertical-align: middle;
+        }
+
+        td.col-name {
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        .sn-mono {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--ink-muted);
+            background: var(--surface-2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+        }
+
+        .qty-pill {
+            font-family: var(--mono);
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .3px;
+            text-transform: uppercase;
+        }
+
+        .badge::before {
+            content: '';
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .badge-active {
+            background: var(--green-bg);
+            color: var(--green);
+        }
+
+        .badge-active::before {
+            background: var(--green);
+        }
+
+        .badge-inactive {
+            background: var(--surface-3);
+            color: var(--ink-muted);
+        }
+
+        .badge-inactive::before {
+            background: var(--ink-ghost);
+        }
+
+        .badge-inactive::before {
+            background: var(--ink-ghost);
+        }
+
+        .badge-admin {
+            background: #fff9db;
+            color: #f08c00;
+            border: 1px solid #ffe066;
+            box-shadow: 0 2px 4px rgba(240, 140, 0, 0.1);
+        }
+
+        .badge-admin::before {
+            background: #f08c00;
+        }
+
+        .row-acts {
+            display: flex;
+            gap: 4px;
+        }
+
+        .act-btn {
+            padding: 5px 10px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            background: var(--surface);
+            font-size: 11px;
+            font-weight: 600;
+            font-family: var(--font);
+            color: var(--ink-soft);
+            cursor: pointer;
+            transition: var(--tr);
+        }
+
+        .act-btn:hover {
+            background: var(--surface-3);
+        }
+
+        .act-btn.del {
+            color: var(--red);
+            border-color: #fca5a5;
+        }
+
+        .act-btn.del:hover {
+            background: var(--red-bg);
+            border-color: var(--red);
+        }
+
+        /* Skeleton */
+        @keyframes shimmer {
+            0% {
+                background-position: -600px 0
+            }
+
+            100% {
+                background-position: 600px 0
+            }
+        }
+
+        .sk-row td {
+            padding: 13px 16px;
+        }
+
+        .sk-cell {
+            height: 13px;
+            border-radius: 4px;
+            background: linear-gradient(90deg, var(--surface-3) 25%, var(--surface-4) 50%, var(--surface-3) 75%);
+            background-size: 600px 100%;
+            animation: shimmer 1.4s infinite;
+        }
+
+        /* Empty */
+        .t-empty {
+            padding: 60px 20px;
+            text-align: center;
+            color: var(--ink-muted);
+        }
+
+        .t-empty-icon {
+            font-size: 44px;
+            margin-bottom: 12px;
+        }
+
+        .t-empty-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--ink-soft);
+            margin-bottom: 4px;
+        }
+
+        .t-empty-sub {
+            font-size: 13px;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 11px 20px;
+            border-top: 1px solid var(--border);
+            background: var(--surface-2);
+            gap: 16px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+
+        .pg-info {
+            font-size: 12px;
+            color: var(--ink-muted);
+        }
+
+        .pg-size-wrap {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .pg-size-select {
+            padding: 5px 10px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            background: var(--surface);
+            font-size: 12px;
+            font-weight: 500;
+            font-family: var(--font);
+            color: var(--ink-soft);
+            cursor: pointer;
+            transition: var(--tr);
+            outline: none;
+        }
+
+        .pg-size-select:hover {
+            background: var(--surface-3);
+            color: var(--ink);
+        }
+
+        .pg-size-select:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+
+        .pg-ctrl {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .pg-btn {
+            padding: 5px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            background: var(--surface);
+            font-size: 12px;
+            font-weight: 600;
+            font-family: var(--font);
+            color: var(--ink-soft);
+            cursor: pointer;
+            transition: var(--tr);
+        }
+
+        .pg-btn:hover:not(:disabled) {
+            background: var(--surface-3);
+            color: var(--ink);
+        }
+
+        .pg-btn:disabled {
+            opacity: .4;
+            cursor: not-allowed;
+        }
+
+        .pg-btn.active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+
+        /* ── DETAIL DRAWER ───────────────────────────── */
+        .drawer-ov {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 17, 23, .4);
+            z-index: 500;
+            backdrop-filter: blur(4px);
+        }
+
+        .drawer-ov.open {
+            display: block;
+            animation: fadeOv .25s ease;
+        }
+
+        @keyframes fadeOv {
+            from {
+                opacity: 0;
+                backdrop-filter: blur(0px)
+            }
+
+            to {
+                opacity: 1;
+                backdrop-filter: blur(4px)
+            }
+        }
+
+        .drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 620px;
+            background: #fafbfe;
+            box-shadow: -8px 0 32px rgba(15, 17, 23, .12);
+            display: flex;
+            flex-direction: column;
+            z-index: 501;
+            transform: translateX(100%);
+            transition: transform 350ms cubic-bezier(.16, 1, .3, 1);
+        }
+
+        .drawer-ov.open .drawer {
+            transform: translateX(0);
+        }
+
+        .drawer-hdr {
+            padding: 24px 28px 20px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+            box-shadow: var(--shadow-xs);
+            position: relative;
+            z-index: 10;
+        }
+
+        .drawer-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .d-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            border-radius: var(--r-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 6px 16px var(--accent-glow);
+            color: #fff;
+        }
+
+        .d-name {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--ink);
+            letter-spacing: -.4px;
+            margin-bottom: 6px;
+            line-height: 1.2;
+        }
+
+        .d-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .d-id {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--ink-soft);
+            background: var(--surface-3);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .d-close {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            color: var(--ink-muted);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--tr);
+            flex-shrink: 0;
+            box-shadow: var(--shadow-xs);
+        }
+
+        .d-close:hover {
+            background: var(--surface-2);
+            color: var(--ink);
+            transform: rotate(90deg);
+        }
+
+        .d-acts {
+            display: flex;
+            gap: 10px;
+        }
+
+        .d-acts .btn {
+            flex: 1;
+            justify-content: center;
+            padding: 10px 16px;
+            border-radius: var(--r-md);
+            font-size: 13px;
+        }
+
+        .drawer-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Stats Cards - Modern look */
+        .stat-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-lg);
+            padding: 18px 20px;
+            box-shadow: var(--shadow-xs);
+            transition: transform var(--tr), box-shadow var(--tr);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--accent);
+            border-radius: 4px 0 0 4px;
+            opacity: 0.8;
+        }
+
+        .stat-card.sc-2::before {
+            background: var(--accent-2);
+        }
+
+        .stat-lbl {
+            font-size: 12px;
+            color: var(--ink-muted);
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .stat-val {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--ink);
+            font-family: var(--mono);
+            letter-spacing: -1px;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .stat-sub {
+            font-size: 12px;
+            color: var(--ink-soft);
+            font-weight: 500;
+        }
+
+        /* Capacity Card */
+        .cap-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-lg);
+            padding: 18px 20px;
+            box-shadow: var(--shadow-xs);
+        }
+
+        .cap-hdr {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            align-items: flex-end;
+        }
+
+        .cap-lbl {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--ink-soft);
+        }
+
+        .cap-val {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--accent);
+            font-family: var(--mono);
+        }
+
+        .prog-bg {
+            height: 8px;
+            background: var(--surface-3);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .prog-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            border-radius: 4px;
+            transition: width .8s cubic-bezier(.16, 1, .3, 1);
+            box-shadow: 0 0 8px var(--accent-glow);
+        }
+
+        .prog-label {
+            font-size: 12px;
+            color: var(--ink-muted);
+            display: flex;
+            justify-content: space-between;
+            font-weight: 500;
+        }
+
+        /* Detail Sections */
+        .d-sec {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-lg);
+            box-shadow: var(--shadow-xs);
+        }
+
+        .d-sec-hdr {
+            padding: 16px 20px 14px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .d-sec-hdr-icon {
+            color: var(--accent);
+            display: flex;
+            background: rgba(79, 110, 247, .1);
+            padding: 6px;
+            border-radius: var(--r-sm);
+        }
+
+        .d-sec-title {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            color: var(--ink);
+        }
+
+        .d-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px 16px;
+            padding: 20px;
+        }
+
+        .d-field-full {
+            grid-column: 1/-1;
+        }
+
+        .d-lbl {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--ink-muted);
+            margin-bottom: 6px;
+        }
+
+        .d-val {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--ink);
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
+        .d-val.big {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .d-val.mono {
+            font-family: var(--mono);
+            color: var(--ink-soft);
+            font-weight: 500;
+            background: var(--surface-2);
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            display: inline-block;
+        }
+
+        /* ── MODAL ───────────────────────────────────── */
+        .modal-ov {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 17, 23, .45);
+            z-index: 600;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-ov.open {
+            display: flex;
+            animation: fadeOv .2s ease;
+        }
+
+        .modal {
+            background: var(--surface);
+            border-radius: var(--r-xl);
+            width: 100%;
+            max-width: 560px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+            animation: mSlide .22s cubic-bezier(.4, 0, .2, 1);
+        }
+
+        @keyframes mSlide {
+            from {
+                opacity: 0;
+                transform: translateY(18px) scale(.97)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1)
+            }
+        }
+
+        .modal-hdr {
+            padding: 20px 22px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            color: var(--ink-muted);
+            border-radius: var(--r-sm);
+            padding: 6px;
+            display: flex;
+            transition: var(--tr);
+        }
+
+        .modal-close:hover {
+            background: var(--surface-3);
+        }
+
+        .modal-body {
+            padding: 20px 22px;
+        }
+
+        .modal-foot {
+            padding: 14px 22px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .form-grp {
+            margin-bottom: 14px;
+        }
+
+        .form-grp:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-lbl {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--ink-soft);
+            margin-bottom: 5px;
+        }
+
+        .req {
+            color: var(--red);
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            font-size: 13px;
+            font-family: var(--font);
+            color: var(--ink);
+            background: var(--surface);
+            outline: none;
+            transition: var(--tr);
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .form-err {
+            display: none;
+            padding: 9px 12px;
+            background: var(--red-bg);
+            color: var(--red);
+            border: 1px solid #fca5a5;
+            border-radius: var(--r-sm);
+            font-size: 13px;
+            margin-bottom: 14px;
+        }
+
+        .form-err.show {
+            display: block;
+        }
+
+        /* ── GLOBAL ERROR ────────────────────────────── */
+        .g-err {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            background: var(--red-bg);
+            border: 1px solid #fca5a5;
+            color: var(--red);
+            padding: 10px 14px;
+            border-radius: var(--r-md);
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        .g-err.show {
+            display: flex;
+        }
+
+        /* ── TOAST ───────────────────────────────────── */
+        .toast-shelf {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9000;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: var(--ink);
+            color: #fff;
+            padding: 11px 16px;
+            border-radius: var(--r-md);
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            min-width: 240px;
+            pointer-events: auto;
+            animation: toastIn .28s ease;
+        }
+
+        .toast.ok .dot {
+            background: #34d399;
+        }
+
+        .toast.err .dot {
+            background: #f87171;
+        }
+
+        .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        @media(max-width:768px) {
+            .main {
+                padding: 14px 16px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .drawer {
+                width: 100%;
+            }
+
+            .d-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Loading bar -->
+    <div class="loading-bar" id="loadingBar"></div>
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+        <div class="topbar-left">
+            <div class="app-icon">📦</div>
+            <div>
+                <div class="app-title">Products</div>
+                <div class="app-subtitle">order-management</div>
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="btn-icon" onclick="refreshData()" title="Refresh">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <polyline points="23 4 23 10 17 10" />
+                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+                </svg>
+            </button>
+            <button class="btn btn-primary" id="addBtn">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path d="M12 5v14M5 12h14" />
+                </svg>
+                Add Product
+            </button>
+        </div>
+    </header>
+
+    <main class="main">
+        <!-- Global error -->
+        <div class="g-err" id="gErr">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 8v4M12 16h.01" />
+            </svg>
+            <span id="gErrText"></span>
+        </div>
+
+        <!-- TOOLBAR -->
+        <div class="toolbar">
+            <div class="search-wrap">
+                <svg class="s-icon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+                    viewBox="0 0 24 24">
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.35-4.35" />
+                </svg>
+                <input class="search-input" id="searchInput" type="text" placeholder="Search by name, brand, SN…"
+                    oninput="handleSearch(this.value)">
+            </div>
+            <div class="spacer"></div>
+            <select class="sort-select" id="sortSelect" onchange="handleSort()">
+                <option value="">Sort: Default</option>
+                <option value="name_asc">Name A→Z</option>
+                <option value="name_desc">Name Z→A</option>
+                <option value="status">Status</option>
+                <option value="sent_asc">Sent Qty ↑</option>
+                <option value="sent_desc">Sent Qty ↓</option>
+            </select>
+        </div>
+
+        <!-- ── FILTER BAR (Zoho-style inline dropdowns) ── -->
+        <div class="filter-bar" id="filterBar">
+            <span class="fb-label">
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                </svg>
+                Filters
+            </span>
+            <div class="fb-sep"></div>
+
+            <!-- Status -->
+            <div class="fd-wrap">
+                <button class="fd-btn" id="fb-status" onclick="toggleDropdown('status',event)">
+                    Status
+                    <svg class="fd-chevron" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5"
+                        viewBox="0 0 24 24">
+                        <path d="m6 9 6 6 6-6" />
+                    </svg>
+                </button>
+                <div class="fd-menu" id="fdm-status" onclick="event.stopPropagation()">
+                    <div class="fd-list">
+                        <div class="fd-item" id="fdi-status-Active" onclick="toggleFilter('status','Active')">
+                            <div class="fd-check"></div>
+                            <span class="badge badge-active" style="font-size:11px;">Active</span>
+                        </div>
+                        <div class="fd-item" id="fdi-status-Inactive" onclick="toggleFilter('status','Inactive')">
+                            <div class="fd-check"></div>
+                            <span class="badge badge-inactive" style="font-size:11px;">Inactive</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Brand -->
+            <div class="fd-wrap">
+                <button class="fd-btn" id="fb-brand" onclick="toggleDropdown('brand',event)">
+                    Brand
+                    <svg class="fd-chevron" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5"
+                        viewBox="0 0 24 24">
+                        <path d="m6 9 6 6 6-6" />
+                    </svg>
+                </button>
+                <div class="fd-menu" id="fdm-brand" onclick="event.stopPropagation()" style="min-width:230px;">
+                    <input class="fd-search" type="text" placeholder="Search brands…"
+                        oninput="searchList('brand',this.value)" id="bs-brand">
+                    <div class="fd-list" id="fdl-brand">
+                        <div class="fd-empty">Loading…</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Asset Type -->
+            <div class="fd-wrap">
+                <button class="fd-btn" id="fb-assetType" onclick="toggleDropdown('assetType',event)">
+                    Asset Type
+                    <svg class="fd-chevron" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5"
+                        viewBox="0 0 24 24">
+                        <path d="m6 9 6 6 6-6" />
+                    </svg>
+                </button>
+                <div class="fd-menu" id="fdm-assetType" onclick="event.stopPropagation()" style="min-width:230px;">
+                    <input class="fd-search" type="text" placeholder="Search asset types…"
+                        oninput="searchList('assetType',this.value)" id="bs-assetType">
+                    <div class="fd-list" id="fdl-assetType">
+                        <div class="fd-empty">Loading…</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Qty Range -->
+            <div class="fd-wrap">
+                <button class="fd-btn" id="fb-qty" onclick="toggleDropdown('qty',event)">
+                    Qty Range
+                    <svg class="fd-chevron" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5"
+                        viewBox="0 0 24 24">
+                        <path d="m6 9 6 6 6-6" />
+                    </svg>
+                </button>
+                <div class="fd-menu" id="fdm-qty" onclick="event.stopPropagation()" style="min-width:220px;">
+                    <div class="fd-range">
+                        <div class="fd-range-title">Sent Quantity</div>
+                        <div class="fd-range-grid">
+                            <input class="fd-num" type="number" id="sq-min" placeholder="Min" min="0">
+                            <input class="fd-num" type="number" id="sq-max" placeholder="Max" min="0">
+                        </div>
+                        <div class="fd-range-title">Max Order Qty</div>
+                        <div class="fd-range-grid">
+                            <input class="fd-num" type="number" id="mq-min" placeholder="Min" min="0">
+                            <input class="fd-num" type="number" id="mq-max" placeholder="Max" min="0">
+                        </div>
+                        <button class="fd-apply" onclick="applyQtyRange()">Apply Range</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fb-sep"></div>
+            <button class="fd-clear" id="clearBtn" onclick="clearAll()">
+                <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path d="M18 6 6 18M6 6l12 12" />
+                </svg>
+                Clear All
+            </button>
+        </div>
+
+        <!-- Active chips -->
+        <div class="filter-chips" id="filterChips"></div>
+
+        <!-- TABLE CARD -->
+        <div class="table-card">
+            <div class="tc-header">
+                <span class="rec-count" id="recCount"><strong>—</strong> products</span>
+                <div id="adminBadge" class="badge badge-admin" style="display:none;margin-left:auto;font-size:10px;">
+                    <svg width="10" height="10" fill="currentColor" viewBox="0 0 24 24" style="margin-right:2px;">
+                        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" />
+                    </svg>
+                    Admin
+                </div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Sr. No</th>
+                            <th>Product Name</th>
+                            <th>Brand</th>
+                            <th>Asset Type</th>
+                            <th>SN Number</th>
+                            <th>Sent Qty</th>
+                            <th>Max Order Qty</th>
+                            <th>Status</th>
+                            <th id="actionsHeader" style="width:1px; display:none;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody"></tbody>
+                </table>
+            </div>
+            <div class="pagination" id="pgBar" style="display:none;">
+                <div style="display:flex;align-items:center;gap:12px;flex:1;">
+                    <span class="pg-info" id="pgInfo">—</span>
+                    <div class="pg-size-wrap">
+                        <label style="font-size:12px;color:var(--ink-muted);margin-right:6px;">Rows:</label>
+                        <select class="pg-size-select" onchange="changePageSize(this.value)">
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="pg-ctrl">
+                    <button class="pg-btn" id="pgPrev" disabled onclick="changePage(-1)">← Prev</button>
+                    <span id="pgNums" style="display:flex;gap:4px;"></span>
+                    <button class="pg-btn" id="pgNext" onclick="changePage(1)">Next →</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- DETAIL DRAWER -->
+    <div class="drawer-ov" id="drawerOv" onclick="handleDrawerOvClick(event)">
+        <div class="drawer" id="drawer">
+            <div class="drawer-hdr">
+                <div class="drawer-top">
+                    <div style="display:flex;gap:12px;align-items:flex-start;flex:1;">
+                        <div class="d-icon">📦</div>
+                        <div style="flex:1;min-width:0;">
+                            <div class="d-name" id="dName">—</div>
+                            <div class="d-meta">
+                                <span id="dStatus"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="d-close" onclick="closeDrawer()">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
+                            <path d="M18 6 6 18M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="d-acts">
+                    <button class="btn btn-ghost" onclick="editFromDrawer()">
+                        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                        </svg>
+                        Edit
+                    </button>
+                    <button class="btn" style="background:var(--red-bg);color:var(--red);border:1px solid #fca5a5;"
+                        onclick="deleteFromDrawer()">
+                        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
+                            <polyline points="3 6 5 6 21 6" />
+                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                            <path d="M10 11v6M14 11v6" />
+                            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                        </svg>
+                        Delete
+                    </button>
+                </div>
+            </div>
+            <div class="drawer-body" id="drawerBody"></div>
+        </div>
+    </div>
+
+    <!-- ADD / EDIT MODAL -->
+    <div class="modal-ov" id="modalOv" onclick="handleModalOvClick(event)">
+        <div class="modal">
+            <div class="modal-hdr">
+                <div class="modal-title" id="modalTitle">Add Product</div>
+                <button class="modal-close" onclick="closeModal()">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M18 6 6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-err" id="formErr"></div>
+                <div class="form-grp">
+                    <label class="form-lbl">Product Name <span class="req">*</span></label>
+                    <input class="form-input" type="text" id="fName" placeholder="Enter product name">
+                </div>
+                <div class="form-row">
+                    <div class="form-grp">
+                        <label class="form-lbl">Brand</label>
+                        <select class="form-select" id="fBrand">
+                            <option value="">Select Brand</option>
+                        </select>
+                    </div>
+                    <div class="form-grp">
+                        <label class="form-lbl">Asset Type</label>
+                        <select class="form-select" id="fAssetType">
+                            <option value="">Select Asset Type</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-grp">
+                        <label class="form-lbl">SN Number</label>
+                        <input class="form-input" type="number" id="fSN" placeholder="SN number">
+                    </div>
+                    <div class="form-grp">
+                        <label class="form-lbl">Status <span class="req">*</span></label>
+                        <select class="form-select" id="fStatus">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-grp">
+                        <label class="form-lbl">Sent Quantity</label>
+                        <input class="form-input" type="number" id="fSentQty" placeholder="0" min="0">
+                    </div>
+                    <div class="form-grp">
+                        <label class="form-lbl">Max Order Quantity</label>
+                        <input class="form-input" type="number" id="fMaxQty" placeholder="0" min="0">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" id="submitBtn" onclick="submitForm()">
+                    <span id="submitTxt">Add Product</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DELETE CONFIRM MODAL -->
+    <div class="modal-ov" id="delModalOv" onclick="handleDelModalOvClick(event)">
+        <div class="modal" style="max-width: 400px; text-align: center;">
+            <div class="modal-body" style="padding: 32px 24px 24px;">
+                <div
+                    style="width: 56px; height: 56px; border-radius: 50%; background: var(--red-bg); color: var(--red); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 24px;">
+                    <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path
+                            d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                        <line x1="12" y1="9" x2="12" y2="13" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                    </svg>
+                </div>
+                <h3 style="font-size: 18px; font-weight: 700; color: var(--ink); margin-bottom: 8px;">Delete Product
+                </h3>
+                <p style="font-size: 14px; color: var(--ink-soft); line-height: 1.5; margin-bottom: 24px;">Are you sure
+                    you want to delete this product? This action cannot be undone.</p>
+                <div style="display: flex; gap: 12px; justify-content: center;">
+                    <button class="btn btn-ghost" style="flex: 1; justify-content: center;"
+                        onclick="closeDelModal()">Cancel</button>
+                    <button class="btn"
+                        style="flex: 1; justify-content: center; background: var(--red); color: white; border: none; box-shadow: 0 2px 8px rgba(220, 38, 38, 0.25);"
+                        id="confirmDelBtn" onclick="doDelete()">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-shelf" id="toasts"></div>
+
+    <script>
+        // ─────────────────────────────────────────────
+        // CONFIG
+        // ─────────────────────────────────────────────
+        const CFG = {
+            appName: "order-management",
+            productReport: "All_Products",
+            brandReport: "All_Brands",
+            assetTypeReport: "All_Asset_Types",
+            productForm: "Product",
+            f: {
+                name: "Product_Name",
+                brand: "Brand",
+                at: "Asset_Type",
+                sn: "SN_Number",
+                sentQty: "Sent_Quantity",
+                maxQty: "Max_Order_Quantity",
+                status: "Status"
+            },
+            brandField: "Brand_Name",
+            assetField: "Asset_Type_Name",
+            PAGE: 50,
+            BATCH: 200,
+            roleReport: "All_Branch_User_Role_Mapping"
+        };
+
+        // ─────────────────────────────────────────────
+        // STATE
+        // ─────────────────────────────────────────────
+        const S = {
+            all: [],   // raw products from API
+            isSuperAdmin: false,
+            brands: [],   // [{id, name}]
+            assets: [],   // [{id, name}]
+            filtered: [],   // after filter+search+sort
+            page: 1,
+            pageSize: 10,   // ← NEW: Items per page
+            search: "",
+            sort: "",
+            filters: {
+                status: [],
+                brands: [],
+                assets: [],
+                sqMin: null, sqMax: null,
+                mqMin: null, mqMax: null
+            },
+            editId: null,
+            drawerRec: null,
+            openDrop: null,
+            delId: null
+        };
+
+        // ─────────────────────────────────────────────
+        // API HELPERS
+        // ─────────────────────────────────────────────
+        async function fetchAll(report) {
+            let all = [], page = 1;
+
+            try {
+
+                while (true) {
+                    const r = await ZOHO.CREATOR.API.getAllRecords({
+                        appName: CFG.appName, reportName: report,
+                        page, pageSize: CFG.BATCH
+                    });
+                    const rows = r?.data ?? [];
+                    all = all.concat(rows);
+                    if (rows.length < CFG.BATCH) break;
+                    page++;
+                }
+                console.log(`fetchAll(${report}): Success, records=${all.length}`);
+                if (all.length > 0) {
+                    console.log(`[${report}] First record keys:`, Object.keys(all[0]));
+                }
+                return all;
+            }
+            catch (e) {
+                console.log("Error fetching data:", e);
+                return [];
+            }
+        }
+
+        // ─────────────────────────────────────────────
+        // LOOKUPS
+        // ─────────────────────────────────────────────
+        function brandName(v) {
+            if (!v) return "—";
+            if (typeof v === "object") return v.display_value || v[CFG.brandField] || "—";
+            return S.brands.find(b => b.id === String(v))?.name ?? String(v);
+        }
+        function assetName(v) {
+            if (!v) return "—";
+            if (typeof v === "object") return v.display_value || v[CFG.assetField] || "—";
+            return S.assets.find(a => a.id === String(v))?.name ?? String(v);
+        }
+        function lookupId(v) {
+            if (!v) return "";
+            if (typeof v === "object") return String(v.ID || "");
+            return String(v);
+        }
+
+        // ─────────────────────────────────────────────
+        // LOAD ALL — parallel, one-shot
+        // ─────────────────────────────────────────────
+        async function loadAll() {
+            setLoading(true);
+            renderSkeleton();
+            try {
+                const [products, brands, assets] = await Promise.all([
+                    fetchAll(CFG.productReport),
+                    fetchAll(CFG.brandReport),
+                    fetchAll(CFG.assetTypeReport)
+                ]);
+
+                console.log(products, brands, assets);
+
+                S.all = products;
+                console.log(`loadAll: Products count=${S.all.length}`);
+
+                // Diagnostic: check for status field variations
+                if (S.all.length > 0) {
+                    const p = S.all[0];
+                    console.log("Product Diagnostic:", {
+                        ID: p.ID,
+                        Name: p[CFG.f.name],
+                        Status: p[CFG.f.status],
+                        RawStatus: p.Status,
+                        Added_User: p.Added_User || p.Created_User
+                    });
+                }
+
+                S.brands = brands.map(r => ({ id: String(r.ID), name: r[CFG.brandField] || r.Brand_Name || r.Name || "—" }));
+                S.assets = assets.map(r => ({ id: String(r.ID), name: r[CFG.assetField] || r.Asset_Type_Name || r.Name || "—" }));
+
+                populateFormDropdowns();
+                populateFilterLists();
+                recompute();
+                hideErr();
+            } catch (e) {
+                showErr("Failed to load data: " + e.message);
+                renderEmpty("Load failed — check SDK connection");
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        // ─────────────────────────────────────────────
+        // FILTER + SEARCH + SORT (all client-side, instant)
+        // ─────────────────────────────────────────────
+        function recompute() {
+            const f = CFG.f, fl = S.filters;
+            let rows = [...S.all];
+
+            // Search (name, brand display, SN)
+            if (S.search) {
+                const q = S.search.toLowerCase();
+                rows = rows.filter(p =>
+                    (p[f.name] || "").toLowerCase().includes(q) ||
+                    String(p[f.sn] || "").toLowerCase().includes(q) ||
+                    brandName(p[f.brand]).toLowerCase().includes(q)
+                );
+            }
+
+            // Filters
+            if (fl.status.length) rows = rows.filter(p => fl.status.includes(p[f.status] || "Inactive"));
+            if (fl.brands.length) rows = rows.filter(p => fl.brands.includes(lookupId(p[f.brand])));
+            if (fl.assets.length) rows = rows.filter(p => fl.assets.includes(lookupId(p[f.at])));
+            if (fl.sqMin !== null) rows = rows.filter(p => (p[f.sentQty] ?? 0) >= fl.sqMin);
+            if (fl.sqMax !== null) rows = rows.filter(p => (p[f.sentQty] ?? 0) <= fl.sqMax);
+            if (fl.mqMin !== null) rows = rows.filter(p => (p[f.maxQty] ?? 0) >= fl.mqMin);
+            if (fl.mqMax !== null) rows = rows.filter(p => (p[f.maxQty] ?? 0) <= fl.mqMax);
+
+            // Sort
+            if (S.sort) rows.sort((a, b) => {
+                if (S.sort === "name_asc") return (a[f.name] || "").localeCompare(b[f.name] || "");
+                if (S.sort === "name_desc") return (b[f.name] || "").localeCompare(a[f.name] || "");
+                if (S.sort === "status") return (a[f.status] || "").localeCompare(b[f.status] || "");
+                if (S.sort === "sent_asc") return (a[f.sentQty] ?? 0) - (b[f.sentQty] ?? 0);
+                if (S.sort === "sent_desc") return (b[f.sentQty] ?? 0) - (a[f.sentQty] ?? 0);
+                return 0;
+            });
+
+            S.filtered = rows;
+            S.page = 1;
+            renderTable();
+            renderPagination();
+            updateFilterBtns();
+            renderChips();
+        }
+
+        // ─────────────────────────────────────────────
+        // TABLE RENDERING
+        // ─────────────────────────────────────────────
+        function renderTable() {
+            const tbody = document.getElementById("tbody");
+            const f = CFG.f;
+            const start = (S.page - 1) * S.pageSize;
+            const page = S.filtered.slice(start, start + S.pageSize);
+
+            const filtered = S.search || hasFilters();
+            document.getElementById("recCount").innerHTML =
+                `<strong>${S.filtered.length}</strong> product${S.filtered.length !== 1 ? "s" : ""}${filtered ? " (filtered)" : ""}`;
+
+            if (page.length === 0) {
+                renderEmpty(S.all.length === 0 ? "No products yet" : "No products match your filters");
+                return;
+            }
+
+            tbody.innerHTML = page.map((p, index) => {
+                const status = p[f.status] || "Inactive";
+                const active = status === "Active";
+                const id = escA(String(p.ID));
+                const acts = S.isSuperAdmin ? `<td><div class="row-acts" onclick="event.stopPropagation()">
+                    <button class="act-btn" onclick="openEdit('${id}')">Edit</button>
+                    <button class="act-btn del" onclick="confirmDelete('${id}')">Delete</button>
+                </div></td>` : "";
+
+                return `<tr onclick="openDrawer('${id}')" data-id="${id}">
+            <td><span class="sn-mono">${start + index + 1}</span></td>
+            <td class="col-name">${esc(p[f.name] || "—")}</td>
+            <td>${esc(brandName(p[f.brand]))}</td>
+            <td>${esc(assetName(p[f.at]))}</td>
+            <td><span class="sn-mono">${esc(String(p[f.sn] || "—"))}</span></td>
+            <td><span class="qty-pill">${p[f.sentQty] ?? 0}</span></td>
+            <td><span class="qty-pill">${p[f.maxQty] ?? 0}</span></td>
+            <td><span class="badge ${active ? "badge-active" : "badge-inactive"}">${esc(status)}</span></td>
+            ${acts}
+        </tr>`;
+            }).join("");
+        }
+
+        function renderSkeleton(n = 7) {
+            const ws = ["15%", "55%", "35%", "40%", "18%", "12%", "12%", "22%", "0"];
+            // Remove the last skeleton cell if not admin
+            if (!S.isSuperAdmin) ws.pop();
+
+            document.getElementById("tbody").innerHTML = Array.from({ length: n }, () =>
+                `<tr class="sk-row">${ws.map(w => `<td><div class="sk-cell" style="width:${w}"></div></td>`).join("")}</tr>`
+            ).join("");
+            document.getElementById("recCount").innerHTML = `<strong>—</strong> products`;
+        }
+
+        function renderEmpty(msg) {
+            const cols = S.isSuperAdmin ? 9 : 8;
+            document.getElementById("tbody").innerHTML = `<tr><td colspan="${cols}"><div class="t-empty">
+        <div class="t-empty-icon">📦</div>
+        <div class="t-empty-title">${esc(msg)}</div>
+        <div class="t-empty-sub">Try adjusting your search or filters</div>
+    </div></td></tr>`;
+            document.getElementById("pgBar").style.display = "none";
+        }
+
+        function renderPagination() {
+            const total = S.filtered.length;
+            const pages = Math.ceil(total / S.pageSize);
+            const bar = document.getElementById("pgBar");
+            if (total === 0) { bar.style.display = "none"; return; }
+            bar.style.display = "flex";
+
+            const s = (S.page - 1) * S.pageSize + 1, e = Math.min(S.page * S.pageSize, total);
+            document.getElementById("pgInfo").textContent = `Showing ${s}–${e} of ${total}`;
+
+            const ctrl = bar.querySelector(".pg-ctrl");
+            if (pages <= 1) {
+                ctrl.style.display = "none";
+                return;
+            }
+
+            ctrl.style.display = "flex";
+            document.getElementById("pgPrev").disabled = S.page <= 1;
+            document.getElementById("pgNext").disabled = S.page >= pages;
+
+            const nums = [];
+            for (let i = 1; i <= pages; i++) {
+                if (i === 1 || i === pages || Math.abs(i - S.page) <= 2) nums.push(i);
+                else if (nums[nums.length - 1] !== "…") nums.push("…");
+            }
+            document.getElementById("pgNums").innerHTML = nums.map(n =>
+                n === "…"
+                    ? `<span style="padding:5px 3px;font-size:12px;color:var(--ink-muted)">…</span>`
+                    : `<button class="pg-btn${n === S.page ? " active" : ""}" onclick="goPage(${n})">${n}</button>`
+            ).join("");
+        }
+
+        function changePage(d) {
+            const tp = Math.ceil(S.filtered.length / S.pageSize);
+            S.page = Math.max(1, Math.min(tp, S.page + d));
+            renderTable(); renderPagination();
+        }
+        function goPage(p) { S.page = p; renderTable(); renderPagination(); }
+        function changePageSize(size) { S.pageSize = parseInt(size, 10); S.page = 1; recompute(); }
+
+        // ─────────────────────────────────────────────
+        // DROPDOWN FILTER LOGIC
+        // ─────────────────────────────────────────────
+        function toggleDropdown(name, e) {
+            e?.stopPropagation();
+            const already = S.openDrop === name;
+            closeDropdowns();
+            if (!already) {
+                S.openDrop = name;
+                document.getElementById(`fdm-${name}`)?.classList.add("open");
+                document.getElementById(`fb-${name}`)?.classList.add("is-open");
+            }
+        }
+        function closeDropdowns() {
+            document.querySelectorAll(".fd-menu.open").forEach(m => m.classList.remove("open"));
+            document.querySelectorAll(".fd-btn.is-open").forEach(b => b.classList.remove("is-open"));
+            S.openDrop = null;
+        }
+
+        /*
+         * KEY FIX: Pure div-based toggles — no <label>/<input> double-fire.
+         * Each .fd-item is a plain div. Clicking it calls toggleFilter() directly.
+         * Selected state is tracked in S.filters and reflected back to the DOM.
+         */
+        function toggleFilter(type, value) {
+            const fl = S.filters;
+            if (type === "status") {
+                fl.status = toggle(fl.status, value);
+                setItemSelected(`fdi-status-${value}`, fl.status.includes(value));
+            } else if (type === "brand") {
+                fl.brands = toggle(fl.brands, value);
+                setItemSelected(`fdi-brand-${value}`, fl.brands.includes(value));
+            } else if (type === "assetType") {
+                fl.assets = toggle(fl.assets, value);
+                setItemSelected(`fdi-assetType-${value}`, fl.assets.includes(value));
+            }
+            recompute();
+        }
+
+        function toggle(arr, v) {
+            return arr.includes(v) ? arr.filter(x => x !== v) : [...arr, v];
+        }
+        function setItemSelected(id, selected) {
+            document.getElementById(id)?.classList.toggle("selected", selected);
+        }
+
+        function applyQtyRange() {
+            const n = id => { const v = parseFloat(document.getElementById(id)?.value); return isNaN(v) ? null : v; };
+            S.filters.sqMin = n("sq-min"); S.filters.sqMax = n("sq-max");
+            S.filters.mqMin = n("mq-min"); S.filters.mqMax = n("mq-max");
+            closeDropdowns();
+            recompute();
+        }
+
+        function clearAll() {
+            S.filters = { status: [], brands: [], assets: [], sqMin: null, sqMax: null, mqMin: null, mqMax: null };
+            S.search = "";
+            document.getElementById("searchInput").value = "";
+            ["sq-min", "sq-max", "mq-min", "mq-max"].forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; });
+            // Reset all checkbox visuals
+            document.querySelectorAll(".fd-item.selected").forEach(el => el.classList.remove("selected"));
+            recompute();
+        }
+
+        function hasFilters() {
+            const f = S.filters;
+            return f.status.length || f.brands.length || f.assets.length ||
+                f.sqMin !== null || f.sqMax !== null || f.mqMin !== null || f.mqMax !== null;
+        }
+
+        function updateFilterBtns() {
+            const upd = (name, count) => {
+                const btn = document.getElementById(`fb-${name}`);
+                if (!btn) return;
+                btn.classList.toggle("has-value", count > 0);
+                const old = btn.querySelector(".fd-count");
+                if (old) old.remove();
+                if (count > 0) {
+                    const sp = document.createElement("span");
+                    sp.className = "fd-count"; sp.textContent = count;
+                    btn.insertBefore(sp, btn.querySelector(".fd-chevron"));
+                }
+            };
+            upd("status", S.filters.status.length);
+            upd("brand", S.filters.brands.length);
+            upd("assetType", S.filters.assets.length);
+            const qc = [S.filters.sqMin, S.filters.sqMax, S.filters.mqMin, S.filters.mqMax].filter(v => v !== null).length;
+            upd("qty", qc);
+
+            document.getElementById("clearBtn").classList.toggle("visible", !!(hasFilters() || S.search));
+        }
+
+        function renderChips() {
+            const el = document.getElementById("filterChips");
+            const fl = S.filters;
+            const chips = [];
+
+            fl.status.forEach(s => chips.push({ label: `Status: ${s}`, rm: () => { fl.status = fl.status.filter(v => v !== s); setItemSelected(`fdi-status-${s}`, false); recompute(); } }));
+            fl.brands.forEach(id => {
+                const b = S.brands.find(x => x.id === id);
+                chips.push({ label: `Brand: ${b ? b.name : id}`, rm: () => { fl.brands = fl.brands.filter(v => v !== id); setItemSelected(`fdi-brand-${id}`, false); recompute(); } });
+            });
+            fl.assets.forEach(id => {
+                const a = S.assets.find(x => x.id === id);
+                chips.push({ label: `Type: ${a ? a.name : id}`, rm: () => { fl.assets = fl.assets.filter(v => v !== id); setItemSelected(`fdi-assetType-${id}`, false); recompute(); } });
+            });
+            if (fl.sqMin !== null) chips.push({ label: `Sent ≥ ${fl.sqMin}`, rm: () => { fl.sqMin = null; document.getElementById("sq-min").value = ""; recompute(); } });
+            if (fl.sqMax !== null) chips.push({ label: `Sent ≤ ${fl.sqMax}`, rm: () => { fl.sqMax = null; document.getElementById("sq-max").value = ""; recompute(); } });
+            if (fl.mqMin !== null) chips.push({ label: `MaxQty ≥ ${fl.mqMin}`, rm: () => { fl.mqMin = null; document.getElementById("mq-min").value = ""; recompute(); } });
+            if (fl.mqMax !== null) chips.push({ label: `MaxQty ≤ ${fl.mqMax}`, rm: () => { fl.mqMax = null; document.getElementById("mq-max").value = ""; recompute(); } });
+
+            window._rmChip = chips.map(c => c.rm);
+            el.innerHTML = chips.map((c, i) => `<span class="chip">${esc(c.label)}<button class="chip-x" onclick="window._rmChip[${i}]()"><svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></span>`).join("");
+        }
+
+        // ─────────────────────────────────────────────
+        // FILTER LIST POPULATION
+        // ─────────────────────────────────────────────
+        function populateFilterLists() {
+            buildList("brand", S.brands, S.filters.brands);
+            buildList("assetType", S.assets, S.filters.assets);
+        }
+
+        function buildList(type, items, selected, query = "") {
+            const el = document.getElementById(`fdl-${type}`);
+            if (!el) return;
+            const filtered = query ? items.filter(i => i.name.toLowerCase().includes(query.toLowerCase())) : items;
+            if (!filtered.length) { el.innerHTML = `<div class="fd-empty">${query ? "No matches" : "None found"}</div>`; return; }
+            el.innerHTML = filtered.map(item => `
+        <div class="fd-item${selected.includes(item.id) ? " selected" : ""}"
+             id="fdi-${type}-${escA(item.id)}"
+             onclick="toggleFilter('${type}','${escA(item.id)}')">
+            <div class="fd-check"></div>
+            <span class="fd-item-label">${esc(item.name)}</span>
+        </div>`).join("");
+        }
+
+        function searchList(type, q) {
+            const items = type === "brand" ? S.brands : S.assets;
+            const selected = type === "brand" ? S.filters.brands : S.filters.assets;
+            buildList(type, items, selected, q);
+        }
+
+        // ─────────────────────────────────────────────
+        // FORM DROPDOWNS
+        // ─────────────────────────────────────────────
+        function populateFormDropdowns() {
+            const sel = (id, items) => {
+                const el = document.getElementById(id);
+                el.innerHTML = `<option value="">Select…</option>` +
+                    items.map(i => `<option value="${escA(i.id)}">${esc(i.name)}</option>`).join("");
+            };
+            sel("fBrand", S.brands);
+            sel("fAssetType", S.assets);
+        }
+
+        // ─────────────────────────────────────────────
+        // SEARCH & SORT
+        // ─────────────────────────────────────────────
+        let _st;
+        function handleSearch(q) {
+            S.search = q.trim();
+            clearTimeout(_st);
+            // Small debounce for typing feel, but very fast since it's client-side
+            _st = setTimeout(recompute, 120);
+        }
+
+        function handleSort() {
+            S.sort = document.getElementById("sortSelect").value;
+            recompute();
+        }
+
+        function refreshData() { loadAll(); }
+
+        // ─────────────────────────────────────────────
+        // DETAIL DRAWER
+        // ─────────────────────────────────────────────
+        function openDrawer(recordId) {
+            const p = S.all.find(x => String(x.ID) === String(recordId));
+            if (!p) return;
+            S.drawerRec = p;
+            const f = CFG.f;
+
+            document.getElementById("dName").textContent = p[f.name] || "—";
+            const status = p[f.status] || "Inactive";
+            document.getElementById("dStatus").innerHTML =
+                `<span class="badge ${status === "Active" ? "badge-active" : "badge-inactive"}">${esc(status)}</span>`;
+
+            // Hide actions in drawer if not admin
+            const actBox = document.querySelector(".d-acts");
+            if (actBox) actBox.style.display = S.isSuperAdmin ? "flex" : "none";
+
+            const sent = +(p[f.sentQty] ?? 0), maxQ = +(p[f.maxQty] ?? 0);
+            const pct = maxQ > 0 ? Math.min(100, Math.round(sent / maxQ * 100)) : 0;
+
+            document.getElementById("drawerBody").innerHTML = `
+        <div class="stat-cards">
+            <div class="stat-card">
+                <div class="stat-lbl">Sent Quantity</div>
+                <div class="stat-val">${sent}</div>
+                <div class="stat-sub">units dispatched</div>
+            </div>
+            <div class="stat-card sc-2">
+                <div class="stat-lbl">Max Order Qty</div>
+                <div class="stat-val">${maxQ}</div>
+                <div class="stat-sub">per order limit</div>
+            </div>
+        </div>
+        
+        <div class="d-sec">
+            <div class="d-sec-hdr">
+                <div class="d-sec-hdr-icon">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7h-3V4c0-1.1-.9-2-2-2H9c-1.1 0-2 .9-2 2v3H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM9 4h6v3H9V4z"/></svg>
+                </div>
+                <div class="d-sec-title">Product Details</div>
+            </div>
+            <div class="d-grid">
+                <div class="d-field-full"><div class="d-lbl">Product Name</div><div class="d-val big">${esc(p[f.name] || "—")}</div></div>
+                <div><div class="d-lbl">Brand</div><div class="d-val">${esc(brandName(p[f.brand]))}</div></div>
+                <div><div class="d-lbl">Asset Type</div><div class="d-val">${esc(assetName(p[f.at]))}</div></div>
+                <div><div class="d-lbl">SN Number</div><div class="d-val mono">${esc(String(p[f.sn] || "—"))}</div></div>
+                <div><div class="d-lbl">Status</div><div class="d-val"><span class="badge ${status === "Active" ? "badge-active" : "badge-inactive"}">${esc(status)}</span></div></div>
+            </div>
+        </div>
+
+        <div class="d-sec">
+            <div class="d-sec-hdr">
+                <div class="d-sec-hdr-icon">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <div class="d-sec-title">Record Info</div>
+            </div>
+            <div class="d-grid">
+                <div class="d-field-full"><div class="d-lbl">Record ID</div><div class="d-val mono">${esc(String(p.ID))}</div></div>
+                ${p.Added_Time ? `<div><div class="d-lbl">Created</div><div class="d-val">${esc(p.Added_Time)}</div></div>` : ""}
+                ${p.Modified_Time ? `<div><div class="d-lbl">Modified</div><div class="d-val">${esc(p.Modified_Time)}</div></div>` : ""}
+            </div>
+        </div>`;
+
+            document.querySelectorAll("tbody tr").forEach(r => r.classList.remove("selected"));
+            document.querySelector(`tbody tr[data-id="${recordId}"]`)?.classList.add("selected");
+            document.getElementById("drawerOv").classList.add("open");
+        }
+
+        function closeDrawer() {
+            document.getElementById("drawerOv").classList.remove("open");
+            document.querySelectorAll("tbody tr").forEach(r => r.classList.remove("selected"));
+            S.drawerRec = null;
+        }
+        function handleDrawerOvClick(e) { if (e.target === document.getElementById("drawerOv")) closeDrawer(); }
+        function editFromDrawer() {
+            if (S.drawerRec) {
+                const id = S.drawerRec.ID;
+                closeDrawer();
+                openEdit(id);
+            }
+        }
+        function deleteFromDrawer() {
+            if (S.drawerRec) {
+                const id = S.drawerRec.ID;
+                closeDrawer();
+                confirmDelete(id);
+            }
+        }
+
+        // ─────────────────────────────────────────────
+        // ADD / EDIT MODAL
+        // ─────────────────────────────────────────────
+        function openAdd() {
+            if (!S.isSuperAdmin) { toast("Permission denied", "err"); return; }
+            S.editId = null;
+            document.getElementById("modalTitle").textContent = "Add Product";
+            document.getElementById("submitTxt").textContent = "Add Product";
+            clearForm(); hideFormErr();
+            document.getElementById("modalOv").classList.add("open");
+            document.getElementById("fName").focus();
+        }
+
+        function openEdit(id) {
+            if (!S.isSuperAdmin) { toast("Permission denied", "err"); return; }
+            const p = S.all.find(x => String(x.ID) === String(id));
+            if (!p) return;
+            const f = CFG.f;
+            S.editId = id;
+            document.getElementById("fName").value = p[f.name] || "";
+            document.getElementById("fBrand").value = lookupId(p[f.brand]);
+            document.getElementById("fAssetType").value = lookupId(p[f.at]);
+            document.getElementById("fSN").value = p[f.sn] || "";
+            document.getElementById("fSentQty").value = p[f.sentQty] ?? "";
+            document.getElementById("fMaxQty").value = p[f.maxQty] ?? "";
+            document.getElementById("fStatus").value = p[f.status] || "Active";
+            document.getElementById("modalTitle").textContent = "Edit Product";
+            document.getElementById("submitTxt").textContent = "Update Product";
+            hideFormErr();
+            document.getElementById("modalOv").classList.add("open");
+        }
+
+        function closeModal() {
+            document.getElementById("modalOv").classList.remove("open");
+            clearForm(); S.editId = null;
+        }
+        function clearForm() {
+            ["fName", "fSN", "fSentQty", "fMaxQty"].forEach(id => document.getElementById(id).value = "");
+            document.getElementById("fBrand").value = "";
+            document.getElementById("fAssetType").value = "";
+            document.getElementById("fStatus").value = "Active";
+        }
+        function handleModalOvClick(e) { if (e.target === document.getElementById("modalOv")) closeModal(); }
+
+        async function submitForm() {
+            const name = document.getElementById("fName").value.trim();
+            if (!name) { showFormErr("Product Name is required."); return; }
+
+            const f = CFG.f;
+            const data = {};
+            data[f.name] = name;
+            data[f.status] = document.getElementById("fStatus").value;
+            const brand = document.getElementById("fBrand").value, at = document.getElementById("fAssetType").value,
+                sn = document.getElementById("fSN").value, sq = document.getElementById("fSentQty").value,
+                mq = document.getElementById("fMaxQty").value;
+            if (brand) data[f.brand] = brand;
+            if (at) data[f.at] = at;
+            if (sn) data[f.sn] = parseInt(sn, 10);
+            if (sq) data[f.sentQty] = parseInt(sq, 10);
+            if (mq) data[f.maxQty] = parseInt(mq, 10);
+
+            document.getElementById("submitBtn").disabled = true;
+            setLoading(true);
+            try {
+                if (S.editId) {
+                    await ZOHO.CREATOR.API.updateRecord({
+                        appName: CFG.appName, reportName: CFG.productReport,
+                        id: S.editId, data: { data }
+                    });
+                    // Update local state immediately — no re-fetch needed
+                    const idx = S.all.findIndex(x => String(x.ID) === String(S.editId));
+                    if (idx !== -1) S.all[idx] = { ...S.all[idx], ...data };
+                    toast("Product updated ✓", "ok");
+                } else {
+                    const r = await ZOHO.CREATOR.API.addRecord({
+                        appName: CFG.appName, formName: CFG.productForm, data: { data }
+                    });
+                    // Prepend to local state
+                    S.all.unshift({ ID: r?.data?.ID ?? ("tmp_" + Date.now()), ...data });
+                    toast("Product added ✓", "ok");
+                }
+                closeModal();
+                recompute();
+            } catch (err) {
+                showFormErr(err.message || "Save failed");
+                toast("Error saving product", "err");
+            } finally {
+                document.getElementById("submitBtn").disabled = false;
+                setLoading(false);
+            }
+        }
+
+        // ─────────────────────────────────────────────
+        // DELETE
+        // ─────────────────────────────────────────────
+        function confirmDelete(id) {
+            if (!S.isSuperAdmin) { toast("Permission denied", "err"); return; }
+            S.delId = id;
+            document.getElementById("delModalOv").classList.add("open");
+        }
+
+        function closeDelModal() {
+            document.getElementById("delModalOv").classList.remove("open");
+            S.delId = null;
+        }
+
+        function handleDelModalOvClick(e) {
+            if (e.target === document.getElementById("delModalOv")) closeDelModal();
+        }
+
+        async function doDelete() {
+            if (!S.isSuperAdmin) return;
+            if (!S.delId) return;
+            const id = S.delId;
+            closeDelModal();
+            setLoading(true);
+            try {
+                await ZOHO.CREATOR.API.deleteRecord({
+                    appName: CFG.appName, reportName: CFG.productReport, criteria: `(ID == ${id})`
+                });
+                S.all = S.all.filter(p => String(p.ID) !== String(id));
+                toast("Product deleted", "ok");
+                closeDrawer();
+                recompute();
+            } catch (e) {
+                const errorMsg = e?.message || e?.error || e?.responseText || (typeof e === "string" ? e : JSON.stringify(e));
+                toast("Delete failed: " + errorMsg, "err");
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        // ─────────────────────────────────────────────
+        // UI UTILITIES
+        // ─────────────────────────────────────────────
+        function setLoading(v) { document.getElementById("loadingBar").classList.toggle("active", v); }
+        function showErr(msg) { document.getElementById("gErrText").textContent = msg; document.getElementById("gErr").classList.add("show"); }
+        function hideErr() { document.getElementById("gErr").classList.remove("show"); }
+        function showFormErr(m) { const e = document.getElementById("formErr"); e.textContent = m; e.classList.add("show"); }
+        function hideFormErr() { document.getElementById("formErr").classList.remove("show"); }
+
+        function toast(msg, type = "ok") {
+            const shelf = document.getElementById("toasts");
+            const t = document.createElement("div");
+            t.className = `toast ${type}`;
+            t.innerHTML = `<span class="dot"></span>${esc(msg)}`;
+            shelf.appendChild(t);
+            setTimeout(() => { t.style.cssText = "opacity:0;transform:translateY(6px);transition:.22s"; setTimeout(() => t.remove(), 240); }, 3000);
+        }
+
+        function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+        function escA(s) { return String(s).replace(/'/g, "\\'"); }
+
+        // ─────────────────────────────────────────────
+        // BOOT
+        // ─────────────────────────────────────────────
+        async function init() {
+            document.getElementById("addBtn").addEventListener("click", openAdd);
+
+            // Close dropdowns when clicking anywhere outside
+            document.addEventListener("click", () => closeDropdowns());
+
+            // ESC to close panels
+            document.addEventListener("keydown", e => {
+                if (e.key !== "Escape") return;
+                closeModal(); closeDrawer(); closeDropdowns(); closeDelModal();
+            });
+
+            try {
+                // 1. Initialize SDK
+                const initData = await ZOHO.CREATOR.init();
+
+                // 2. Identify Login User
+                const initParams = await ZOHO.CREATOR.UTIL.getInitParams() || {};
+                const loginUser = initParams.loginUser || "";
+                console.log("Logged in User:", loginUser);
+
+                // 3. Fetch Role from Mapping Module
+                if (loginUser) {
+                    try {
+                        const allMappedUsers = await fetchAll(CFG.roleReport);
+                        console.log("All User Mappings Found:", allMappedUsers.length);
+
+                        // Check if ANY record for this user has the 'Super Admin' role
+                        const emailToMatch = loginUser.toLowerCase().trim();
+                        S.isSuperAdmin = allMappedUsers.some(m => {
+                            const u = m.User;
+                            if (!u) return false;
+
+                            const isMatch = (typeof u === "string")
+                                ? u.toLowerCase().trim() === emailToMatch
+                                : (u.display_value?.toLowerCase().trim() === emailToMatch || u.email?.toLowerCase().trim() === emailToMatch);
+
+                            return isMatch && m.Role === "Super Admin";
+                        });
+
+                        if (S.isSuperAdmin) {
+                            console.log("Access Granted: Super Admin role detected for", loginUser);
+                        } else {
+                            console.log("Access Restricted: No Super Admin mapping found for", loginUser);
+                        }
+                    } catch (apiErr) {
+                        console.error("Permission check failed:", apiErr);
+                    }
+                }
+
+                console.log("Final Permission (isSuperAdmin):", S.isSuperAdmin);
+
+                // UI Status Update
+                const badge = document.getElementById("adminBadge");
+                const addBtn = document.getElementById("addBtn");
+                const actHdr = document.getElementById("actionsHeader");
+
+                if (badge) badge.style.display = S.isSuperAdmin ? "inline-block" : "none";
+                if (addBtn) addBtn.style.display = S.isSuperAdmin ? "flex" : "none";
+                if (actHdr) actHdr.style.display = S.isSuperAdmin ? "table-cell" : "none";
+
+                await loadAll();
+            } catch (e) {
+                showErr("SDK init failed: " + (e?.message ?? String(e)));
+                document.getElementById("tbody").innerHTML = `<tr><td colspan="9"><div class="t-empty">
+            <div class="t-empty-icon">⚠️</div>
+            <div class="t-empty-title">SDK initialisation failed</div>
+            <div class="t-empty-sub">${esc(e?.message ?? String(e))}</div>
+        </div></td></tr>`;
+            }
+        }
+
+        document.readyState === "loading"
+            ? document.addEventListener("DOMContentLoaded", init)
+            : init();
+    </script>
+</body>
+
+</html>
