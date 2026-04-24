@@ -51,7 +51,10 @@
 
         body {
             font-family: var(--font);
-            background: var(--surface-2);
+            background:
+                radial-gradient(circle at 5% 5%, rgba(91, 124, 255, .16), transparent 24%),
+                radial-gradient(circle at 90% 8%, rgba(139, 92, 246, .16), transparent 24%),
+                var(--surface-2);
             color: var(--ink);
             height: 100vh;
             display: flex;
@@ -64,7 +67,8 @@
 
         /* ── TOPBAR ─────────────────────────────────── */
         .topbar {
-            background: var(--surface);
+            background: rgba(255, 255, 255, .84);
+            backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border);
             padding: 0 24px;
             height: 56px;
@@ -85,15 +89,29 @@
         }
 
         .app-icon {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, var(--accent), var(--accent-2));
-            border-radius: var(--r-sm);
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, var(--brand), var(--brand-2));
+            border-radius: 11px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
-            box-shadow: 0 2px 8px var(--accent-glow);
+            font-size: 18px;
+            color: #fff;
+            box-shadow: 0 8px 20px rgba(79, 110, 247, .35);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.04);
+            }
         }
 
         .app-title {
@@ -663,26 +681,6 @@
             height: 100%;
         }
 
-        .tc-header {
-            padding: 12px 20px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-shrink: 0;
-        }
-
-        .rec-count {
-            font-size: 12px;
-            color: var(--ink-muted);
-            font-weight: 500;
-        }
-
-        .rec-count strong {
-            color: var(--ink-soft);
-            font-weight: 700;
-        }
-
         .table-wrap {
             overflow-x: auto;
             overflow-y: auto;
@@ -1136,6 +1134,7 @@
             display: flex;
             flex-direction: column;
             gap: 24px;
+            min-height: 0;
         }
 
         /* Stats Cards - Modern look */
@@ -1266,6 +1265,7 @@
             border: 1px solid var(--border);
             border-radius: var(--r-lg);
             box-shadow: var(--shadow-xs);
+            flex-shrink: 0;
         }
 
         .d-sec-hdr {
@@ -1568,6 +1568,288 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* ── AUDIT LOG TIMELINE ─────────────────────── */
+        .audit-sec {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-lg);
+            box-shadow: var(--shadow-xs);
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .audit-sec-hdr {
+            padding: 16px 20px 14px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .audit-hdr-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .audit-hdr-icon {
+            color: #7c3aed;
+            background: rgba(124, 58, 237, .1);
+            padding: 6px;
+            border-radius: var(--r-sm);
+            display: flex;
+        }
+
+        .audit-count-badge {
+            background: rgba(79, 110, 247, .1);
+            color: var(--accent);
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+            border: 1px solid rgba(79, 110, 247, .2);
+        }
+
+        .audit-body {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 28px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 9px;
+            top: 8px;
+            bottom: 8px;
+            width: 2px;
+            background: linear-gradient(180deg, var(--accent), var(--accent-2), var(--border));
+            border-radius: 2px;
+        }
+
+        .tl-item {
+            position: relative;
+            margin-bottom: 20px;
+            animation: tlIn .3s ease both;
+        }
+
+        .tl-item:last-child {
+            margin-bottom: 0;
+        }
+
+        @keyframes tlIn {
+            from {
+                opacity: 0;
+                transform: translateX(-8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .tl-dot {
+            position: absolute;
+            left: -24px;
+            top: 10px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 2.5px solid var(--surface);
+            background: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent);
+            z-index: 1;
+        }
+
+        .tl-dot.tl-create {
+            background: var(--green);
+            box-shadow: 0 0 0 2px var(--green);
+        }
+
+        .tl-dot.tl-update {
+            background: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent);
+        }
+
+        .tl-dot.tl-delete {
+            background: var(--red);
+            box-shadow: 0 0 0 2px var(--red);
+        }
+
+        .tl-dot.tl-other {
+            background: var(--ink-ghost);
+            box-shadow: 0 0 0 2px var(--ink-ghost);
+        }
+
+        .tl-card {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--r-md);
+            padding: 12px 14px;
+            transition: box-shadow var(--tr), border-color var(--tr);
+        }
+
+        .tl-card:hover {
+            box-shadow: var(--shadow-sm);
+            border-color: var(--ink-ghost);
+        }
+
+        .tl-card-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tl-action-pill {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .3px;
+            padding: 3px 9px;
+            border-radius: 20px;
+            text-transform: uppercase;
+        }
+
+        .tl-pill-create {
+            background: var(--green-bg);
+            color: var(--green);
+        }
+
+        .tl-pill-update {
+            background: rgba(79, 110, 247, .1);
+            color: var(--accent);
+        }
+
+        .tl-pill-delete {
+            background: var(--red-bg);
+            color: var(--red);
+        }
+
+        .tl-pill-other {
+            background: var(--surface-3);
+            color: var(--ink-muted);
+        }
+
+        .tl-time {
+            font-size: 11px;
+            color: var(--ink-muted);
+            font-family: var(--mono);
+            white-space: nowrap;
+        }
+
+        .tl-user {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--ink-soft);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tl-user-avatar {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            color: #fff;
+            font-size: 9px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .tl-changes {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .tl-change-row {
+            display: grid;
+            grid-template-columns: auto 1fr 1fr;
+            gap: 6px 8px;
+            align-items: start;
+            font-size: 12px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            padding: 8px 10px;
+        }
+
+        .tl-field-name {
+            font-weight: 700;
+            color: var(--ink);
+            white-space: nowrap;
+            padding-right: 6px;
+            border-right: 1px solid var(--border);
+        }
+
+        .tl-old {
+            color: var(--red);
+            text-decoration: line-through;
+            opacity: .8;
+            padding-left: 6px;
+            word-break: break-word;
+        }
+
+        .tl-new {
+            color: var(--green);
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .audit-empty {
+            text-align: center;
+            padding: 32px 20px;
+            color: var(--ink-muted);
+        }
+
+        .audit-empty-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .audit-empty-text {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .audit-loading {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 24px 20px;
+            color: var(--ink-muted);
+            font-size: 13px;
+        }
+
+        .audit-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin .7s linear infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 
@@ -1748,7 +2030,7 @@
                     <svg width="10" height="10" fill="currentColor" viewBox="0 0 24 24" style="margin-right:2px;">
                         <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" />
                     </svg>
-                    Admin
+                    ADMIN
                 </div>
             </div>
             <div class="table-wrap">
@@ -1955,6 +2237,7 @@
             assetField: "Asset_Type_Name",
             PAGE: 50,
             BATCH: 200,
+            auditLogReport: "All_Audit_Logs",
             roleReport: "All_Branch_User_Role_Mapping"
         };
 
@@ -2401,7 +2684,7 @@
         // ─────────────────────────────────────────────
         // DETAIL DRAWER
         // ─────────────────────────────────────────────
-        function openDrawer(recordId) {
+        async function openDrawer(recordId) {
             const p = S.all.find(x => String(x.ID) === String(recordId));
             if (!p) return;
             S.drawerRec = p;
@@ -2463,9 +2746,29 @@
             </div>
         </div>`;
 
+            // Append audit section dynamically via DOM (more reliable in Zoho iframe)
+            const auditSec = document.createElement('div');
+            auditSec.className = 'audit-sec';
+            auditSec.innerHTML = `
+                <div class="audit-sec-hdr">
+                    <div class="audit-hdr-left">
+                        <div class="audit-hdr-icon">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        </div>
+                        <div class="d-sec-title">Audit History</div>
+                    </div>
+                    <span class="audit-count-badge" id="auditCountBadge">Loading…</span>
+                </div>
+                <div class="audit-body" id="auditTimelineContainer">
+                    <div class="audit-loading"><div class="audit-spinner"></div>Loading audit history…</div>
+                </div>`;
+            document.getElementById('drawerBody').appendChild(auditSec);
+            console.log('Audit section appended, drawerBody children:', document.getElementById('drawerBody').children.length);
+
             document.querySelectorAll("tbody tr").forEach(r => r.classList.remove("selected"));
             document.querySelector(`tbody tr[data-id="${recordId}"]`)?.classList.add("selected");
             document.getElementById("drawerOv").classList.add("open");
+            fetchAndRenderAuditLog(String(p.ID));
         }
 
         function closeDrawer() {
@@ -2474,6 +2777,125 @@
             S.drawerRec = null;
         }
         function handleDrawerOvClick(e) { if (e.target === document.getElementById("drawerOv")) closeDrawer(); }
+
+        // ─────────────────────────────────────────────
+        // AUDIT LOG TIMELINE
+        // ─────────────────────────────────────────────
+        async function fetchAndRenderAuditLog(recordId) {
+            const container = document.getElementById('auditTimelineContainer');
+            const badge = document.getElementById('auditCountBadge');
+            if (!container) return;
+            container.innerHTML = `<div class="audit-loading"><div class="audit-spinner"></div>Loading audit history…</div>`;
+            if (badge) badge.textContent = 'Loading…';
+            try {
+                const logs = await fetchAuditLogsForRecord(recordId);
+                console.log('Audit logs fetched for record', recordId, ':', logs.length, 'records');
+                if (logs.length > 0) console.log('Sample audit log:', JSON.stringify(logs[0]));
+                renderAuditTimeline(container, badge, logs);
+            } catch (e) {
+                console.warn('Audit log fetch error:', e);
+                container.innerHTML = `<div class="audit-empty"><div class="audit-empty-icon">⚠️</div><div class="audit-empty-text">Could not load audit history</div></div>`;
+                if (badge) badge.textContent = 'Error';
+            }
+        }
+
+        async function fetchAuditLogsForRecord(recordId) {
+            let all = [], page = 1;
+            console.log('Fetching audit logs for Record_ID:', recordId, 'Module: Product');
+            try {
+                // Fetch all audit logs for Product module, filter client-side for reliability
+                while (true) {
+                    const r = await ZOHO.CREATOR.API.getAllRecords({
+                        appName: CFG.appName,
+                        reportName: CFG.auditLogReport,
+                        criteria: `(Module == "Product")`,
+                        page,
+                        pageSize: CFG.BATCH
+                    });
+                    const rows = r?.data ?? [];
+                    console.log(`Audit log page ${page}: ${rows.length} rows fetched`);
+                    if (rows.length > 0 && page === 1) {
+                        console.log('Audit log field keys:', Object.keys(rows[0]));
+                        console.log('First audit record:', JSON.stringify(rows[0]));
+                    }
+                    all = all.concat(rows);
+                    if (rows.length < CFG.BATCH) break;
+                    page++;
+                }
+            } catch (e) {
+                console.warn('Audit log API error (may mean no records):', e);
+                return [];
+            }
+            // Client-side filter by Record_ID for exact match
+            const rid = String(recordId);
+            const filtered = all.filter(log => String(log.Record_ID || '') === rid);
+            console.log(`Audit logs: total=${all.length}, matched Record_ID=${rid}: ${filtered.length}`);
+            filtered.sort((a, b) => new Date(b.Timestamp || 0) - new Date(a.Timestamp || 0));
+            return filtered;
+        }
+
+        function renderAuditTimeline(container, badge, logs) {
+            if (!logs.length) {
+                container.innerHTML = `<div class="audit-empty"><div class="audit-empty-icon">📋</div><div class="audit-empty-text">No Audit Logs</div></div>`;
+                if (badge) badge.textContent = '0';
+                return;
+            }
+            if (badge) badge.textContent = `${logs.length} event${logs.length !== 1 ? 's' : ''}`;
+
+            const items = logs.map((log, i) => {
+                const fc = String(log.Feild_Changed || '');
+                const fcLow = fc.toLowerCase();
+                const actionLabel = fcLow.includes('creat') ? 'Created'
+                    : fcLow.includes('delet') ? 'Deleted'
+                        : (log.Old_Value || log.New_Value) ? 'Updated'
+                            : fc ? 'Event' : 'Event';
+                const dotClass = actionLabel === 'Created' ? 'tl-create' : actionLabel === 'Deleted' ? 'tl-delete' : actionLabel === 'Updated' ? 'tl-update' : 'tl-other';
+                const pillClass = actionLabel === 'Created' ? 'tl-pill-create' : actionLabel === 'Deleted' ? 'tl-pill-delete' : actionLabel === 'Updated' ? 'tl-pill-update' : 'tl-pill-other';
+
+                const userRaw = log.User || '';
+                const userName = typeof userRaw === 'object' ? (userRaw.display_value || userRaw.email || 'System') : String(userRaw || 'System');
+                const initials = userName.split(/\s+/).map(w => w[0] || '').join('').toUpperCase().slice(0, 2) || 'S';
+
+                let tsFormatted = '—';
+                const tsRaw = log.Timestamp || log.Added_Time || '';
+                if (tsRaw) {
+                    try {
+                        tsFormatted = new Date(tsRaw).toLocaleString('en-IN', {
+                            day: '2-digit', month: 'short', year: 'numeric',
+                            hour: '2-digit', minute: '2-digit', hour12: true
+                        });
+                    } catch (_) { tsFormatted = tsRaw; }
+                }
+
+                let changesHtml = '';
+                if (fc) {
+                    const fields = fc.split(',').map(f => f.trim()).filter(Boolean);
+                    const oldVals = String(log.Old_Value || '').split(',').map(v => v.trim());
+                    const newVals = String(log.New_Value || '').split(',').map(v => v.trim());
+                    const rows = fields.map((field, fi) => {
+                        const oldV = oldVals[fi] || '';
+                        const newV = newVals[fi] || '';
+                        if (!oldV && !newV) return `<div class="tl-change-row" style="grid-template-columns:1fr"><span class="tl-field-name" style="border-right:none">${esc(field)}</span></div>`;
+                        return `<div class="tl-change-row"><span class="tl-field-name">${esc(field)}</span><span class="tl-old">${oldV ? esc(oldV) : '<em style="opacity:.5">—</em>'}</span><span class="tl-new">${newV ? esc(newV) : '<em style="opacity:.5">—</em>'}</span></div>`;
+                    }).join('');
+                    changesHtml = `<div class="tl-changes">${rows}</div>`;
+                }
+
+                return `<div class="tl-item" style="animation-delay:${i * 0.05}s">
+                    <div class="tl-dot ${dotClass}"></div>
+                    <div class="tl-card">
+                        <div class="tl-card-top">
+                            <span class="tl-action-pill ${pillClass}">${esc(actionLabel)}</span>
+                            <span class="tl-time">${esc(tsFormatted)}</span>
+                        </div>
+                        <div class="tl-user"><span class="tl-user-avatar">${esc(initials)}</span>${esc(userName)}</div>
+                        ${changesHtml}
+                    </div>
+                </div>`;
+            }).join('');
+
+            container.innerHTML = `<div class="timeline">${items}</div>`;
+        }
         function editFromDrawer() {
             if (S.drawerRec) {
                 const id = S.drawerRec.ID;
