@@ -1,0 +1,2777 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Management</title>
+    <script src="https://js.zohostatic.com/creator/widgets/version/1.0/widgetsdk-min.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --ink: #0f1117;
+            --ink-soft: #3d4252;
+            --ink-muted: #7c8296;
+            --ink-ghost: #b0b6c8;
+            --surface: #ffffff;
+            --surface-2: #f4f5f8;
+            --surface-3: #eceef3;
+            --surface-4: #e2e5ed;
+            --accent: #4f6ef7;
+            --accent-dark: #3d5ce6;
+            --accent-glow: rgba(79, 110, 247, .18);
+            --green: #059669;
+            --green-bg: #d1fae5;
+            --red: #dc2626;
+            --red-bg: #fee2e2;
+            --amber: #d97706;
+            --amber-bg: #fef3c7;
+            --blue: #2563eb;
+            --blue-bg: #dbeafe;
+            --purple: #7c3aed;
+            --border: #e2e5ed;
+            --border-focus: #4f6ef7;
+            --r-sm: 6px;
+            --r-md: 10px;
+            --r-lg: 16px;
+            --r-xl: 22px;
+            --shadow-xs: 0 1px 2px rgba(15, 17, 23, .06);
+            --shadow-sm: 0 2px 6px rgba(15, 17, 23, .08);
+            --shadow-lg: 0 12px 40px rgba(15, 17, 23, .14);
+            --shadow-xl: 0 24px 64px rgba(15, 17, 23, .18);
+            --font: 'DM Sans', sans-serif;
+            --mono: 'DM Mono', monospace;
+            --tr: 200ms cubic-bezier(.4, 0, .2, 1);
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--surface-2);
+            color: var(--ink);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-size: 14px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            overflow: hidden;
+        }
+
+        /* ── TOPBAR */
+        .topbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-xs);
+            flex-shrink: 0;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .app-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #4f6ef7, #7c3aed);
+            border-radius: var(--r-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            box-shadow: 0 2px 8px rgba(79, 110, 247, .3);
+        }
+
+        .app-title {
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: -.2px;
+        }
+
+        .app-subtitle {
+            font-size: 12px;
+            color: var(--ink-muted);
+            margin-top: 1px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Loading bar */
+        .loading-bar {
+            height: 2px;
+            background: linear-gradient(90deg, #4f6ef7, #7c3aed, #4f6ef7);
+            background-size: 200% 100%;
+            animation: lbar 1.2s linear infinite;
+            position: fixed;
+            top: 56px;
+            left: 0;
+            right: 0;
+            z-index: 999;
+            display: none;
+        }
+
+        .loading-bar.active {
+            display: block;
+        }
+
+        @keyframes lbar {
+            0% {
+                background-position: 200% 0
+            }
+
+            100% {
+                background-position: -200% 0
+            }
+        }
+
+        .main {
+            padding: 20px 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ── BUTTONS */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: var(--r-md);
+            font-size: 13px;
+            font-weight: 600;
+            font-family: var(--font);
+            cursor: pointer;
+            transition: var(--tr);
+            white-space: nowrap;
+            outline: none;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(79, 110, 247, .3);
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(79, 110, 247, .4);
+        }
+
+        .btn-primary:active {
+            transform: none;
+        }
+
+        .btn-primary:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--ink-soft);
+            border: 1px solid var(--border);
+        }
+
+        .btn-ghost:hover {
+            background: var(--surface-3);
+            color: var(--ink);
+        }
+
+        .btn-icon {
+            padding: 7px;
+            background: var(--surface);
+            color: var(--ink-muted);
+            border: 1px solid var(--border);
+            border-radius: var(--r-md);
+            cursor: pointer;
+            transition: var(--tr);
+            display: flex;
+        }
+
+        .btn-icon:hover {
+            background: var(--surface-3);
+            color: var(--ink);
+        }
+
+        /* ── TOOLBAR */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+
+        .search-wrap {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+            max-width: 340px;
+        }
+
+        .search-wrap .s-icon {
+            position: absolute;
+            left: 11px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--ink-ghost);
+            pointer-events: none;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 8px 12px 8px 34px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-md);
+            font-size: 13px;
+            font-family: var(--font);
+            background: var(--surface);
+            color: var(--ink);
+            outline: none;
+            transition: var(--tr);
+        }
+
+        .search-input:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .search-input::placeholder {
+            color: var(--ink-ghost);
+        }
+
+        .spacer {
+            flex: 1;
+        }
+
+        .sort-select {
+            padding: 7px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-md);
+            font-size: 12px;
+            font-family: var(--font);
+            color: var(--ink-soft);
+            background: var(--surface);
+            outline: none;
+            cursor: pointer;
+            transition: var(--tr);
+        }
+
+        /* ── FILTER BAR */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 10px;
+            padding: 10px 14px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-lg);
+            box-shadow: var(--shadow-xs);
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 10;
+            flex-shrink: 0;
+        }
+
+        .fb-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--ink-muted);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .fb-sep {
+            width: 1px;
+            height: 18px;
+            background: var(--border);
+            margin: 0 2px;
+        }
+
+        .fd-wrap {
+            position: relative;
+        }
+
+        .fd-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            background: var(--surface);
+            font-size: 12px;
+            font-weight: 600;
+            font-family: var(--font);
+            color: var(--ink-soft);
+            cursor: pointer;
+            transition: var(--tr);
+            white-space: nowrap;
+        }
+
+        .fd-btn:hover {
+            background: var(--surface-2);
+            color: var(--ink);
+            border-color: var(--ink-ghost);
+        }
+
+        .fd-btn.has-value {
+            background: rgba(79, 110, 247, .08);
+            border-color: var(--accent);
+            color: var(--accent-dark);
+        }
+
+        .fd-btn.is-open {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+
+        .fd-count {
+            background: var(--accent);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            min-width: 16px;
+            height: 16px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+        }
+
+        .fd-chevron {
+            transition: transform var(--tr);
+            opacity: .5;
+        }
+
+        .fd-btn.is-open .fd-chevron {
+            transform: rotate(180deg);
+        }
+
+        .fd-menu {
+            position: absolute;
+            top: calc(100% + 5px);
+            left: 0;
+            min-width: 210px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-md);
+            box-shadow: var(--shadow-lg);
+            z-index: 400;
+            display: none;
+            padding: 6px;
+        }
+
+        .fd-menu.open {
+            display: block;
+            animation: dropIn .14s ease;
+        }
+
+        @keyframes dropIn {
+            from {
+                opacity: 0;
+                transform: translateY(-5px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .fd-search {
+            width: 100%;
+            padding: 7px 10px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            font-size: 12px;
+            font-family: var(--font);
+            color: var(--ink);
+            background: var(--surface-2);
+            outline: none;
+            margin-bottom: 5px;
+        }
+
+        .fd-search:focus {
+            border-color: var(--border-focus);
+            background: var(--surface);
+        }
+
+        .fd-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .fd-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .fd-list::-webkit-scrollbar-thumb {
+            background: var(--surface-4);
+            border-radius: 2px;
+        }
+
+        .fd-item {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 7px 8px;
+            border-radius: var(--r-sm);
+            cursor: pointer;
+            user-select: none;
+            transition: background var(--tr);
+        }
+
+        .fd-item:hover {
+            background: var(--surface-2);
+        }
+
+        .fd-item.selected {
+            background: rgba(79, 110, 247, .06);
+        }
+
+        .fd-check {
+            width: 15px;
+            height: 15px;
+            border: 1.5px solid var(--border);
+            border-radius: 3px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--tr);
+        }
+
+        .fd-item.selected .fd-check {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .fd-item.selected .fd-check::after {
+            content: '';
+            width: 8px;
+            height: 5px;
+            border-left: 2px solid #fff;
+            border-bottom: 2px solid #fff;
+            transform: rotate(-45deg) translateY(-1px);
+            display: block;
+        }
+
+        .fd-item-label {
+            font-size: 12px;
+            color: var(--ink);
+            flex: 1;
+        }
+
+        .fd-empty {
+            padding: 10px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--ink-muted);
+        }
+
+        .fd-clear {
+            display: none;
+            align-items: center;
+            gap: 4px;
+            padding: 5px 10px;
+            border: 1px solid #fca5a5;
+            border-radius: var(--r-sm);
+            background: var(--red-bg);
+            color: var(--red);
+            font-size: 12px;
+            font-weight: 600;
+            font-family: var(--font);
+            cursor: pointer;
+            transition: var(--tr);
+        }
+
+        .fd-clear:hover {
+            background: #fecaca;
+        }
+
+        .fd-clear.visible {
+            display: inline-flex;
+        }
+
+        /* ── FILTER CHIPS */
+        .filter-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .filter-chips:empty {
+            display: none;
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px 4px 12px;
+            background: rgba(79, 110, 247, .1);
+            border: 1px solid rgba(79, 110, 247, .25);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--accent);
+            animation: chipIn .18s ease;
+        }
+
+        @keyframes chipIn {
+            from {
+                opacity: 0;
+                transform: scale(.85)
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1)
+            }
+        }
+
+        .chip-x {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--accent);
+            opacity: .6;
+            display: flex;
+            padding: 0;
+            transition: var(--tr);
+        }
+
+        .chip-x:hover {
+            opacity: 1;
+        }
+
+        /* ── TABLE CARD */
+        .table-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-lg);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .tc-header {
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .rec-count {
+            font-size: 12px;
+            color: var(--ink-muted);
+            font-weight: 500;
+        }
+
+        .rec-count strong {
+            color: var(--ink-soft);
+            font-weight: 700;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+            overflow-y: auto;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .table-wrap::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .table-wrap::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .table-wrap::-webkit-scrollbar-thumb {
+            background: var(--surface-4);
+            border-radius: 3px;
+        }
+
+        .table-wrap::-webkit-scrollbar-thumb:hover {
+            background: var(--ink-ghost);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead tr {
+            background: var(--surface-2);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+
+        th {
+            padding: 10px 16px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--ink-muted);
+            white-space: nowrap;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background var(--tr);
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: #f7f8fb;
+        }
+
+        tbody tr.selected {
+            background: rgba(79, 110, 247, .05);
+        }
+
+        td {
+            padding: 12px 16px;
+            font-size: 13px;
+            color: var(--ink-soft);
+            vertical-align: middle;
+        }
+
+        td.col-orderid {
+            font-weight: 700;
+            color: var(--ink);
+            font-family: var(--mono);
+        }
+
+        .sn-mono {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--ink-muted);
+            background: var(--surface-2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+        }
+
+        .items-pill {
+            font-family: var(--mono);
+            font-size: 12px;
+            font-weight: 600;
+            background: var(--surface-2);
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            color: var(--ink-soft);
+        }
+
+        /* Status badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .3px;
+            text-transform: uppercase;
+        }
+
+        .badge::before {
+            content: '';
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .badge-pending {
+            background: var(--amber-bg);
+            color: var(--amber);
+        }
+
+        .badge-pending::before {
+            background: var(--amber);
+        }
+
+        .badge-partial {
+            background: var(--blue-bg);
+            color: var(--blue);
+        }
+
+        .badge-partial::before {
+            background: var(--blue);
+        }
+
+        .badge-cancelled {
+            background: var(--red-bg);
+            color: var(--red);
+        }
+
+        .badge-cancelled::before {
+            background: var(--red);
+        }
+
+        .badge-delivered {
+            background: var(--green-bg);
+            color: var(--green);
+        }
+
+        .badge-delivered::before {
+            background: var(--green);
+        }
+
+        .row-acts {
+            display: flex;
+            gap: 4px;
+        }
+
+        .act-btn {
+            padding: 5px 10px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            background: var(--surface);
+            font-size: 11px;
+            font-weight: 600;
+            font-family: var(--font);
+            color: var(--ink-soft);
+            cursor: pointer;
+            transition: var(--tr);
+        }
+
+        .act-btn:hover {
+            background: var(--surface-3);
+        }
+
+        .act-btn.del {
+            color: var(--red);
+            border-color: #fca5a5;
+        }
+
+        .act-btn.del:hover {
+            background: var(--red-bg);
+            border-color: var(--red);
+        }
+
+        /* Skeleton */
+        @keyframes shimmer {
+            0% {
+                background-position: -600px 0
+            }
+
+            100% {
+                background-position: 600px 0
+            }
+        }
+
+        .sk-row td {
+            padding: 13px 16px;
+        }
+
+        .sk-cell {
+            height: 13px;
+            border-radius: 4px;
+            background: linear-gradient(90deg, var(--surface-3) 25%, var(--surface-4) 50%, var(--surface-3) 75%);
+            background-size: 600px 100%;
+            animation: shimmer 1.4s infinite;
+        }
+
+        /* Empty */
+        .t-empty {
+            padding: 60px 20px;
+            text-align: center;
+            color: var(--ink-muted);
+        }
+
+        .t-empty-icon {
+            font-size: 44px;
+            margin-bottom: 12px;
+        }
+
+        .t-empty-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--ink-soft);
+            margin-bottom: 4px;
+        }
+
+        .t-empty-sub {
+            font-size: 13px;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 11px 20px;
+            border-top: 1px solid var(--border);
+            background: var(--surface-2);
+            gap: 16px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+
+        .pg-info {
+            font-size: 12px;
+            color: var(--ink-muted);
+        }
+
+        .pg-size-wrap {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .pg-size-select {
+            padding: 5px 10px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            background: var(--surface);
+            font-size: 12px;
+            font-weight: 500;
+            font-family: var(--font);
+            color: var(--ink-soft);
+            cursor: pointer;
+            outline: none;
+            transition: var(--tr);
+        }
+
+        .pg-size-select:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+
+        .pg-ctrl {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .pg-btn {
+            padding: 5px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            background: var(--surface);
+            font-size: 12px;
+            font-weight: 600;
+            font-family: var(--font);
+            color: var(--ink-soft);
+            cursor: pointer;
+            transition: var(--tr);
+        }
+
+        .pg-btn:hover:not(:disabled) {
+            background: var(--surface-3);
+            color: var(--ink);
+        }
+
+        .pg-btn:disabled {
+            opacity: .4;
+            cursor: not-allowed;
+        }
+
+        .pg-btn.active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+
+        /* ── DETAIL DRAWER */
+        .drawer-ov {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 17, 23, .4);
+            z-index: 500;
+            backdrop-filter: blur(4px);
+        }
+
+        .drawer-ov.open {
+            display: block;
+            animation: fadeOv .25s ease;
+        }
+
+        @keyframes fadeOv {
+            from {
+                opacity: 0
+            }
+
+            to {
+                opacity: 1
+            }
+        }
+
+        .drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 540px;
+            background: #fafbfe;
+            box-shadow: -8px 0 32px rgba(15, 17, 23, .12);
+            display: flex;
+            flex-direction: column;
+            z-index: 501;
+            transform: translateX(100%);
+            transition: transform 350ms cubic-bezier(.16, 1, .3, 1);
+        }
+
+        .drawer-ov.open .drawer {
+            transform: translateX(0);
+        }
+
+        .drawer-hdr {
+            padding: 24px 28px 20px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+            box-shadow: var(--shadow-xs);
+            position: relative;
+            z-index: 10;
+        }
+
+        .drawer-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .d-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #4f6ef7, #7c3aed);
+            border-radius: var(--r-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 6px 16px rgba(79, 110, 247, .3);
+        }
+
+        .d-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--ink);
+            letter-spacing: -.3px;
+            margin-bottom: 6px;
+            font-family: var(--mono);
+        }
+
+        .d-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .d-id {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--ink-soft);
+            background: var(--surface-3);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .d-close {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            color: var(--ink-muted);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--tr);
+            flex-shrink: 0;
+            box-shadow: var(--shadow-xs);
+        }
+
+        .d-close:hover {
+            background: var(--surface-2);
+            color: var(--ink);
+            transform: rotate(90deg);
+        }
+
+        .d-acts {
+            display: flex;
+            gap: 10px;
+        }
+
+        .d-acts .btn {
+            flex: 1;
+            justify-content: center;
+            padding: 10px 16px;
+            border-radius: var(--r-md);
+            font-size: 13px;
+        }
+
+        .drawer-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .drawer-body::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .drawer-body::-webkit-scrollbar-thumb {
+            background: var(--surface-4);
+            border-radius: 3px;
+        }
+
+        /* Drawer sections */
+        .d-sec {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-lg);
+            box-shadow: var(--shadow-xs);
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .d-sec-hdr {
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .d-sec-hdr-icon {
+            color: var(--accent);
+            display: flex;
+            background: rgba(79, 110, 247, .1);
+            padding: 6px;
+            border-radius: var(--r-sm);
+        }
+
+        .d-sec-title {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            color: var(--ink);
+        }
+
+        .d-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px 16px;
+            padding: 20px;
+        }
+
+        .d-field-full {
+            grid-column: 1/-1;
+        }
+
+        .d-lbl {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--ink-muted);
+            margin-bottom: 5px;
+        }
+
+        .d-val {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--ink);
+            line-height: 1.5;
+            word-break: break-word;
+        }
+
+        .d-val.mono {
+            font-family: var(--mono);
+            color: var(--ink-soft);
+            background: var(--surface-2);
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            display: inline-block;
+        }
+
+        /* Stat cards */
+        .stat-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            flex-shrink: 0;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-lg);
+            padding: 18px 20px;
+            box-shadow: var(--shadow-xs);
+            transition: transform var(--tr), box-shadow var(--tr);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--accent);
+            border-radius: 4px 0 0 4px;
+        }
+
+        .stat-card.sc-2::before {
+            background: var(--purple);
+        }
+
+        .stat-lbl {
+            font-size: 12px;
+            color: var(--ink-muted);
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .stat-val {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--ink);
+            font-family: var(--mono);
+            letter-spacing: -1px;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .stat-sub {
+            font-size: 12px;
+            color: var(--ink-soft);
+            font-weight: 500;
+        }
+
+        /* Products table inside drawer */
+        .products-tbl {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .products-tbl th {
+            padding: 10px 16px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--ink-muted);
+            background: var(--surface-2);
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        .products-tbl td {
+            padding: 11px 16px;
+            font-size: 13px;
+            color: var(--ink-soft);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .products-tbl tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .products-tbl tbody tr:hover td {
+            background: #f0f3ff;
+        }
+
+        .qty-badge {
+            font-family: var(--mono);
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent-dark);
+            background: var(--amber-bg);
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid #fde68a;
+        }
+
+        /* ── MODAL */
+        .modal-ov {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 17, 23, .45);
+            z-index: 600;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 24px 20px;
+            backdrop-filter: blur(3px);
+            overflow-y: auto;
+        }
+
+        .modal-ov.open {
+            display: flex;
+            animation: fadeOv .2s ease;
+        }
+
+        .modal {
+            background: var(--surface);
+            border-radius: var(--r-xl);
+            width: 100%;
+            max-width: 720px;
+            box-shadow: var(--shadow-xl);
+            animation: mSlide .22s cubic-bezier(.4, 0, .2, 1);
+            margin: auto;
+        }
+
+        @keyframes mSlide {
+            from {
+                opacity: 0;
+                transform: translateY(18px) scale(.97)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1)
+            }
+        }
+
+        .modal-hdr {
+            padding: 20px 24px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            color: var(--ink-muted);
+            border-radius: var(--r-sm);
+            padding: 6px;
+            display: flex;
+            transition: var(--tr);
+        }
+
+        .modal-close:hover {
+            background: var(--surface-3);
+        }
+
+        .modal-body {
+            padding: 20px 24px;
+        }
+
+        .modal-foot {
+            padding: 14px 24px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .form-grp {
+            margin-bottom: 14px;
+        }
+
+        .form-grp:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-lbl {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--ink-soft);
+            margin-bottom: 5px;
+        }
+
+        .req {
+            color: var(--red);
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            font-size: 13px;
+            font-family: var(--font);
+            color: var(--ink);
+            background: var(--surface);
+            outline: none;
+            transition: var(--tr);
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            font-size: 13px;
+            font-family: var(--font);
+            color: var(--ink);
+            background: var(--surface);
+            outline: none;
+            transition: var(--tr);
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-textarea:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .form-err {
+            display: none;
+            padding: 9px 12px;
+            background: var(--red-bg);
+            color: var(--red);
+            border: 1px solid #fca5a5;
+            border-radius: var(--r-sm);
+            font-size: 13px;
+            margin-bottom: 14px;
+        }
+
+        .form-err.show {
+            display: block;
+        }
+
+        .form-divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 18px 0 16px;
+        }
+
+        /* Subform */
+        .subform-hdr {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .subform-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        .subform-add {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            border: 1.5px dashed var(--accent);
+            border-radius: var(--r-sm);
+            background: rgba(79, 110, 247, .04);
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 600;
+            font-family: var(--font);
+            cursor: pointer;
+            transition: var(--tr);
+        }
+
+        .subform-add:hover {
+            background: rgba(79, 110, 247, .1);
+        }
+
+        .subform-wrap {
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-radius: var(--r-md);
+        }
+
+        .subform-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 560px;
+        }
+
+        .subform-table th {
+            padding: 9px 12px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--ink-muted);
+            background: var(--surface-2);
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        .subform-table td {
+            padding: 6px 8px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        .subform-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .sf-select,
+        .sf-input {
+            width: 100%;
+            padding: 7px 9px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            font-size: 12px;
+            font-family: var(--font);
+            color: var(--ink);
+            background: var(--surface);
+            outline: none;
+            transition: var(--tr);
+        }
+
+        .sf-select:focus,
+        .sf-input:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+
+        .sf-readonly {
+            padding: 7px 9px;
+            font-size: 12px;
+            font-family: var(--font);
+            color: var(--ink-muted);
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            min-width: 100px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sf-del-btn {
+            background: none;
+            border: 1px solid #fca5a5;
+            border-radius: var(--r-sm);
+            color: var(--red);
+            padding: 5px 8px;
+            cursor: pointer;
+            transition: var(--tr);
+            display: flex;
+            align-items: center;
+        }
+
+        .sf-del-btn:hover {
+            background: var(--red-bg);
+        }
+
+        .sf-empty {
+            padding: 24px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--ink-muted);
+            border-radius: var(--r-md);
+            border: 1.5px dashed var(--border);
+            background: var(--surface-2);
+        }
+
+        /* Global error */
+        .g-err {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            background: var(--red-bg);
+            border: 1px solid #fca5a5;
+            color: var(--red);
+            padding: 10px 14px;
+            border-radius: var(--r-md);
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        .g-err.show {
+            display: flex;
+        }
+
+        /* Toast */
+        .toast-shelf {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9000;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: var(--ink);
+            color: #fff;
+            padding: 11px 16px;
+            border-radius: var(--r-md);
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            min-width: 240px;
+            pointer-events: auto;
+            animation: toastIn .28s ease;
+        }
+
+        .toast.ok .dot {
+            background: #34d399;
+        }
+
+        .toast.err .dot {
+            background: #f87171;
+        }
+
+        .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        @media(max-width:768px) {
+            .main {
+                padding: 14px 16px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .drawer {
+                width: 100%;
+            }
+
+            .d-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="loading-bar" id="loadingBar"></div>
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+        <div class="topbar-left">
+            <div class="app-icon">📋</div>
+            <div>
+                <div class="app-title">Orders</div>
+                <div class="app-subtitle">order-management</div>
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="btn-icon" onclick="refreshData()" title="Refresh">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <polyline points="23 4 23 10 17 10" />
+                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+                </svg>
+            </button>
+            <button class="btn btn-primary" id="addBtn">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path d="M12 5v14M5 12h14" />
+                </svg>
+                Add Order
+            </button>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="g-err" id="gErr">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 8v4M12 16h.01" />
+            </svg>
+            <span id="gErrText"></span>
+        </div>
+
+        <!-- TOOLBAR -->
+        <div class="toolbar">
+            <div class="search-wrap">
+                <svg class="s-icon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+                    viewBox="0 0 24 24">
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.35-4.35" />
+                </svg>
+                <input class="search-input" id="searchInput" type="text"
+                    placeholder="Search by Order ID, branch, status…" oninput="handleSearch(this.value)">
+            </div>
+            <div class="spacer"></div>
+            <select class="sort-select" id="sortSelect" onchange="handleSort()">
+                <option value="">Sort: Default</option>
+                <option value="date_desc">Date Newest</option>
+                <option value="date_asc">Date Oldest</option>
+                <option value="orderid_asc">Order ID A→Z</option>
+                <option value="status">Status</option>
+            </select>
+        </div>
+
+        <!-- FILTER BAR -->
+        <div class="filter-bar" id="filterBar">
+            <span class="fb-label">
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                </svg>
+                Filters
+            </span>
+            <div class="fb-sep"></div>
+
+            <!-- Status -->
+            <div class="fd-wrap">
+                <button class="fd-btn" id="fb-status" onclick="toggleDropdown('status',event)">
+                    Status
+                    <svg class="fd-chevron" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5"
+                        viewBox="0 0 24 24">
+                        <path d="m6 9 6 6 6-6" />
+                    </svg>
+                </button>
+                <div class="fd-menu" id="fdm-status" onclick="event.stopPropagation()">
+                    <div class="fd-list">
+                        <div class="fd-item" id="fdi-status-Pending" onclick="toggleFilter('status','Pending')">
+                            <div class="fd-check"></div><span class="badge badge-pending"
+                                style="font-size:11px;">Pending</span>
+                        </div>
+                        <div class="fd-item" id="fdi-status-Partial Sent"
+                            onclick="toggleFilter('status','Partial Sent')">
+                            <div class="fd-check"></div><span class="badge badge-partial"
+                                style="font-size:11px;">Partial Sent</span>
+                        </div>
+                        <div class="fd-item" id="fdi-status-Cancelled" onclick="toggleFilter('status','Cancelled')">
+                            <div class="fd-check"></div><span class="badge badge-cancelled"
+                                style="font-size:11px;">Cancelled</span>
+                        </div>
+                        <div class="fd-item" id="fdi-status-Delivered" onclick="toggleFilter('status','Delivered')">
+                            <div class="fd-check"></div><span class="badge badge-delivered"
+                                style="font-size:11px;">Delivered</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Branch -->
+            <div class="fd-wrap">
+                <button class="fd-btn" id="fb-branch" onclick="toggleDropdown('branch',event)">
+                    Branch
+                    <svg class="fd-chevron" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5"
+                        viewBox="0 0 24 24">
+                        <path d="m6 9 6 6 6-6" />
+                    </svg>
+                </button>
+                <div class="fd-menu" id="fdm-branch" onclick="event.stopPropagation()" style="min-width:230px;">
+                    <input class="fd-search" type="text" placeholder="Search branches…"
+                        oninput="searchBranches(this.value)" id="bs-branch">
+                    <div class="fd-list" id="fdl-branch">
+                        <div class="fd-empty">Loading…</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fb-sep"></div>
+            <button class="fd-clear" id="clearBtn" onclick="clearAll()">
+                <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path d="M18 6 6 18M6 6l12 12" />
+                </svg>
+                Clear All
+            </button>
+        </div>
+
+        <!-- Filter chips -->
+        <div class="filter-chips" id="filterChips"></div>
+
+        <!-- TABLE CARD -->
+        <div class="table-card">
+            <div class="tc-header">
+                <span class="rec-count" id="recCount"><strong>—</strong> orders</span>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Sr. No</th>
+                            <th>Order ID</th>
+                            <th>Order Date</th>
+                            <th>Branch</th>
+                            <th>Status</th>
+                            <th>Items</th>
+                            <th style="width:1px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody"></tbody>
+                </table>
+            </div>
+            <div class="pagination" id="pgBar" style="display:none;">
+                <div style="display:flex;align-items:center;gap:12px;flex:1;">
+                    <span class="pg-info" id="pgInfo">—</span>
+                    <div class="pg-size-wrap">
+                        <label style="font-size:12px;color:var(--ink-muted);margin-right:6px;">Rows:</label>
+                        <select class="pg-size-select" onchange="changePageSize(this.value)">
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="pg-ctrl">
+                    <button class="pg-btn" id="pgPrev" disabled onclick="changePage(-1)">← Prev</button>
+                    <span id="pgNums" style="display:flex;gap:4px;"></span>
+                    <button class="pg-btn" id="pgNext" onclick="changePage(1)">Next →</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- DETAIL DRAWER -->
+    <div class="drawer-ov" id="drawerOv" onclick="handleDrawerOvClick(event)">
+        <div class="drawer" id="drawer">
+            <div class="drawer-hdr">
+                <div class="drawer-top">
+                    <div style="display:flex;gap:12px;align-items:flex-start;flex:1;">
+                        <div class="d-icon">📋</div>
+                        <div style="flex:1;min-width:0;">
+                            <div class="d-name" id="dName">—</div>
+                            <div class="d-meta">
+                                <span class="d-id" id="dDate">—</span>
+                                <span id="dStatus"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="d-close" onclick="closeDrawer()">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
+                            <path d="M18 6 6 18M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="d-acts">
+                    <button class="btn btn-ghost" onclick="editFromDrawer()">
+                        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                        </svg>
+                        Edit
+                    </button>
+                    <button class="btn" style="background:var(--red-bg);color:var(--red);border:1px solid #fca5a5;"
+                        onclick="deleteFromDrawer()">
+                        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
+                            <polyline points="3 6 5 6 21 6" />
+                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                            <path d="M10 11v6M14 11v6" />
+                            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                        </svg>
+                        Delete
+                    </button>
+                </div>
+            </div>
+            <div class="drawer-body" id="drawerBody"></div>
+        </div>
+    </div>
+
+    <!-- ADD / EDIT MODAL -->
+    <div class="modal-ov" id="modalOv" onclick="handleModalOvClick(event)">
+        <div class="modal">
+            <div class="modal-hdr">
+                <div class="modal-title" id="modalTitle">Add Order</div>
+                <button class="modal-close" onclick="closeModal()">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M18 6 6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-err" id="formErr"></div>
+                <div class="form-row">
+                    <div class="form-grp">
+                        <label class="form-lbl">Order Date <span class="req">*</span></label>
+                        <input class="form-input" type="date" id="fDate">
+                    </div>
+                    <div class="form-grp">
+                        <label class="form-lbl">Status <span class="req">*</span></label>
+                        <select class="form-select" id="fStatus">
+                            <option value="Pending">Pending</option>
+                            <option value="Partial Sent">Partial Sent</option>
+                            <option value="Cancelled">Cancelled</option>
+                            <option value="Delivered">Delivered</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-grp">
+                    <label class="form-lbl">Branch <span class="req">*</span></label>
+                    <select class="form-select" id="fBranch">
+                        <option value="">Select Branch</option>
+                    </select>
+                </div>
+
+                <hr class="form-divider">
+
+                <!-- Products Subform -->
+                <div class="subform-hdr">
+                    <div class="subform-title">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24" style="display:inline;vertical-align:middle;margin-right:5px;">
+                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                            <line x1="3" y1="6" x2="21" y2="6" />
+                            <path d="M16 10a4 4 0 0 1-8 0" />
+                        </svg>
+                        Products Selection
+                    </div>
+                    <button class="subform-add" onclick="addRow()">
+                        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"
+                            viewBox="0 0 24 24">
+                            <path d="M12 5v14M5 12h14" />
+                        </svg>
+                        Add Row
+                    </button>
+                </div>
+                <div id="subformWrap"></div>
+
+                <hr class="form-divider">
+
+                <div class="form-grp">
+                    <label class="form-lbl">Manual Product Request</label>
+                    <textarea class="form-textarea" id="fManual"
+                        placeholder="Enter any manual product notes or requests…"></textarea>
+                </div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" id="submitBtn" onclick="submitForm()">
+                    <span id="submitTxt">Add Order</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DELETE CONFIRM MODAL -->
+    <div class="modal-ov" id="delModalOv" onclick="handleDelModalOvClick(event)">
+        <div class="modal" style="max-width:400px;text-align:center;">
+            <div class="modal-body" style="padding:36px 28px 28px;">
+                <div
+                    style="width:60px;height:60px;border-radius:50%;background:var(--red-bg);color:var(--red);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;">
+                    <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path
+                            d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                        <line x1="12" y1="9" x2="12" y2="13" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                    </svg>
+                </div>
+                <h3 style="font-size:18px;font-weight:700;color:var(--ink);margin-bottom:8px;">Delete Order</h3>
+                <p style="font-size:14px;color:var(--ink-soft);line-height:1.6;margin-bottom:24px;">Are you sure you
+                    want to delete this order? This action cannot be undone.</p>
+                <div style="display:flex;gap:12px;">
+                    <button class="btn btn-ghost" style="flex:1;justify-content:center;"
+                        onclick="closeDelModal()">Cancel</button>
+                    <button class="btn"
+                        style="flex:1;justify-content:center;background:var(--red);color:#fff;border:none;box-shadow:0 2px 8px rgba(220,38,38,.25);"
+                        onclick="doDelete()">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-shelf" id="toasts"></div>
+
+    <script>
+        // ─────────────────────────────────────────────
+        // CONFIG
+        // ─────────────────────────────────────────────
+        const CFG = {
+            appName: "order-management",
+            orderReport: "All_Orders",
+            branchReport: "All_Branches",
+            productReport: "All_Products",
+            brandReport: "All_Brands",
+            assetTypeReport: "All_Asset_Types",
+            orderForm: "Order",
+            f: {
+                orderId: "Order_ID",
+                date: "order_date",
+                status: "Status",
+                branch: "Branch",
+                products: "Products_Selection",
+                manual: "Manual_Product_Request",
+                sf: {
+                    product: "Product",
+                    brand: "Brand",
+                    assetType: "Asset_Type",
+                    qty: "Ordered_Qty"
+                }
+            },
+            branchField: "Branch_Name",
+            productField: "Product_Name",
+            brandField: "Brand_Name",
+            assetField: "Asset_Type_Name",
+            BATCH: 200
+        };
+
+        // ─────────────────────────────────────────────
+        // STATE
+        // ─────────────────────────────────────────────
+        const S = {
+            all: [],
+            branches: [],
+            products: [],
+            brands: [],
+            assets: [],
+            filtered: [],
+            page: 1,
+            pageSize: 10,
+            search: "",
+            sort: "",
+            filters: { status: [], branches: [] },
+            editId: null,
+            drawerRec: null,
+            openDrop: null,
+            delId: null,
+            modalRows: []   // [{rowId, productId, brandId, assetId, qty}]
+        };
+
+        // ─────────────────────────────────────────────
+        // API HELPERS
+        // ─────────────────────────────────────────────
+        async function fetchAll(report) {
+            let all = [], page = 1;
+            while (true) {
+                const r = await ZOHO.CREATOR.API.getAllRecords({
+                    appName: CFG.appName, reportName: report,
+                    page, pageSize: CFG.BATCH
+                });
+                const rows = r?.data ?? [];
+                all = all.concat(rows);
+                if (rows.length < CFG.BATCH) break;
+                page++;
+            }
+            console.log(all);
+            return all;
+        }
+
+        // ─────────────────────────────────────────────
+        // LOOKUPS
+        // ─────────────────────────────────────────────
+        function lookupId(v) {
+            if (!v) return "";
+            if (typeof v === "object") return String(v.ID || "");
+            return String(v);
+        }
+        function branchName(v) {
+            if (!v) return "—";
+            if (typeof v === "object") return v.display_value || v[CFG.branchField] || "—";
+            return S.branches.find(b => b.id === String(v))?.name ?? String(v);
+        }
+        function productName(v) {
+            if (!v) return "—";
+            if (typeof v === "object") return v.display_value || v[CFG.productField] || "—";
+            return S.products.find(p => p.id === String(v))?.name ?? String(v);
+        }
+        function brandName(v) {
+            if (!v) return "—";
+            if (typeof v === "object") return v.display_value || v[CFG.brandField] || "—";
+            return S.brands.find(b => b.id === String(v))?.name ?? String(v);
+        }
+        function assetName(v) {
+            if (!v) return "—";
+            if (typeof v === "object") return v.display_value || v[CFG.assetField] || "—";
+            return S.assets.find(a => a.id === String(v))?.name ?? String(v);
+        }
+
+        function statusClass(s) {
+            if (s === "Pending") return "badge-pending";
+            if (s === "Partial Sent") return "badge-partial";
+            if (s === "Cancelled") return "badge-cancelled";
+            if (s === "Delivered") return "badge-delivered";
+            return "badge-pending";
+        }
+        function fmtDate(d) {
+            if (!d) return "—";
+            try {
+                const dt = new Date(d);
+                if (isNaN(dt)) return String(d);
+                return dt.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+            } catch { return String(d); }
+        }
+
+        // ─────────────────────────────────────────────
+        // LOAD ALL
+        // ─────────────────────────────────────────────
+        async function loadAll() {
+            setLoading(true);
+            renderSkeleton();
+            try {
+                const [orders, branches, products, brands, assets] = await Promise.all([
+                    fetchAll(CFG.orderReport),
+                    fetchAll(CFG.branchReport),
+                    fetchAll(CFG.productReport),
+                    fetchAll(CFG.brandReport),
+                    fetchAll(CFG.assetTypeReport)
+                ]);
+
+                S.all = orders;
+                S.branches = branches.map(r => ({ id: String(r.ID), name: r[CFG.branchField] || "—" }));
+                S.products = products
+                    .filter(r => (r.Status || "") === "Active")
+                    .map(r => ({
+                        id: String(r.ID),
+                        name: r[CFG.productField] || r.Name || "—",
+                        brandId: lookupId(r.Brand),
+                        assetId: lookupId(r.Asset_Type)
+                    }));
+                S.brands = brands.map(r => ({ id: String(r.ID), name: r[CFG.brandField] || "—" }));
+                S.assets = assets.map(r => ({ id: String(r.ID), name: r[CFG.assetField] || "—" }));
+
+                populateFormDropdowns();
+                buildBranchFilterList();
+                recompute();
+                hideErr();
+            } catch (e) {
+                showErr("Failed to load data: " + (e?.message ?? String(e)));
+                renderEmpty("Load failed — check SDK connection");
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        // ─────────────────────────────────────────────
+        // FILTER + SEARCH + SORT
+        // ─────────────────────────────────────────────
+        function recompute() {
+            const f = CFG.f, fl = S.filters;
+            let rows = [...S.all];
+
+            if (S.search) {
+                const q = S.search.toLowerCase();
+                rows = rows.filter(o =>
+                    (o[f.orderId] || "").toLowerCase().includes(q) ||
+                    branchName(o[f.branch]).toLowerCase().includes(q) ||
+                    (o[f.status] || "").toLowerCase().includes(q)
+                );
+            }
+
+            if (fl.status.length) rows = rows.filter(o => fl.status.includes(o[f.status] || "Pending"));
+            if (fl.branches.length) rows = rows.filter(o => fl.branches.includes(lookupId(o[f.branch])));
+
+            if (S.sort) rows.sort((a, b) => {
+                if (S.sort === "date_desc") return new Date(b[f.date] || 0) - new Date(a[f.date] || 0);
+                if (S.sort === "date_asc") return new Date(a[f.date] || 0) - new Date(b[f.date] || 0);
+                if (S.sort === "orderid_asc") return (a[f.orderId] || "").localeCompare(b[f.orderId] || "");
+                if (S.sort === "status") return (a[f.status] || "").localeCompare(b[f.status] || "");
+                return 0;
+            });
+
+            S.filtered = rows;
+            S.page = 1;
+            renderTable();
+            renderPagination();
+            updateFilterBtns();
+            renderChips();
+        }
+
+        // ─────────────────────────────────────────────
+        // TABLE RENDERING
+        // ─────────────────────────────────────────────
+        function renderTable() {
+            const tbody = document.getElementById("tbody");
+            const f = CFG.f;
+            const start = (S.page - 1) * S.pageSize;
+            const page = S.filtered.slice(start, start + S.pageSize);
+            const filtered = S.search || hasFilters();
+
+            document.getElementById("recCount").innerHTML =
+                `<strong>${S.filtered.length}</strong> order${S.filtered.length !== 1 ? "s" : ""}${filtered ? " (filtered)" : ""}`;
+
+            if (page.length === 0) {
+                renderEmpty(S.all.length === 0 ? "No orders yet" : "No orders match your filters");
+                return;
+            }
+
+            tbody.innerHTML = page.map((o, idx) => {
+                const status = o[f.status] || "Pending";
+                const id = escA(String(o.ID));
+                const lines = Array.isArray(o[f.products]) ? o[f.products].length : 0;
+                return `<tr onclick="openDrawer('${id}')" data-id="${id}">
+            <td><span class="sn-mono">${start + idx + 1}</span></td>
+            <td class="col-orderid">${esc(o[f.orderId] || "—")}</td>
+            <td>${fmtDate(o[f.date])}</td>
+            <td>${esc(branchName(o[f.branch]))}</td>
+            <td><span class="badge ${statusClass(status)}">${esc(status)}</span></td>
+            <td><span class="items-pill">${lines} item${lines !== 1 ? "s" : ""}</span></td>
+            <td><div class="row-acts" onclick="event.stopPropagation()">
+                <button class="act-btn" onclick="openEdit('${id}')">Edit</button>
+                <button class="act-btn del" onclick="confirmDelete('${id}')">Delete</button>
+            </div></td>
+        </tr>`;
+            }).join("");
+        }
+
+        function renderSkeleton(n = 7) {
+            const ws = ["10%", "14%", "16%", "18%", "14%", "10%", "0"];
+            document.getElementById("tbody").innerHTML = Array.from({ length: n }, () =>
+                `<tr class="sk-row">${ws.map(w => `<td><div class="sk-cell" style="width:${w}"></div></td>`).join("")}</tr>`
+            ).join("");
+            document.getElementById("recCount").innerHTML = `<strong>—</strong> orders`;
+        }
+
+        function renderEmpty(msg) {
+            document.getElementById("tbody").innerHTML = `<tr><td colspan="7"><div class="t-empty">
+        <div class="t-empty-icon">📋</div>
+        <div class="t-empty-title">${esc(msg)}</div>
+        <div class="t-empty-sub">Try adjusting your search or filters</div>
+    </div></td></tr>`;
+            document.getElementById("pgBar").style.display = "none";
+        }
+
+        // ─────────────────────────────────────────────
+        // PAGINATION
+        // ─────────────────────────────────────────────
+        function renderPagination() {
+            const total = S.filtered.length;
+            const pages = Math.ceil(total / S.pageSize);
+            const bar = document.getElementById("pgBar");
+            if (total === 0) { bar.style.display = "none"; return; }
+            bar.style.display = "flex";
+            const s = (S.page - 1) * S.pageSize + 1, e = Math.min(S.page * S.pageSize, total);
+            document.getElementById("pgInfo").textContent = `Showing ${s}–${e} of ${total}`;
+            const ctrl = bar.querySelector(".pg-ctrl");
+            if (pages <= 1) { ctrl.style.display = "none"; return; }
+            ctrl.style.display = "flex";
+            document.getElementById("pgPrev").disabled = S.page <= 1;
+            document.getElementById("pgNext").disabled = S.page >= pages;
+            const nums = [];
+            for (let i = 1; i <= pages; i++) {
+                if (i === 1 || i === pages || Math.abs(i - S.page) <= 2) nums.push(i);
+                else if (nums[nums.length - 1] !== "…") nums.push("…");
+            }
+            document.getElementById("pgNums").innerHTML = nums.map(n =>
+                n === "…"
+                    ? `<span style="padding:5px 3px;font-size:12px;color:var(--ink-muted)">…</span>`
+                    : `<button class="pg-btn${n === S.page ? " active" : ""}" onclick="goPage(${n})">${n}</button>`
+            ).join("");
+        }
+        function changePage(d) {
+            const tp = Math.ceil(S.filtered.length / S.pageSize);
+            S.page = Math.max(1, Math.min(tp, S.page + d));
+            renderTable(); renderPagination();
+        }
+        function goPage(p) { S.page = p; renderTable(); renderPagination(); }
+        function changePageSize(size) { S.pageSize = parseInt(size, 10); S.page = 1; recompute(); }
+
+        // ─────────────────────────────────────────────
+        // FILTER DROPDOWNS
+        // ─────────────────────────────────────────────
+        function toggleDropdown(name, e) {
+            e?.stopPropagation();
+            const already = S.openDrop === name;
+            closeDropdowns();
+            if (!already) {
+                S.openDrop = name;
+                document.getElementById(`fdm-${name}`)?.classList.add("open");
+                document.getElementById(`fb-${name}`)?.classList.add("is-open");
+            }
+        }
+        function closeDropdowns() {
+            document.querySelectorAll(".fd-menu.open").forEach(m => m.classList.remove("open"));
+            document.querySelectorAll(".fd-btn.is-open").forEach(b => b.classList.remove("is-open"));
+            S.openDrop = null;
+        }
+        function toggleFilter(type, value) {
+            const fl = S.filters;
+            if (type === "status") {
+                fl.status = toggle(fl.status, value);
+                setItemSelected(`fdi-status-${value}`, fl.status.includes(value));
+            } else if (type === "branch") {
+                fl.branches = toggle(fl.branches, value);
+                setItemSelected(`fdi-branch-${value}`, fl.branches.includes(value));
+            }
+            recompute();
+        }
+        function toggle(arr, v) { return arr.includes(v) ? arr.filter(x => x !== v) : [...arr, v]; }
+        function setItemSelected(id, sel) { document.getElementById(id)?.classList.toggle("selected", sel); }
+        function clearAll() {
+            S.filters = { status: [], branches: [] };
+            S.search = "";
+            document.getElementById("searchInput").value = "";
+            document.querySelectorAll(".fd-item.selected").forEach(el => el.classList.remove("selected"));
+            recompute();
+        }
+        function hasFilters() { return S.filters.status.length || S.filters.branches.length; }
+        function updateFilterBtns() {
+            const upd = (name, count) => {
+                const btn = document.getElementById(`fb-${name}`);
+                if (!btn) return;
+                btn.classList.toggle("has-value", count > 0);
+                const old = btn.querySelector(".fd-count");
+                if (old) old.remove();
+                if (count > 0) {
+                    const sp = document.createElement("span");
+                    sp.className = "fd-count"; sp.textContent = count;
+                    btn.insertBefore(sp, btn.querySelector(".fd-chevron"));
+                }
+            };
+            upd("status", S.filters.status.length);
+            upd("branch", S.filters.branches.length);
+            document.getElementById("clearBtn").classList.toggle("visible", !!(hasFilters() || S.search));
+        }
+        function renderChips() {
+            const el = document.getElementById("filterChips");
+            const fl = S.filters;
+            const chips = [];
+            fl.status.forEach(s => chips.push({ label: `Status: ${s}`, rm: () => { fl.status = fl.status.filter(v => v !== s); setItemSelected(`fdi-status-${s}`, false); recompute(); } }));
+            fl.branches.forEach(id => {
+                const b = S.branches.find(x => x.id === id);
+                chips.push({ label: `Branch: ${b ? b.name : id}`, rm: () => { fl.branches = fl.branches.filter(v => v !== id); setItemSelected(`fdi-branch-${id}`, false); recompute(); } });
+            });
+            window._rmChip = chips.map(c => c.rm);
+            el.innerHTML = chips.map((c, i) => `<span class="chip">${esc(c.label)}<button class="chip-x" onclick="window._rmChip[${i}]()"><svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></span>`).join("");
+        }
+
+        // ─────────────────────────────────────────────
+        // FILTER LIST POPULATION
+        // ─────────────────────────────────────────────
+        function buildBranchFilterList(query = "") {
+            const el = document.getElementById("fdl-branch");
+            if (!el) return;
+            const items = query ? S.branches.filter(b => b.name.toLowerCase().includes(query.toLowerCase())) : S.branches;
+            if (!items.length) { el.innerHTML = `<div class="fd-empty">${query ? "No matches" : "None found"}</div>`; return; }
+            el.innerHTML = items.map(item => `
+        <div class="fd-item${S.filters.branches.includes(item.id) ? " selected" : ""}"
+             id="fdi-branch-${escA(item.id)}"
+             onclick="toggleFilter('branch','${escA(item.id)}')">
+            <div class="fd-check"></div>
+            <span class="fd-item-label">${esc(item.name)}</span>
+        </div>`).join("");
+        }
+        function searchBranches(q) { buildBranchFilterList(q); }
+
+        // ─────────────────────────────────────────────
+        // FORM DROPDOWNS
+        // ─────────────────────────────────────────────
+        function populateFormDropdowns() {
+            const el = document.getElementById("fBranch");
+            el.innerHTML = `<option value="">Select Branch</option>` +
+                S.branches.map(b => `<option value="${escA(b.id)}">${esc(b.name)}</option>`).join("");
+        }
+
+        // ─────────────────────────────────────────────
+        // SUBFORM ROWS
+        // ─────────────────────────────────────────────
+        function addRow() {
+            S.modalRows.push({ rowId: "", productId: "", brandId: "", assetId: "", qty: "" });
+            renderSubform();
+        }
+        function removeRow(idx) {
+            S.modalRows.splice(idx, 1);
+            renderSubform();
+        }
+        function onProductChange(idx, productId) {
+            const prod = S.products.find(p => p.id === productId);
+            S.modalRows[idx].productId = productId;
+            S.modalRows[idx].brandId = prod?.brandId || "";
+            S.modalRows[idx].assetId = prod?.assetId || "";
+            renderSubform();
+        }
+        function onQtyChange(idx, val) {
+            S.modalRows[idx].qty = val;
+        }
+
+        function renderSubform() {
+            const wrap = document.getElementById("subformWrap");
+            if (S.modalRows.length === 0) {
+                wrap.innerHTML = `<div class="sf-empty">No products added. Click <strong>"Add Row"</strong> above to get started.</div>`;
+                return;
+            }
+            const productOptions = S.products.map(p =>
+                `<option value="${escA(p.id)}">${esc(p.name)}</option>`
+            ).join("");
+
+            wrap.innerHTML = `<div class="subform-wrap"><table class="subform-table">
+        <thead><tr>
+            <th>Product <span style="color:var(--red)">*</span></th>
+            <th>Brand</th>
+            <th>Asset Type</th>
+            <th>Ordered Qty <span style="color:var(--red)">*</span></th>
+            <th></th>
+        </tr></thead>
+        <tbody>${S.modalRows.map((row, idx) => {
+                const bName = row.brandId ? (S.brands.find(b => b.id === row.brandId)?.name || "—") : "—";
+                const aName = row.assetId ? (S.assets.find(a => a.id === row.assetId)?.name || "—") : "—";
+                const selOpts = `<option value="">Select Product</option>` +
+                    S.products.map(p => `<option value="${escA(p.id)}"${p.id === row.productId ? " selected" : ""}>${esc(p.name)}</option>`).join("");
+                return `<tr>
+                <td style="min-width:170px;"><select class="sf-select" onchange="onProductChange(${idx},this.value)">${selOpts}</select></td>
+                <td style="min-width:120px;"><div class="sf-readonly">${esc(bName)}</div></td>
+                <td style="min-width:130px;"><div class="sf-readonly">${esc(aName)}</div></td>
+                <td style="min-width:100px;"><input class="sf-input" type="number" min="1" value="${esc(String(row.qty))}" oninput="onQtyChange(${idx},this.value)" placeholder="Qty"></td>
+                <td><button class="sf-del-btn" onclick="removeRow(${idx})">
+                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                </button></td>
+            </tr>`;
+            }).join("")}</tbody>
+    </table></div>`;
+        }
+
+        // ─────────────────────────────────────────────
+        // SEARCH & SORT
+        // ─────────────────────────────────────────────
+        let _st;
+        function handleSearch(q) {
+            S.search = q.trim();
+            clearTimeout(_st);
+            _st = setTimeout(recompute, 120);
+        }
+        function handleSort() { S.sort = document.getElementById("sortSelect").value; recompute(); }
+        function refreshData() { loadAll(); }
+
+        // ─────────────────────────────────────────────
+        // DETAIL DRAWER
+        // ─────────────────────────────────────────────
+        async function openDrawer(recordId) {
+            const defaultRec = S.all.find(x => String(x.ID) === String(recordId));
+            if (!defaultRec) return;
+
+            // Show drawer immediately with skeleton data
+            S.drawerRec = defaultRec;
+            const f = CFG.f;
+            const status = defaultRec[f.status] || "Pending";
+
+            document.getElementById("dName").textContent = defaultRec[f.orderId] || "—";
+            document.getElementById("dDate").textContent = fmtDate(defaultRec[f.date]);
+            document.getElementById("dStatus").innerHTML = `<span class="badge ${statusClass(status)}">${esc(status)}</span>`;
+
+            document.getElementById("drawerBody").innerHTML = `<div style="padding:40px;text-align:center;color:var(--ink-muted);font-size:13px;">Loading order details…</div>`;
+
+            document.querySelectorAll("tbody tr").forEach(r => r.classList.remove("selected"));
+            document.querySelector(`tbody tr[data-id="${recordId}"]`)?.classList.add("selected");
+            document.getElementById("drawerOv").classList.add("open");
+
+            // Fetch the full record
+            let rec = defaultRec;
+            try {
+                const resp = await ZOHO.CREATOR.API.getRecordById({
+                    appName: CFG.appName, reportName: CFG.orderReport, id: recordId
+                });
+                if (resp && resp.data) {
+                    rec = resp.data;
+                    S.drawerRec = rec;
+                }
+            } catch (e) { }
+
+            const lines = Array.isArray(rec[f.products]) ? rec[f.products] : [];
+            const ptbl = lines.length > 0
+                ? `<table class="products-tbl">
+            <thead><tr><th>#</th><th>Product</th><th>Brand</th><th>Asset Type</th><th>Ordered Qty</th></tr></thead>
+            <tbody>${lines.map((l, i) => {
+                    const sf = f.sf;
+                    return `<tr>
+                    <td><span class="sn-mono">${i + 1}</span></td>
+                    <td style="font-weight:600;color:var(--ink);">${esc(productName(lookupId(l[sf.product])))}</td>
+                    <td>${esc(brandName(lookupId(l[sf.brand])))}</td>
+                    <td>${esc(assetName(lookupId(l[sf.assetType])))}</td>
+                    <td><span class="qty-badge">${l[sf.qty] ?? 0}</span></td>
+                </tr>`;
+                }).join("")}</tbody>
+           </table>`
+                : `<div style="padding:24px;text-align:center;font-size:13px;color:var(--ink-muted);">No products in this order</div>`;
+
+            document.getElementById("drawerBody").innerHTML = `
+        <div class="stat-cards">
+            <div class="stat-card">
+                <div class="stat-lbl">Total Items</div>
+                <div class="stat-val">${lines.length}</div>
+                <div class="stat-sub">product lines</div>
+            </div>
+            <div class="stat-card sc-2">
+                <div class="stat-lbl">Branch</div>
+                <div class="stat-val" style="font-size:14px;letter-spacing:0;font-weight:600;margin-top:4px;">${esc(branchName(rec[f.branch]))}</div>
+                <div class="stat-sub">assigned branch</div>
+            </div>
+        </div>
+
+        <div class="d-sec">
+            <div class="d-sec-hdr">
+                <div class="d-sec-hdr-icon">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                </div>
+                <div class="d-sec-title">Order Details</div>
+            </div>
+            <div class="d-grid">
+                <div><div class="d-lbl">Order ID</div><div class="d-val mono">${esc(rec[f.orderId] || "—")}</div></div>
+                <div><div class="d-lbl">Order Date</div><div class="d-val">${fmtDate(rec[f.date])}</div></div>
+                <div><div class="d-lbl">Status</div><div class="d-val"><span class="badge ${statusClass(status)}">${esc(status)}</span></div></div>
+                <div><div class="d-lbl">Branch</div><div class="d-val">${esc(branchName(rec[f.branch]))}</div></div>
+                ${rec[f.manual] ? `<div class="d-field-full"><div class="d-lbl">Manual Request</div><div class="d-val" style="white-space:pre-wrap;">${esc(rec[f.manual])}</div></div>` : ""}
+            </div>
+        </div>
+
+        <div class="d-sec">
+            <div class="d-sec-hdr">
+                <div class="d-sec-hdr-icon">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                </div>
+                <div class="d-sec-title">Products (${lines.length})</div>
+            </div>
+            ${ptbl}
+        </div>
+
+        <div class="d-sec">
+            <div class="d-sec-hdr">
+                <div class="d-sec-hdr-icon">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <div class="d-sec-title">Record Info</div>
+            </div>
+            <div class="d-grid">
+                <div class="d-field-full"><div class="d-lbl">Record ID</div><div class="d-val mono">${esc(String(rec.ID))}</div></div>
+                ${rec.Added_Time ? `<div><div class="d-lbl">Created</div><div class="d-val">${esc(rec.Added_Time)}</div></div>` : ""}
+                ${rec.Modified_Time ? `<div><div class="d-lbl">Modified</div><div class="d-val">${esc(rec.Modified_Time)}</div></div>` : ""}
+            </div>
+        </div>`;
+        }
+
+        function closeDrawer() {
+            document.getElementById("drawerOv").classList.remove("open");
+            document.querySelectorAll("tbody tr").forEach(r => r.classList.remove("selected"));
+            S.drawerRec = null;
+        }
+        function handleDrawerOvClick(e) { if (e.target === document.getElementById("drawerOv")) closeDrawer(); }
+        function editFromDrawer() {
+            if (S.drawerRec) { const id = S.drawerRec.ID; closeDrawer(); openEdit(id); }
+        }
+        function deleteFromDrawer() {
+            if (S.drawerRec) { const id = S.drawerRec.ID; closeDrawer(); confirmDelete(id); }
+        }
+
+        // ─────────────────────────────────────────────
+        // ADD / EDIT MODAL
+        // ─────────────────────────────────────────────
+        function todayISO() { return new Date().toISOString().split("T")[0]; }
+
+        function openAdd() {
+            S.editId = null; S.modalRows = [];
+            document.getElementById("modalTitle").textContent = "Add Order";
+            document.getElementById("submitTxt").textContent = "Add Order";
+            document.getElementById("fDate").value = todayISO();
+            document.getElementById("fStatus").value = "Pending";
+            document.getElementById("fBranch").value = "";
+            document.getElementById("fManual").value = "";
+            renderSubform(); hideFormErr();
+            document.getElementById("modalOv").classList.add("open");
+        }
+
+        async function openEdit(id) {
+            const o = S.all.find(x => String(x.ID) === String(id));
+            if (!o) return;
+            const f = CFG.f;
+            S.editId = id;
+
+            let dateVal = "";
+            if (o[f.date]) {
+                try { const d = new Date(o[f.date]); if (!isNaN(d)) dateVal = d.toISOString().split("T")[0]; }
+                catch { }
+            }
+
+            document.getElementById("fDate").value = dateVal;
+            document.getElementById("fStatus").value = o[f.status] || "Pending";
+            document.getElementById("fBranch").value = lookupId(o[f.branch]);
+            document.getElementById("fManual").value = o[f.manual] || "";
+
+            // Open modal immediately with basic fields
+            S.modalRows = [];
+            document.getElementById("modalTitle").textContent = "Edit Order";
+            document.getElementById("submitTxt").textContent = "Update Order";
+            document.getElementById("subformWrap").innerHTML =
+                `<div class="sf-empty" style="font-size:13px;color:var(--ink-muted);">Loading products…</div>`;
+            hideFormErr();
+            document.getElementById("modalOv").classList.add("open");
+
+            // Fetch the full record to get subform (Products_Selection) rows
+            setLoading(true);
+            try {
+                const resp = await ZOHO.CREATOR.API.getRecordById({
+                    appName: CFG.appName,
+                    reportName: CFG.orderReport,
+                    id: id
+                });
+                const full = resp?.data;
+                const lines = full && Array.isArray(full[f.products]) ? full[f.products] : [];
+                S.modalRows = lines.map(l => ({
+                    rowId: String(l.ID || ""),
+                    productId: lookupId(l[f.sf.product]),
+                    brandId: lookupId(l[f.sf.brand]),
+                    assetId: lookupId(l[f.sf.assetType]),
+                    qty: String(l[f.sf.qty] ?? "")
+                }));
+            } catch (e) {
+                // Fall back to whatever's in S.all (may be empty for subform)
+                const lines = Array.isArray(o[f.products]) ? o[f.products] : [];
+                S.modalRows = lines.map(l => ({
+                    rowId: String(l.ID || ""),
+                    productId: lookupId(l[f.sf.product]),
+                    brandId: lookupId(l[f.sf.brand]),
+                    assetId: lookupId(l[f.sf.assetType]),
+                    qty: String(l[f.sf.qty] ?? "")
+                }));
+            } finally {
+                setLoading(false);
+                renderSubform();
+            }
+        }
+
+
+        function closeModal() {
+            document.getElementById("modalOv").classList.remove("open");
+            S.editId = null; S.modalRows = [];
+        }
+        function handleModalOvClick(e) { if (e.target === document.getElementById("modalOv")) closeModal(); }
+
+        async function submitForm() {
+            const date = document.getElementById("fDate").value;
+            const status = document.getElementById("fStatus").value;
+            const branch = document.getElementById("fBranch").value;
+
+            if (!date) { showFormErr("Order Date is required."); return; }
+            if (!branch) { showFormErr("Branch is required."); return; }
+            if (S.modalRows.length === 0) { showFormErr("Please add at least one product row."); return; }
+
+            for (let i = 0; i < S.modalRows.length; i++) {
+                const r = S.modalRows[i];
+                if (!r.productId) { showFormErr(`Row ${i + 1}: select a Product.`); return; }
+                if (!r.qty || parseInt(r.qty, 10) < 1) { showFormErr(`Row ${i + 1}: Ordered Qty must be ≥ 1.`); return; }
+            }
+
+            const sf = CFG.f.sf;
+            const productsData = S.modalRows.map(r => {
+                const row = {};
+                if (r.rowId) row.ID = r.rowId;
+                row[sf.product] = r.productId;
+                if (r.brandId) row[sf.brand] = r.brandId;
+                if (r.assetId) row[sf.assetType] = r.assetId;
+                row[sf.qty] = parseInt(r.qty, 10);
+                return row;
+            });
+
+            const ff = CFG.f;
+            const data = {};
+            data[ff.date] = date;
+            data[ff.status] = status;
+            data[ff.branch] = branch;
+            data[ff.products] = productsData;
+            const manual = document.getElementById("fManual").value.trim();
+            if (manual) data[ff.manual] = manual;
+
+            document.getElementById("submitBtn").disabled = true;
+            setLoading(true);
+            try {
+                if (S.editId) {
+                    await ZOHO.CREATOR.API.updateRecord({
+                        appName: CFG.appName, reportName: CFG.orderReport,
+                        id: S.editId, data: { data }
+                    });
+                    const idx = S.all.findIndex(x => String(x.ID) === String(S.editId));
+                    if (idx !== -1) S.all[idx] = { ...S.all[idx], ...data };
+                    toast("Order updated ✓", "ok");
+                } else {
+                    const r = await ZOHO.CREATOR.API.addRecord({
+                        appName: CFG.appName, formName: CFG.orderForm, data: { data }
+                    });
+                    S.all.unshift({ ID: r?.data?.ID ?? ("tmp_" + Date.now()), ...data });
+                    toast("Order added ✓", "ok");
+                }
+                closeModal();
+                recompute();
+            } catch (err) {
+                const msg = err?.message || err?.error || (typeof err === "string" ? err : JSON.stringify(err));
+                showFormErr(msg || "Save failed");
+                toast("Error saving order", "err");
+            } finally {
+                document.getElementById("submitBtn").disabled = false;
+                setLoading(false);
+            }
+        }
+
+        // ─────────────────────────────────────────────
+        // DELETE
+        // ─────────────────────────────────────────────
+        function confirmDelete(id) {
+            S.delId = id;
+            document.getElementById("delModalOv").classList.add("open");
+        }
+        function closeDelModal() {
+            document.getElementById("delModalOv").classList.remove("open");
+            S.delId = null;
+        }
+        function handleDelModalOvClick(e) { if (e.target === document.getElementById("delModalOv")) closeDelModal(); }
+
+        async function doDelete() {
+            if (!S.delId) return;
+            const id = S.delId;
+            closeDelModal(); setLoading(true);
+            try {
+                await ZOHO.CREATOR.API.deleteRecord({
+                    appName: CFG.appName, reportName: CFG.orderReport, criteria: `(ID == ${id})`
+                });
+                S.all = S.all.filter(o => String(o.ID) !== String(id));
+                toast("Order deleted", "ok");
+                closeDrawer(); recompute();
+            } catch (e) {
+                const msg = e?.message || e?.error || e?.responseText || (typeof e === "string" ? e : JSON.stringify(e));
+                toast("Delete failed: " + msg, "err");
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        // ─────────────────────────────────────────────
+        // UI UTILITIES
+        // ─────────────────────────────────────────────
+        function setLoading(v) { document.getElementById("loadingBar").classList.toggle("active", v); }
+        function showErr(msg) { document.getElementById("gErrText").textContent = msg; document.getElementById("gErr").classList.add("show"); }
+        function hideErr() { document.getElementById("gErr").classList.remove("show"); }
+        function showFormErr(m) { const e = document.getElementById("formErr"); e.textContent = m; e.classList.add("show"); }
+        function hideFormErr() { document.getElementById("formErr").classList.remove("show"); }
+
+        function toast(msg, type = "ok") {
+            const shelf = document.getElementById("toasts");
+            const t = document.createElement("div");
+            t.className = `toast ${type}`;
+            t.innerHTML = `<span class="dot"></span>${esc(msg)}`;
+            shelf.appendChild(t);
+            setTimeout(() => { t.style.cssText = "opacity:0;transform:translateY(6px);transition:.22s"; setTimeout(() => t.remove(), 240); }, 3000);
+        }
+        function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+        function escA(s) { return String(s).replace(/'/g, "\\'"); }
+
+        // ─────────────────────────────────────────────
+        // BOOT
+        // ─────────────────────────────────────────────
+        async function init() {
+            document.getElementById("addBtn").addEventListener("click", openAdd);
+            document.addEventListener("click", () => closeDropdowns());
+            document.addEventListener("keydown", e => {
+                if (e.key !== "Escape") return;
+                closeModal(); closeDrawer(); closeDropdowns(); closeDelModal();
+            });
+            try {
+                await ZOHO.CREATOR.init();
+                await loadAll();
+            } catch (e) {
+                showErr("SDK init failed: " + (e?.message ?? String(e)));
+                document.getElementById("tbody").innerHTML = `<tr><td colspan="7"><div class="t-empty">
+            <div class="t-empty-icon">⚠️</div>
+            <div class="t-empty-title">SDK initialisation failed</div>
+            <div class="t-empty-sub">${esc(e?.message ?? String(e))}</div>
+        </div></td></tr>`;
+            }
+        }
+        document.readyState === "loading"
+            ? document.addEventListener("DOMContentLoaded", init)
+            : init();
+    </script>
+</body>
+
+</html>

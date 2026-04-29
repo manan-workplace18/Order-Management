@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Widget</title>
+    <script src="https://js.zohostatic.com/creator/widgets/version/1.0/widgetsdk-min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --ink: #0f1117;
+            --ink-soft: #3d4252;
+            --ink-muted: #7c8296;
+            --ink-ghost: #b0b6c8;
+            --surface: #ffffff;
+            --surface-2: #f4f6fb;
+            --surface-3: #eef1f8;
+            --border: #e3e8f3;
+            --brand: #5b7cff;
+            --brand-2: #8b5cf6;
+            --green: #22c55e;
+            --orange: #f59e0b;
+            --red: #ef4444;
+            --cyan: #22d3ee;
+            --shadow-xs: 0 1px 2px rgba(15, 17, 23, .06);
+            --shadow-sm: 0 8px 20px rgba(79, 110, 247, .08);
+            --shadow-lg: 0 16px 44px rgba(15, 17, 23, .14);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 18px;
+            --radius-xl: 24px;
+            --tr: 220ms cubic-bezier(.4, 0, .2, 1);
+            --font: "DM Sans", sans-serif;
+            --mono: "DM Mono", monospace;
+        }
+
+        body {
+            font-family: var(--font);
+            background:
+                radial-gradient(circle at 5% 5%, rgba(91, 124, 255, .16), transparent 24%),
+                radial-gradient(circle at 90% 8%, rgba(139, 92, 246, .16), transparent 24%),
+                var(--surface-2);
+            color: var(--ink);
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .topbar {
+            height: 60px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(255, 255, 255, .84);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 22px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .top-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            color: #fff;
+            font-size: 16px;
+            background: linear-gradient(135deg, var(--brand), var(--brand-2));
+            box-shadow: 0 8px 20px rgba(91, 124, 255, .35);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .title {
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: -.2px;
+        }
+
+        .subtitle {
+            font-size: 12px;
+            color: var(--ink-muted);
+            margin-top: 1px;
+        }
+
+        .top-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .btn {
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--ink-soft);
+            border-radius: var(--radius-md);
+            font-family: var(--font);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: var(--tr);
+        }
+
+        .btn:hover {
+            border-color: var(--ink-ghost);
+            transform: translateY(-1px);
+        }
+
+        .btn.primary {
+            border: none;
+            color: #fff;
+            background: linear-gradient(135deg, var(--brand), var(--brand-2));
+            box-shadow: 0 8px 20px rgba(91, 124, 255, .3);
+        }
+
+        .loading-bar {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            display: none;
+            z-index: 150;
+            background: linear-gradient(90deg, var(--brand), var(--brand-2), var(--brand));
+            background-size: 200% 100%;
+            animation: bar 1.2s linear infinite;
+        }
+
+        .loading-bar.on {
+            display: block;
+        }
+
+        @keyframes bar {
+            0% {
+                background-position: 180% 0;
+            }
+
+            100% {
+                background-position: -180% 0;
+            }
+        }
+
+        .app {
+            height: calc(100vh - 60px);
+            overflow-y: auto;
+            padding: 18px;
+        }
+
+        .app::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .app::-webkit-scrollbar-thumb {
+            background: #d5dbeb;
+            border-radius: 8px;
+        }
+
+        .toolbar {
+            display: grid;
+            grid-template-columns: 1fr auto auto auto auto;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .search-wrap {
+            position: relative;
+        }
+
+        .search {
+            width: 100%;
+            border: 1px solid var(--border);
+            background: #fff;
+            padding: 10px 12px 10px 36px;
+            border-radius: var(--radius-md);
+            font-family: var(--font);
+            font-size: 13px;
+            outline: none;
+            transition: var(--tr);
+        }
+
+        .search:focus {
+            border-color: var(--brand);
+            box-shadow: 0 0 0 3px rgba(91, 124, 255, .18);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--ink-ghost);
+            font-size: 12px;
+        }
+
+        .select {
+            border: 1px solid var(--border);
+            background: #fff;
+            border-radius: var(--radius-md);
+            padding: 10px 12px;
+            font-size: 12px;
+            font-family: var(--font);
+            font-weight: 600;
+            color: var(--ink-soft);
+            min-width: 140px;
+            outline: none;
+            transition: var(--tr);
+        }
+
+        .select:focus {
+            border-color: var(--brand);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(12, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, .86);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xs);
+            transition: var(--tr);
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .card-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px 8px;
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--ink-soft);
+        }
+
+        .card-actions {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .kpi {
+            grid-column: span 3;
+            padding: 13px 14px;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(180deg, rgba(255, 255, 255, .98), rgba(248, 251, 255, .92));
+            border-color: #dfe8ff;
+        }
+
+        .kpi::after {
+            content: "";
+            position: absolute;
+            right: -24px;
+            top: -24px;
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(91, 124, 255, .15), rgba(139, 92, 246, .06));
+        }
+
+        .kpi-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .kpi-icon {
+            width: 22px;
+            height: 22px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            opacity: .96;
+            filter: drop-shadow(0 1px 1px rgba(15, 17, 23, .12));
+        }
+
+        .kpi-icon svg {
+            width: 22px;
+            height: 22px;
+            stroke-width: 1.9;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .kpi-icon.orders {
+            color: #3b5ef0;
+        }
+
+        .kpi-icon.tickets {
+            color: #0284c7;
+        }
+
+        .kpi-icon.open {
+            color: #16a34a;
+        }
+
+        .kpi-icon.products {
+            color: #8b5cf6;
+        }
+
+        .kpi-label {
+            font-size: 12px;
+            color: var(--ink-muted);
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .kpi-value {
+            font-size: 34px;
+            font-weight: 700;
+            letter-spacing: -.8px;
+            color: var(--ink);
+            line-height: 1;
+        }
+
+        .kpi-sub {
+            font-size: 12px;
+            color: var(--ink-ghost);
+            margin-top: 8px;
+        }
+
+        .chart-card {
+            padding-bottom: 10px;
+        }
+
+        .chart-body {
+            padding: 0 10px 10px;
+        }
+
+        .chart-holder {
+            min-height: 260px;
+        }
+
+        .chart-main {
+            grid-column: span 7;
+        }
+
+        .list-main {
+            grid-column: span 5;
+        }
+
+        .small-left {
+            grid-column: span 3;
+        }
+
+        .small-mid {
+            grid-column: span 5;
+        }
+
+        .small-right {
+            grid-column: span 4;
+        }
+
+        .tiny-btn {
+            border: 1px solid var(--border);
+            background: #fff;
+            border-radius: var(--radius-sm);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--ink-soft);
+            padding: 6px 8px;
+            cursor: pointer;
+            transition: var(--tr);
+        }
+
+        .tiny-btn:hover {
+            background: var(--surface-3);
+        }
+
+        .tiny-select {
+            border: 1px solid var(--border);
+            background: #fff;
+            border-radius: var(--radius-sm);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--ink-soft);
+            padding: 6px 8px;
+            font-family: var(--font);
+            outline: none;
+        }
+
+        .list {
+            padding: 4px 12px 12px;
+            max-height: 285px;
+            overflow-y: auto;
+        }
+
+        .list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 10px 10px;
+            margin-bottom: 8px;
+            background: #fff;
+            transition: var(--tr);
+        }
+
+        .list-item:hover {
+            transform: translateX(2px);
+            border-color: #d2dcfa;
+        }
+
+        .li-main {
+            min-width: 0;
+        }
+
+        .li-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--ink);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .li-sub {
+            font-size: 11px;
+            color: var(--ink-muted);
+            margin-top: 2px;
+        }
+
+        .li-badge {
+            font-family: var(--mono);
+            font-size: 12px;
+            font-weight: 700;
+            border-radius: 7px;
+            border: 1px solid #dbe4ff;
+            background: #eef2ff;
+            color: #3348b0;
+            padding: 7px 8px;
+            min-width: 70px;
+            text-align: center;
+        }
+
+        .empty {
+            height: 220px;
+            display: grid;
+            place-items: center;
+            text-align: center;
+            color: var(--ink-muted);
+            font-size: 13px;
+        }
+
+        .err {
+            display: none;
+            margin-bottom: 10px;
+            border: 1px solid #fecaca;
+            border-radius: var(--radius-md);
+            background: #fef2f2;
+            color: #b91c1c;
+            padding: 10px 12px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .err.show {
+            display: block;
+        }
+
+        .toast-shelf {
+            position: fixed;
+            right: 18px;
+            bottom: 18px;
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .toast {
+            background: #111827;
+            color: #fff;
+            padding: 10px 12px;
+            border-radius: var(--radius-md);
+            font-size: 12px;
+            box-shadow: var(--shadow-lg);
+            animation: in .24s ease;
+        }
+
+        @keyframes in {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 1160px) {
+            .toolbar {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+
+            .kpi {
+                grid-column: span 12;
+            }
+
+            .chart-main,
+            .list-main,
+            .small-left,
+            .small-mid,
+            .small-right {
+                grid-column: span 12;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="loading-bar" id="loadingBar"></div>
+
+    <header class="topbar">
+        <div class="top-left">
+            <div class="logo">📊</div>
+            <div>
+                <div class="title"> Dashboard</div>
+                <div class="subtitle">order-management</div>
+            </div>
+        </div>
+        <div class="top-actions">
+            <button class="btn" onclick="refreshData()">Refresh</button>
+            <button class="btn primary" onclick="exportOverviewCsv()">Export Summary CSV</button>
+        </div>
+    </header>
+
+    <main class="app">
+        <div class="err" id="globalErr"></div>
+
+        <section class="toolbar">
+            <div class="search-wrap">
+                <span class="search-icon">⌕</span>
+                <input class="search" id="searchInput" type="text" placeholder="Search by order, branch, ticket..."
+                    oninput="handleSearch(this.value)">
+            </div>
+            <select class="select" id="dateFilter" onchange="onFilterChange()">
+                <option value="all">Date: All</option>
+                <option value="today">Today</option>
+                <option value="7d">Last 7 Days</option>
+                <option value="30d">Last 30 Days</option>
+                <option value="month">This Month</option>
+                <option value="year">This Year</option>
+            </select>
+            <select class="select" id="branchFilter" onchange="onFilterChange()">
+                <option value="">Branch: All</option>
+            </select>
+            <select class="select" id="statusFilter" onchange="onFilterChange()">
+                <option value="">Order Status: All</option>
+            </select>
+            <button class="btn" onclick="clearFilters()">Clear Filters</button>
+        </section>
+
+        <section class="grid">
+            <article class="card kpi">
+                <div class="kpi-top">
+                    <div class="kpi-label">Total Products</div>
+                    <div class="kpi-icon products" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m7.5 4.27 9 5.15"></path>
+                            <path
+                                d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z">
+                            </path>
+                            <path d="m3.3 7 8.7 5 8.7-5"></path>
+                            <path d="M12 22V12"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="kpi-value" id="kpiProducts">0</div>
+                <div class="kpi-sub" id="kpiProductsSub">In product catalog</div>
+            </article>
+
+            <article class="card kpi">
+                <div class="kpi-top">
+                    <div class="kpi-label">Total Orders</div>
+                    <div class="kpi-icon orders" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                            <path d="M3 6h18"></path>
+                            <path d="M16 10a4 4 0 0 1-8 0"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="kpi-value" id="kpiOrders">0</div>
+                <div class="kpi-sub" id="kpiOrdersSub">Across selected range</div>
+            </article>
+            <article class="card kpi">
+                <div class="kpi-top">
+                    <div class="kpi-label">Total Tickets</div>
+                    <div class="kpi-icon tickets" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="m4.93 4.93 4.24 4.24"></path>
+                            <path d="m14.83 9.17 4.24-4.24"></path>
+                            <path d="m14.83 14.83 4.24 4.24"></path>
+                            <path d="m9.17 14.83-4.24 4.24"></path>
+                            <circle cx="12" cy="12" r="4"></circle>
+                        </svg>
+                    </div>
+                </div>
+                <div class="kpi-value" id="kpiTickets">0</div>
+                <div class="kpi-sub" id="kpiTicketsSub">Across selected range</div>
+            </article>
+            <article class="card kpi">
+                <div class="kpi-top">
+                    <div class="kpi-label">Open Tickets</div>
+                    <div class="kpi-icon open" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                    </div>
+                </div>
+                <div class="kpi-value" id="kpiOpen">0</div>
+                <div class="kpi-sub" id="kpiOpenSub">Pending / Open / In Process</div>
+            </article>
+
+
+
+            <article class="card chart-card chart-main">
+                <div class="card-head">
+                    <div class="card-title">Orders Analytics</div>
+                    <div class="card-actions">
+                        <button class="tiny-btn" onclick="exportChartCsv('ordersMonthly')">Export CSV</button>
+                    </div>
+                </div>
+                <div class="chart-body">
+                    <div class="chart-holder" id="ordersMonthlyChart"></div>
+                </div>
+            </article>
+
+            <article class="card chart-card list-main">
+                <div class="card-head">
+                    <div class="card-title">Order Products</div>
+                    <div class="card-actions">
+                        <button class="tiny-btn" onclick="exportChartCsv('topProducts')">Export CSV</button>
+                    </div>
+                </div>
+                <div class="list" id="topProductsList"></div>
+            </article>
+
+            <article class="card chart-card small-left">
+                <div class="card-head">
+                    <div class="card-title">Orders Status</div>
+                    <div class="card-actions">
+                        <button class="tiny-btn" onclick="exportChartCsv('ordersStatus')">Export CSV</button>
+                    </div>
+                </div>
+                <div class="chart-body">
+                    <div class="chart-holder" id="ordersStatusChart"></div>
+                </div>
+            </article>
+
+            <article class="card chart-card small-mid">
+                <div class="card-head">
+                    <div class="card-title">Top Ordering Branches</div>
+                    <div class="card-actions">
+                        <select class="tiny-select" id="assetTypeFilter" onchange="onAssetTypeChange(this.value)">
+                            <option value="">All Asset Types</option>
+                        </select>
+                        <button class="tiny-btn" onclick="exportChartCsv('topBranches')">Export CSV</button>
+                    </div>
+                </div>
+                <div class="chart-body">
+                    <div class="chart-holder" id="topBranchesChart"></div>
+                </div>
+            </article>
+
+            <article class="card chart-card small-right">
+                <div class="card-head">
+                    <div class="card-title">Ticket Status</div>
+                    <div class="card-actions">
+                        <select class="tiny-select" id="ticketScope" onchange="onTicketScopeChange(this.value)">
+                            <option value="all">All</option>
+                            <option value="month">Monthly</option>
+                            <option value="year">Yearly</option>
+                        </select>
+                        <button class="tiny-btn" onclick="exportChartCsv('ticketStatus')">Export CSV</button>
+                    </div>
+                </div>
+                <div class="chart-body">
+                    <div class="chart-holder" id="ticketStatusChart"></div>
+                </div>
+            </article>
+        </section>
+    </main>
+
+    <div class="toast-shelf" id="toasts"></div>
+
+    <script>
+        const CFG = {
+            appName: "order-management",
+            reports: {
+                orders: "All_Orders",
+                tickets: "All_Tickets",
+                ticketFallbacks: ["All_Ticket", "Ticket", "All_Ticket_form", "All_Ticket_Form", "Tickets", "All_tickets"],
+                products: "All_Products",
+                branches: "All_Branches",
+                assets: "All_Asset_Types"
+            },
+            fields: {
+                order: {
+                    id: "Order_ID",
+                    date: "order_date",
+                    status: "Status",
+                    branch: "Branch",
+                    products: "Products_Selection",
+                    subform: {
+                        product: "Product",
+                        assetType: "Asset_Type",
+                        qty: "Ordered_Qty"
+                    }
+                },
+                ticket: {
+                    id: "Ticket_ID",
+                    status: "Status",
+                    priority: "Priority",
+                    branch: "Branch"
+                },
+                product: {
+                    name: "Product_Name",
+                    assetType: "Asset_Type"
+                }
+            },
+            branchField: "Branch_Name",
+            assetField: "Asset_Type_Name",
+            productField: "Product_Name",
+            batch: 200
+        };
+
+        const S = {
+            all: {
+                orders: [],
+                tickets: [],
+                products: [],
+                branches: [],
+                assets: []
+            },
+            map: {
+                branchById: new Map(),
+                assetById: new Map(),
+                productById: new Map(),
+                assetIdByName: new Map(),
+                productIdByName: new Map()
+            },
+            filters: {
+                search: "",
+                date: "all",
+                branchId: "",
+                orderStatus: "",
+                assetTypeId: "",
+                ticketScope: "all"
+            },
+            filtered: {
+                orders: [],
+                tickets: []
+            },
+            csv: {
+                ordersMonthly: [],
+                topProducts: [],
+                ordersStatus: [],
+                topBranches: [],
+                ticketStatus: [],
+                overview: []
+            },
+            ticketStatusChoices: [], // Valid choices from Meta-API
+            charts: {
+                ordersMonthly: null,
+                ordersStatus: null,
+                topBranches: null,
+                ticketStatus: null
+            }
+        };
+
+        async function fetchAll(reportName, criteria = "", fields = []) {
+            async function fetchViaApi() {
+                if (!ZOHO?.CREATOR?.API?.getAllRecords) return null;
+                let out = [];
+                let page = 1;
+                while (true) {
+                    const params = {
+                        appName: CFG.appName,
+                        reportName,
+                        page,
+                        pageSize: 200 // Maximize batch size
+                    };
+                    if (criteria) params.criteria = criteria;
+                    if (fields && fields.length) params.fields = fields;
+
+                    const res = await ZOHO.CREATOR.API.getAllRecords(params);
+                    const rows = res?.data || [];
+                    out = out.concat(rows);
+                    if (rows.length < 200) break;
+                    page++;
+                }
+                return out;
+            }
+
+            async function fetchViaData() {
+                if (!ZOHO?.CREATOR?.DATA?.getRecords) return null;
+                let out = [];
+                let cursor = null;
+                while (true) {
+                    const params = { app_name: CFG.appName, report_name: reportName, max_records: 200 };
+                    if (cursor) params.record_cursor = cursor;
+                    if (criteria) params.criteria = criteria;
+                    // Note: DATA.getRecords doesn't support 'fields' parameter in the same way as API.getAllRecords
+                    const res = await ZOHO.CREATOR.DATA.getRecords(params);
+                    const rows = res?.data || [];
+                    out = out.concat(rows);
+                    if (rows.length < 200 || !res?.record_cursor) break;
+                    cursor = res.record_cursor;
+                }
+                return out;
+            }
+
+            // 1) Try API path first.
+            try {
+                const rows = await fetchViaApi();
+                if (Array.isArray(rows) && rows.length > 0) return rows;
+            } catch (e) {
+                // Continue to DATA fallback below.
+            }
+
+            // 2) Try DATA path next.
+            try {
+                const rows = await fetchViaData();
+                if (Array.isArray(rows) && rows.length > 0) return rows;
+            } catch (e) {
+                // Continue to final fallback below.
+            }
+
+            // 3) If one channel exists but returned empty, use that empty array.
+            // This avoids hard failure for reports that are simply empty.
+            const apiExists = !!ZOHO?.CREATOR?.API?.getAllRecords;
+            const dataExists = !!ZOHO?.CREATOR?.DATA?.getRecords;
+            if (apiExists || dataExists) {
+                const rows = apiExists ? await fetchViaApi().catch(() => null) : await fetchViaData().catch(() => null);
+                return Array.isArray(rows) ? rows : [];
+            }
+
+            throw new Error("Zoho records API unavailable (DATA/API not found).");
+        }
+
+        function lookupId(v) {
+            if (!v) return "";
+            if (typeof v === "object") return String(v.ID || v.value || v.actual_value || "");
+            return String(v);
+        }
+        function lookupDisplay(v, fallbackMap) {
+            if (!v) return "—";
+            if (typeof v === "object") return v.display_value || v.name || v.label || "—";
+            return fallbackMap.get(String(v)) || String(v);
+        }
+        function esc(v) {
+            return String(v)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;");
+        }
+        function parseDateAny(v) {
+            if (!v) return null;
+            const d = new Date(v);
+            if (!isNaN(d)) return d;
+            return null;
+        }
+        function isInRange(d, range) {
+            if (range === "all") return true;
+            if (!d) return false;
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const dd = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+            if (range === "today") return dd.getTime() === today.getTime();
+            if (range === "7d") {
+                const x = new Date(today);
+                x.setDate(x.getDate() - 7);
+                return dd >= x && dd <= today;
+            }
+            if (range === "30d") {
+                const x = new Date(today);
+                x.setDate(x.getDate() - 30);
+                return dd >= x && dd <= today;
+            }
+            if (range === "month") return dd.getFullYear() === today.getFullYear() && dd.getMonth() === today.getMonth();
+            if (range === "year") return dd.getFullYear() === today.getFullYear();
+            return true;
+        }
+        function monthLabel(i) {
+            return ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][i];
+        }
+        function normalizeStatus(s) {
+            if (s && typeof s === "object") {
+                return String(
+                    s.display_value ||
+                    s.actual_value ||
+                    s.value ||
+                    s.name ||
+                    s.label ||
+                    "Unknown"
+                ).trim();
+            }
+            return String(s || "Unknown").trim();
+        }
+        function isOpenTicket(s) {
+            // s is already a normalized string from ticketStatusValue()
+            const x = String(s || "").trim();
+            if (!x || x === "unknown") return false;
+            return x === "Open";
+        }
+        function ticketDateValue(t) {
+            return t?.Added_Time || t?.Created_Time || t?.created_time || t?.Modified_Time || t?.modified_time || t?.Ticket_Date || t?.ticket_date || null;
+        }
+        function ticketStatusValue(t) {
+            const fT = CFG.fields.ticket;
+            return normalizeStatus(
+                t?.[fT.status] ??
+                t?.Status ??
+                ""
+            );
+        }
+
+        function extractOrderLines(orderRec) {
+            const f = CFG.fields.order;
+            const raw = Array.isArray(orderRec[f.products]) ? orderRec[f.products] : [];
+            return raw.map(line => {
+                let productId = lookupId(line[f.subform.product]);
+                let assetId = lookupId(line[f.subform.assetType]);
+                let qty = parseInt(line[f.subform.qty], 10) || 0;
+
+                // Fallback for list payloads that only include display_value:
+                // "ProductName,AssetType,BrandName,Qty"
+                if ((!productId || !assetId || !qty) && line?.display_value) {
+                    const parts = String(line.display_value).split(",").map(s => s.trim());
+                    const productName = parts[0] || "";
+                    const assetName = parts[1] || "";
+                    const qtyFromDisplay = parseInt(parts[3], 10) || 0;
+
+                    if (!productId && productName) {
+                        productId = S.map.productIdByName.get(productName.toLowerCase()) || "";
+                    }
+                    if (!assetId && assetName) {
+                        assetId = S.map.assetIdByName.get(assetName.toLowerCase()) || "";
+                    }
+                    if (!qty && qtyFromDisplay) qty = qtyFromDisplay;
+                }
+
+                return { productId, assetId, qty };
+            }).filter(x => x.productId || x.assetId || x.qty);
+        }
+
+        async function loadAll() {
+            setLoading(true);
+            try {
+                // Optimization: Criteria to only fetch last 12 months for speed
+                const oneYearAgo = new Date();
+                oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+                const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                const cDate = `${oneYearAgo.getDate() < 10 ? '0' + oneYearAgo.getDate() : oneYearAgo.getDate()}-${months[oneYearAgo.getMonth()]}-${oneYearAgo.getFullYear()} 00:00:00`;
+                const recentCriteria = `(Added_Time >= "${cDate}")`;
+
+                // All 5 fetches run in parallel — no blocking serial calls
+                const [orders, products, branches, assets, tickets] = await Promise.all([
+                    fetchAll(CFG.reports.orders, recentCriteria, [CFG.fields.order.id, CFG.fields.order.date, CFG.fields.order.status, CFG.fields.order.branch, "ID", "Added_Time"]),
+                    fetchAll(CFG.reports.products, "", ["ID", CFG.fields.product.name, CFG.fields.product.assetType]),
+                    fetchAll(CFG.reports.branches, "", ["ID", CFG.branchField]),
+                    fetchAll(CFG.reports.assets, "", ["ID", CFG.assetField]),
+                    fetchTicketsWithFallback(recentCriteria)
+                ]);
+
+                S.all.orders = orders;
+                S.all.tickets = tickets;
+                S.all.products = products;
+                S.all.branches = branches;
+                S.all.assets = assets;
+
+                S.map.branchById = new Map(branches.map(b => [String(b.ID), b[CFG.branchField] || "—"]));
+                S.map.assetById = new Map(assets.map(a => [String(a.ID), a[CFG.assetField] || a.Asset_Type_Name || "—"]));
+                S.map.productById = new Map(products.map(p => [String(p.ID), p[CFG.productField] || p.Name || "—"]));
+                S.map.assetIdByName = new Map(assets.map(a => [String(a[CFG.assetField] || a.Asset_Type_Name || "").toLowerCase(), String(a.ID)]));
+                S.map.productIdByName = new Map(products.map(p => [String(p[CFG.productField] || p.Name || "").toLowerCase(), String(p.ID)]));
+
+                populateFilters();
+                recompute();
+                showErr("");
+            } catch (e) {
+                showErr("Failed to load dashboard data: " + (e?.message || String(e)));
+                toast("Load failed", "err");
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        async function fetchTicketsWithFallback(criteria = "") {
+            const candidates = [CFG.reports.tickets, ...(CFG.reports.ticketFallbacks || [])];
+            let lastErr = null;
+            for (const reportName of candidates) {
+                try {
+                    // Fields needed for tickets: ID, Ticket_ID, Status, Priority, Branch, Added_Time
+                    const fields = ["ID", "Added_Time", CFG.fields.ticket.id, CFG.fields.ticket.status, CFG.fields.ticket.priority, CFG.fields.ticket.branch];
+                    const rows = await fetchAll(reportName, criteria, fields);
+                    if (Array.isArray(rows) && rows.length) {
+                        if (reportName !== CFG.reports.tickets) {
+                            toast("Tickets loaded using report: " + reportName);
+                        }
+                        return rows;
+                    }
+                } catch (e) {
+                    lastErr = e;
+                }
+            }
+
+            // If no ticket rows found from any candidate, return empty and surface hint.
+            if (lastErr) {
+                console.warn("Ticket fetch fallback errors:", lastErr);
+            }
+            toast("Ticket data is empty. Verify ticket report name/permissions.", "err");
+            return [];
+        }
+
+        function populateFilters() {
+            const branchSel = document.getElementById("branchFilter");
+            branchSel.innerHTML = `<option value="">Branch: All</option>` +
+                S.all.branches.map(b => `<option value="${esc(String(b.ID))}">${esc(S.map.branchById.get(String(b.ID)) || "—")}</option>`).join("");
+
+            const statusSet = new Set(S.all.orders.map(o => normalizeStatus(o[CFG.fields.order.status])));
+            const statusSel = document.getElementById("statusFilter");
+            statusSel.innerHTML = `<option value="">Order Status: All</option>` +
+                [...statusSet].sort().map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join("");
+
+            const assetSel = document.getElementById("assetTypeFilter");
+            assetSel.innerHTML = `<option value="">All Asset Types</option>` +
+                S.all.assets.map(a => `<option value="${esc(String(a.ID))}">${esc(S.map.assetById.get(String(a.ID)) || "—")}</option>`).join("");
+        }
+
+        function recompute() {
+            const fO = CFG.fields.order;
+            const fT = CFG.fields.ticket;
+            const q = S.filters.search.toLowerCase();
+
+            S.filtered.orders = S.all.orders.filter(o => {
+                const date = parseDateAny(o[fO.date] || o.Added_Time);
+                if (!isInRange(date, S.filters.date)) return false;
+                if (S.filters.branchId && lookupId(o[fO.branch]) !== S.filters.branchId) return false;
+                const st = normalizeStatus(o[fO.status]);
+                if (S.filters.orderStatus && st !== S.filters.orderStatus) return false;
+                if (S.filters.assetTypeId) {
+                    const lines = extractOrderLines(o);
+                    if (!lines.some(line => line.assetId === S.filters.assetTypeId)) return false;
+                }
+                if (q) {
+                    const hay = [
+                        o[fO.id] || "",
+                        lookupDisplay(o[fO.branch], S.map.branchById),
+                        st
+                    ].join(" ").toLowerCase();
+                    if (!hay.includes(q)) return false;
+                }
+                return true;
+            });
+
+            S.filtered.tickets = S.all.tickets.filter(t => {
+                const date = parseDateAny(ticketDateValue(t));
+                if (!isInRange(date, S.filters.date)) return false;
+                if (S.filters.branchId && lookupId(t[fT.branch]) !== S.filters.branchId) return false;
+                if (q) {
+                    const hay = [
+                        t[fT.id] || "",
+                        ticketStatusValue(t),
+                        lookupDisplay(t[fT.branch], S.map.branchById)
+                    ].join(" ").toLowerCase();
+                    if (!hay.includes(q)) return false;
+                }
+                return true;
+            });
+
+            renderKpis();
+            renderAllCharts();
+            renderTopProductsList();
+            buildOverviewCsv();
+        }
+
+        function renderKpis() {
+            const orders = S.filtered.orders.length;
+            const tickets = S.filtered.tickets.length;
+            const products = S.all.products.length;
+
+            // Build the same status map the Ticket Status chart uses (scope = "all")
+            // so the KPI open count is always derived from the exact same status strings
+            // that appear in the chart — they can never disagree.
+            const statusMap = new Map();
+            S.filtered.tickets.forEach(t => {
+                const s = ticketStatusValue(t);
+                statusMap.set(s, (statusMap.get(s) || 0) + 1);
+            });
+            let open = 0;
+            statusMap.forEach((count, status) => {
+                if (isOpenTicket(status)) open += count;
+            });
+
+            // Build title showing exactly which statuses counted as open (hover to verify)
+            const openStatuses = [...statusMap.entries()]
+                .filter(([s]) => isOpenTicket(s))
+                .map(([s, c]) => `${s}: ${c}`)
+                .join(", ");
+            const closedStatuses = [...statusMap.entries()]
+                .filter(([s]) => !isOpenTicket(s))
+                .map(([s, c]) => `${s}: ${c}`)
+                .join(", ");
+            const kpiOpenEl = document.getElementById("kpiOpen");
+            kpiOpenEl.title = `Open: ${openStatuses || "none"} | Closed: ${closedStatuses || "none"}`;
+
+            animateNumber("kpiOrders", orders);
+            animateNumber("kpiTickets", tickets);
+            animateNumber("kpiOpen", open);
+            animateNumber("kpiProducts", products);
+
+            const rangeLabel = document.getElementById("dateFilter").selectedOptions[0].textContent.replace("Date: ", "");
+            document.getElementById("kpiOrdersSub").textContent = "Range: " + rangeLabel;
+            document.getElementById("kpiTicketsSub").textContent = "Range: " + rangeLabel;
+            document.getElementById("kpiOpenSub").textContent = tickets ? ((open / tickets * 100).toFixed(1) + "% of tickets") : "0% of tickets";
+        }
+
+        function animateNumber(id, target) {
+            const el = document.getElementById(id);
+            const current = parseInt((el.dataset.v || "0"), 10) || 0;
+            const start = current;
+            const end = target;
+            el.dataset.v = String(target);
+            const startAt = performance.now();
+            const dur = 520;
+            function step(ts) {
+                const p = Math.min((ts - startAt) / dur, 1);
+                const eased = 1 - Math.pow(1 - p, 3);
+                const val = Math.round(start + (end - start) * eased);
+                el.textContent = val.toLocaleString("en-US");
+                if (p < 1) requestAnimationFrame(step);
+            }
+            requestAnimationFrame(step);
+        }
+
+        function renderAllCharts() {
+            renderOrdersMonthlyChart();
+            renderOrdersStatusChart();
+            renderTopBranchesChart();
+            renderTicketStatusChart();
+        }
+
+        function renderOrdersMonthlyChart() {
+            const fO = CFG.fields.order;
+            const monthCounts = Array(12).fill(0);
+            S.filtered.orders.forEach(o => {
+                const d = parseDateAny(o[fO.date] || o.Added_Time);
+                if (d) monthCounts[d.getMonth()] += 1;
+            });
+
+            S.csv.ordersMonthly = monthCounts.map((count, idx) => ({ Month: monthLabel(idx), Orders: count }));
+
+            const opts = {
+                chart: {
+                    type: "bar",
+                    height: 280,
+                    toolbar: { show: false },
+                    animations: { enabled: true, easing: "easeinout", speed: 700 }
+                },
+                series: [{ name: "Orders", data: monthCounts }],
+                xaxis: { categories: Array.from({ length: 12 }, (_, i) => monthLabel(i)), axisBorder: { show: false } },
+                yaxis: { labels: { style: { colors: "#8b93a7" } } },
+                grid: { borderColor: "#edf1fb" },
+                colors: ["#9fe3b2"],
+                plotOptions: { bar: { borderRadius: 8, columnWidth: "45%" } },
+                dataLabels: { enabled: false },
+                tooltip: { theme: "light" }
+            };
+            mountChart("ordersMonthly", "ordersMonthlyChart", opts);
+        }
+
+        function renderOrdersStatusChart() {
+            const fO = CFG.fields.order;
+            const map = new Map();
+            S.filtered.orders.forEach(o => {
+                const s = normalizeStatus(o[fO.status]);
+                map.set(s, (map.get(s) || 0) + 1);
+            });
+            const labels = [...map.keys()];
+            const data = labels.map(k => map.get(k));
+            S.csv.ordersStatus = labels.map((label, i) => ({ Status: label, Orders: data[i] }));
+
+            const opts = {
+                chart: { type: "donut", height: 280, toolbar: { show: false } },
+                labels,
+                series: data,
+                colors: ["#86efac", "#93c5fd", "#facc15", "#fca5a5", "#c4b5fd", "#67e8f9"],
+                legend: { position: "bottom", fontSize: "12px" },
+                dataLabels: { enabled: false },
+                stroke: { width: 0 },
+                plotOptions: { pie: { donut: { size: "64%" } } }
+            };
+            mountChart("ordersStatus", "ordersStatusChart", opts);
+        }
+
+        function renderTopBranchesChart() {
+            const fO = CFG.fields.order;
+            const branchTotals = new Map();
+            S.filtered.orders.forEach(o => {
+                const branchId = lookupId(o[fO.branch]);
+                if (!branchId) return;
+                const lines = extractOrderLines(o);
+                let qty = 0;
+                lines.forEach(line => {
+                    if (S.filters.assetTypeId && line.assetId !== S.filters.assetTypeId) return;
+                    qty += line.qty || 0;
+                });
+                if (!qty) return;
+                branchTotals.set(branchId, (branchTotals.get(branchId) || 0) + qty);
+            });
+
+            const rows = [...branchTotals.entries()]
+                .map(([id, total]) => ({ id, label: S.map.branchById.get(id) || id, total }))
+                .sort((a, b) => b.total - a.total)
+                .slice(0, 8);
+
+            const labels = rows.map(r => r.label);
+            const data = rows.map(r => r.total);
+            S.csv.topBranches = rows.map(r => ({ Branch: r.label, Units: r.total }));
+
+            const opts = {
+                chart: { type: "bar", height: 280, toolbar: { show: false } },
+                series: [{ name: "Units", data }],
+                xaxis: { categories: labels, labels: { style: { colors: "#8b93a7" } } },
+                plotOptions: { bar: { horizontal: true, borderRadius: 7, barHeight: "66%" } },
+                colors: ["#f7d78a"],
+                dataLabels: { enabled: false },
+                grid: { borderColor: "#edf1fb" },
+                tooltip: { theme: "light" }
+            };
+            mountChart("topBranches", "topBranchesChart", opts);
+        }
+
+        function renderTicketStatusChart() {
+            const fT = CFG.fields.ticket;
+            const scope = S.filters.ticketScope;
+            const now = new Date();
+
+            const rows = S.filtered.tickets.filter(t => {
+                if (scope === "all") return true;
+                const d = parseDateAny(ticketDateValue(t));
+                if (!d) return false;
+                if (scope === "month") return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+                if (scope === "year") return d.getFullYear() === now.getFullYear();
+                return true;
+            });
+
+            const map = new Map();
+            rows.forEach(t => {
+                const s = ticketStatusValue(t);
+                map.set(s, (map.get(s) || 0) + 1);
+            });
+
+            const labels = [...map.keys()];
+            const data = labels.map(k => map.get(k));
+            S.csv.ticketStatus = labels.map((label, i) => ({ Status: label, Tickets: data[i] }));
+
+            const opts = {
+                chart: { type: "donut", height: 280, toolbar: { show: false } },
+                labels,
+                series: data,
+                colors: ["#68d9a3", "#fbbf24", "#fda4af", "#93c5fd", "#c4b5fd", "#67e8f9"],
+                legend: { position: "bottom", fontSize: "12px" },
+                dataLabels: { enabled: false },
+                stroke: { width: 0 },
+                plotOptions: { pie: { donut: { size: "64%" } } }
+            };
+            mountChart("ticketStatus", "ticketStatusChart", opts);
+        }
+
+        function renderTopProductsList() {
+            const holder = document.getElementById("topProductsList");
+            const fO = CFG.fields.order;
+            const totals = new Map();
+            S.filtered.orders.forEach(o => {
+                extractOrderLines(o).forEach(line => {
+                    if (S.filters.assetTypeId && line.assetId !== S.filters.assetTypeId) return;
+                    if (!line.productId) return;
+                    totals.set(line.productId, (totals.get(line.productId) || 0) + (line.qty || 0));
+                });
+            });
+
+            const rows = [...totals.entries()]
+                .map(([id, total]) => ({ id, name: S.map.productById.get(id) || id, total }))
+                .sort((a, b) => b.total - a.total)
+                .slice(0, 8);
+
+            S.csv.topProducts = rows.map(r => ({ Product: r.name, Units: r.total }));
+
+            if (!rows.length) {
+                holder.innerHTML = `<div class="empty">No product activity for current filters.</div>`;
+                return;
+            }
+            holder.innerHTML = rows.map(r => `
+                <div class="list-item">
+                    <div class="li-main">
+                        <div class="li-name">${esc(r.name)}</div>
+                        <div class="li-sub">From filtered orders</div>
+                    </div>
+                    <div class="li-badge">Units ${esc(String(r.total))}</div>
+                </div>
+            `).join("");
+        }
+
+        function mountChart(key, elId, options) {
+            const ex = S.charts[key];
+            if (ex) {
+                ex.destroy();
+                S.charts[key] = null;
+            }
+            const el = document.getElementById(elId);
+            if (!el) return;
+            if (!options.series || !options.series.length || options.series.every(s => Array.isArray(s.data) && s.data.length === 0)) {
+                el.innerHTML = `<div class="empty">No chart data</div>`;
+                return;
+            }
+            const chart = new ApexCharts(el, options);
+            chart.render();
+            S.charts[key] = chart;
+        }
+
+        function buildOverviewCsv() {
+            const summary = [
+                { Metric: "Total Orders", Value: S.filtered.orders.length },
+                { Metric: "Total Tickets", Value: S.filtered.tickets.length },
+                { Metric: "Open Tickets", Value: S.filtered.tickets.filter(t => isOpenTicket(ticketStatusValue(t))).length }
+            ];
+            S.csv.overview = summary;
+        }
+
+        function downloadCsv(filename, rows) {
+            if (!rows || !rows.length) {
+                toast("No data to export", "err");
+                return;
+            }
+            const csv = Papa.unparse(rows);
+            const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                a.remove();
+                URL.revokeObjectURL(url);
+            }, 0);
+            toast("CSV exported");
+        }
+
+        function exportChartCsv(key) {
+            const map = {
+                ordersMonthly: "orders_monthly.csv",
+                topProducts: "top_products.csv",
+                ordersStatus: "orders_status.csv",
+                topBranches: "top_branches.csv",
+                ticketStatus: "ticket_status.csv"
+            };
+            downloadCsv(map[key] || "chart_data.csv", S.csv[key] || []);
+        }
+        function exportOverviewCsv() {
+            downloadCsv("dashboard_summary.csv", S.csv.overview || []);
+        }
+
+        function onFilterChange() {
+            S.filters.date = document.getElementById("dateFilter").value;
+            S.filters.branchId = document.getElementById("branchFilter").value;
+            S.filters.orderStatus = document.getElementById("statusFilter").value;
+            recompute();
+        }
+        function onAssetTypeChange(v) { S.filters.assetTypeId = v; renderTopBranchesChart(); }
+        function onTicketScopeChange(v) { S.filters.ticketScope = v; renderTicketStatusChart(); }
+
+        let _searchTimer;
+        function handleSearch(v) {
+            clearTimeout(_searchTimer);
+            _searchTimer = setTimeout(() => {
+                S.filters.search = v.trim();
+                recompute();
+            }, 140);
+        }
+        function clearFilters() {
+            document.getElementById("searchInput").value = "";
+            document.getElementById("dateFilter").value = "all";
+            document.getElementById("branchFilter").value = "";
+            document.getElementById("statusFilter").value = "";
+            document.getElementById("assetTypeFilter").value = "";
+            document.getElementById("ticketScope").value = "all";
+            S.filters = {
+                search: "",
+                date: "all",
+                branchId: "",
+                orderStatus: "",
+                assetTypeId: "",
+                ticketScope: "all"
+            };
+            recompute();
+        }
+        function refreshData() { loadAll(); }
+
+        function setLoading(v) { document.getElementById("loadingBar").classList.toggle("on", !!v); }
+        function showErr(msg) {
+            const e = document.getElementById("globalErr");
+            if (!msg) {
+                e.textContent = "";
+                e.classList.remove("show");
+                return;
+            }
+            e.textContent = msg;
+            e.classList.add("show");
+        }
+        function toast(msg, type = "ok") {
+            const shelf = document.getElementById("toasts");
+            const t = document.createElement("div");
+            t.className = "toast " + type;
+            t.textContent = msg;
+            shelf.appendChild(t);
+            setTimeout(() => {
+                t.style.cssText = "opacity:0;transform:translateY(6px);transition:.22s";
+                setTimeout(() => t.remove(), 240);
+            }, 2600);
+        }
+
+        async function init() {
+            try {
+                // Support both SDK shapes used across existing widgets.
+                if (ZOHO?.CREATOR?.API?.getAllRecords && ZOHO?.CREATOR?.init) {
+                    await ZOHO.CREATOR.init();
+                } else if (ZOHO?.CREATOR?.UTIL?.getInitParams) {
+                    await ZOHO.CREATOR.UTIL.getInitParams();
+                } else if (ZOHO?.CREATOR?.init) {
+                    await ZOHO.CREATOR.init();
+                } else {
+                    throw new Error("Zoho SDK init method not available.");
+                }
+                await loadAll();
+            } catch (e) {
+                showErr("SDK init failed: " + (e?.message || String(e)));
+            }
+        }
+
+        document.readyState === "loading"
+            ? document.addEventListener("DOMContentLoaded", init)
+            : init();
+    </script>
+</body>
+
+</html>
