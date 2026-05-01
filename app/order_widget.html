@@ -28,6 +28,7 @@
             --surface-3: #eceef3;
             --surface-4: #e2e5ed;
             --accent: #4f6ef7;
+            --accent-2: #7c3aed;
             --accent-dark: #3d5ce6;
             --accent-glow: rgba(79, 110, 247, .18);
             --green: #059669;
@@ -56,10 +57,7 @@
 
         body {
             font-family: var(--font);
-            background: 
-                radial-gradient(circle at 5% 5%, rgba(91, 124, 255, .16), transparent 24%),
-                radial-gradient(circle at 90% 8%, rgba(139, 92, 246, .16), transparent 24%),
-                var(--surface-2);
+            background: var(--surface-2);
             color: var(--ink);
             height: 100vh;
             display: flex;
@@ -72,8 +70,7 @@
 
         /* ── TOPBAR */
         .topbar {
-            background: rgba(255, 255, 255, .84);
-            backdrop-filter: blur(12px);
+            background: var(--surface);
             border-bottom: 1px solid var(--border);
             padding: 0 24px;
             height: 56px;
@@ -94,22 +91,15 @@
         }
 
         .app-icon {
-            width: 38px;
-            height: 38px;
-            background: linear-gradient(135deg, var(--brand), var(--brand-2));
-            border-radius: 11px;
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #4f6ef7, #7c3aed);
+            border-radius: var(--r-sm);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
-            color: #fff;
-            box-shadow: 0 8px 20px rgba(79, 110, 247, .35);
-            animation: pulse 4s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.04); }
+            font-size: 16px;
+            box-shadow: 0 2px 8px rgba(79, 110, 247, .3);
         }
 
         .app-title {
@@ -244,9 +234,8 @@
 
         .search-wrap {
             position: relative;
-            flex: 1;
-            min-width: 200px;
-            max-width: 340px;
+            width: 320px;
+            flex-shrink: 0;
         }
 
         .search-wrap .s-icon {
@@ -260,7 +249,8 @@
 
         .search-input {
             width: 100%;
-            padding: 8px 12px 8px 34px;
+            height: 38px;
+            padding: 0 12px 0 34px;
             border: 1px solid var(--border);
             border-radius: var(--r-md);
             font-size: 13px;
@@ -285,7 +275,8 @@
         }
 
         .sort-select {
-            padding: 7px 12px;
+            height: 38px;
+            padding: 0 12px;
             border: 1px solid var(--border);
             border-radius: var(--r-md);
             font-size: 12px;
@@ -295,6 +286,7 @@
             outline: none;
             cursor: pointer;
             transition: var(--tr);
+            flex-shrink: 0;
         }
 
         /* ── FILTER BAR */
@@ -302,16 +294,17 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            margin-bottom: 10px;
-            padding: 10px 14px;
+            padding: 0 14px;
+            height: 38px;
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: var(--r-lg);
+            border-radius: var(--r-md);
             box-shadow: var(--shadow-xs);
             flex-wrap: wrap;
             position: relative;
             z-index: 10;
             flex-shrink: 0;
+            flex: 1;
         }
 
         .fb-label {
@@ -582,8 +575,15 @@
         }
 
         @keyframes dropUp {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .ss-search-wrap {
@@ -730,8 +730,7 @@
 
         /* ── TABLE CARD */
         .table-card {
-            background: rgba(255, 255, 255, .88);
-            backdrop-filter: blur(10px);
+            background: var(--surface);
             border: 1px solid var(--border);
             border-radius: var(--r-lg);
             box-shadow: var(--shadow-sm);
@@ -1495,6 +1494,288 @@
             border: 1px solid #fde68a;
         }
 
+        /* ── AUDIT LOG TIMELINE ─────────────────────── */
+        .audit-sec {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-lg);
+            box-shadow: var(--shadow-xs);
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .audit-sec-hdr {
+            padding: 16px 20px 14px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .audit-hdr-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .audit-hdr-icon {
+            color: #7c3aed;
+            background: rgba(124, 58, 237, .1);
+            padding: 6px;
+            border-radius: var(--r-sm);
+            display: flex;
+        }
+
+        .audit-count-badge {
+            background: rgba(79, 110, 247, .1);
+            color: var(--accent);
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+            border: 1px solid rgba(79, 110, 247, .2);
+        }
+
+        .audit-body {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 28px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 9px;
+            top: 8px;
+            bottom: 8px;
+            width: 2px;
+            background: linear-gradient(180deg, var(--accent), var(--accent-2), var(--border));
+            border-radius: 2px;
+        }
+
+        .tl-item {
+            position: relative;
+            margin-bottom: 20px;
+            animation: tlIn .3s ease both;
+        }
+
+        .tl-item:last-child {
+            margin-bottom: 0;
+        }
+
+        @keyframes tlIn {
+            from {
+                opacity: 0;
+                transform: translateX(-8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .tl-dot {
+            position: absolute;
+            left: -24px;
+            top: 10px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 2.5px solid var(--surface);
+            background: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent);
+            z-index: 1;
+        }
+
+        .tl-dot.tl-create {
+            background: var(--green);
+            box-shadow: 0 0 0 2px var(--green);
+        }
+
+        .tl-dot.tl-update {
+            background: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent);
+        }
+
+        .tl-dot.tl-delete {
+            background: var(--red);
+            box-shadow: 0 0 0 2px var(--red);
+        }
+
+        .tl-dot.tl-other {
+            background: var(--ink-ghost);
+            box-shadow: 0 0 0 2px var(--ink-ghost);
+        }
+
+        .tl-card {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--r-md);
+            padding: 12px 14px;
+            transition: box-shadow var(--tr), border-color var(--tr);
+        }
+
+        .tl-card:hover {
+            box-shadow: var(--shadow-sm);
+            border-color: var(--ink-ghost);
+        }
+
+        .tl-card-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tl-action-pill {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .3px;
+            padding: 3px 9px;
+            border-radius: 20px;
+            text-transform: uppercase;
+        }
+
+        .tl-pill-create {
+            background: var(--green-bg);
+            color: var(--green);
+        }
+
+        .tl-pill-update {
+            background: rgba(79, 110, 247, .1);
+            color: var(--accent);
+        }
+
+        .tl-pill-delete {
+            background: var(--red-bg);
+            color: var(--red);
+        }
+
+        .tl-pill-other {
+            background: var(--surface-3);
+            color: var(--ink-muted);
+        }
+
+        .tl-time {
+            font-size: 11px;
+            color: var(--ink-muted);
+            font-family: var(--mono);
+            white-space: nowrap;
+        }
+
+        .tl-user {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--ink-soft);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tl-user-avatar {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            color: #fff;
+            font-size: 9px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .tl-changes {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .tl-change-row {
+            display: grid;
+            grid-template-columns: auto 1fr 1fr;
+            gap: 6px 8px;
+            align-items: start;
+            font-size: 12px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            padding: 8px 10px;
+        }
+
+        .tl-field-name {
+            font-weight: 700;
+            color: var(--ink);
+            white-space: nowrap;
+            padding-right: 6px;
+            border-right: 1px solid var(--border);
+        }
+
+        .tl-old {
+            color: var(--red);
+            text-decoration: line-through;
+            opacity: .8;
+            padding-left: 6px;
+            word-break: break-word;
+        }
+
+        .tl-new {
+            color: var(--green);
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .audit-empty {
+            text-align: center;
+            padding: 32px 20px;
+            color: var(--ink-muted);
+        }
+
+        .audit-empty-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .audit-empty-text {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .audit-loading {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 24px 20px;
+            color: var(--ink-muted);
+            font-size: 13px;
+        }
+
+        .audit-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin .7s linear infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
         /* ── MODAL */
         .modal-ov {
             display: none;
@@ -1701,20 +1982,27 @@
             border: 1px solid var(--border);
             border-radius: var(--r-md);
             min-height: 120px;
-            overflow: visible; /* CRITICAL: Allow dropdown to pop out */
+            overflow: visible;
+            /* CRITICAL: Allow dropdown to pop out */
             position: relative;
             background: var(--surface);
         }
 
         .subform-table {
             width: 100%;
-            border-collapse: separate; /* Changed for border radius */
+            border-collapse: separate;
+            /* Changed for border radius */
             border-spacing: 0;
             min-width: 560px;
         }
 
-        .subform-table th:first-child { border-top-left-radius: var(--r-md); }
-        .subform-table th:last-child { border-top-right-radius: var(--r-md); }
+        .subform-table th:first-child {
+            border-top-left-radius: var(--r-md);
+        }
+
+        .subform-table th:last-child {
+            border-top-right-radius: var(--r-md);
+        }
 
         .subform-table th {
             padding: 9px 12px;
@@ -1930,7 +2218,7 @@
             <span id="gErrText"></span>
         </div>
 
-        <!-- TOOLBAR -->
+        <!-- TOOLBAR & FILTERS -->
         <div class="toolbar">
             <div class="search-wrap">
                 <svg class="s-icon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
@@ -1941,7 +2229,94 @@
                 <input class="search-input" id="searchInput" type="text"
                     placeholder="Search by Order ID, branch, status…" oninput="handleSearch(this.value)">
             </div>
-            <div class="spacer"></div>
+
+            <!-- FILTER BAR -->
+            <div class="filter-bar" id="filterBar">
+                <span class="fb-label">
+                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                    </svg>
+                    Filters
+                </span>
+                <div class="fb-sep"></div>
+
+                <!-- Status -->
+                <div class="fd-wrap">
+                    <button class="fd-btn" id="fb-status" onclick="toggleDropdown('status',event)">
+                        Status
+                        <svg class="fd-chevron" width="11" height="11" fill="none" stroke="currentColor"
+                            stroke-width="2.5" viewBox="0 0 24 24">
+                            <path d="m6 9 6 6 6-6" />
+                        </svg>
+                    </button>
+                    <div class="fd-menu" id="fdm-status" onclick="event.stopPropagation()" style="min-width:180px;">
+                        <div class="fd-list" id="fdl-status">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Branch -->
+                <div class="fd-wrap">
+                    <button class="fd-btn" id="fb-branch" onclick="toggleDropdown('branch',event)">
+                        Branch
+                        <svg class="fd-chevron" width="11" height="11" fill="none" stroke="currentColor"
+                            stroke-width="2.5" viewBox="0 0 24 24">
+                            <path d="m6 9 6 6 6-6" />
+                        </svg>
+                    </button>
+                    <div class="fd-menu" id="fdm-branch" onclick="event.stopPropagation()" style="min-width:230px;">
+                        <input class="fd-search" type="text" placeholder="Search branches…"
+                            oninput="searchBranches(this.value)" id="bs-branch">
+                        <div class="fd-list" id="fdl-branch">
+                            <div class="fd-empty">Loading…</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Date -->
+                <div class="fd-wrap">
+                    <button class="fd-btn" id="fb-dateBtn" onclick="toggleDropdown('dateBtn',event)">
+                        Order Date
+                        <svg class="fd-chevron" width="11" height="11" fill="none" stroke="currentColor"
+                            stroke-width="2.5" viewBox="0 0 24 24">
+                            <path d="m6 9 6 6 6-6" />
+                        </svg>
+                    </button>
+                    <div class="fd-menu" id="fdm-dateBtn" onclick="event.stopPropagation()">
+                        <div class="fd-list">
+                            <div class="fd-item" id="fdi-date-Today" onclick="toggleFilter('date','Today')">
+                                <div class="fd-check"></div><span class="fd-item-label">Today</span>
+                            </div>
+                            <div class="fd-item" id="fdi-date-Yesterday" onclick="toggleFilter('date','Yesterday')">
+                                <div class="fd-check"></div><span class="fd-item-label">Yesterday</span>
+                            </div>
+                            <div class="fd-item" id="fdi-date-Last 7 Days" onclick="toggleFilter('date','Last 7 Days')">
+                                <div class="fd-check"></div><span class="fd-item-label">Last 7 Days</span>
+                            </div>
+                            <div class="fd-item" id="fdi-date-Last 30 Days"
+                                onclick="toggleFilter('date','Last 30 Days')">
+                                <div class="fd-check"></div><span class="fd-item-label">Last 30 Days</span>
+                            </div>
+                            <div class="fd-item" id="fdi-date-This Month" onclick="toggleFilter('date','This Month')">
+                                <div class="fd-check"></div><span class="fd-item-label">This Month</span>
+                            </div>
+                            <div class="fd-item" id="fdi-date-This Year" onclick="toggleFilter('date','This Year')">
+                                <div class="fd-check"></div><span class="fd-item-label">This Year</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fb-sep"></div>
+                <button class="fd-clear" id="clearBtn" onclick="clearAll()">
+                    <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5"
+                        viewBox="0 0 24 24">
+                        <path d="M18 6 6 18M6 6l12 12" />
+                    </svg>
+                    Clear All
+                </button>
+            </div>
+
             <select class="sort-select" id="sortSelect" onchange="handleSort()">
                 <option value="">Sort: Default</option>
                 <option value="date_desc">Date Newest</option>
@@ -1951,89 +2326,13 @@
             </select>
         </div>
 
-        <!-- FILTER BAR -->
-        <div class="filter-bar" id="filterBar">
-            <span class="fb-label">
-                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
-                </svg>
-                Filters
-            </span>
-            <div class="fb-sep"></div>
-
-            <!-- Status -->
-            <div class="fd-wrap">
-                <button class="fd-btn" id="fb-status" onclick="toggleDropdown('status',event)">
-                    Status
-                    <svg class="fd-chevron" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5"
-                        viewBox="0 0 24 24">
-                        <path d="m6 9 6 6 6-6" />
-                    </svg>
-                </button>
-                <div class="fd-menu" id="fdm-status" onclick="event.stopPropagation()" style="min-width:180px;">
-                    <div class="fd-list" id="fdl-status">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Branch -->
-            <div class="fd-wrap">
-                <button class="fd-btn" id="fb-branch" onclick="toggleDropdown('branch',event)">
-                    Branch
-                    <svg class="fd-chevron" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5"
-                        viewBox="0 0 24 24">
-                        <path d="m6 9 6 6 6-6" />
-                    </svg>
-                </button>
-                <div class="fd-menu" id="fdm-branch" onclick="event.stopPropagation()" style="min-width:230px;">
-                    <input class="fd-search" type="text" placeholder="Search branches…"
-                        oninput="searchBranches(this.value)" id="bs-branch">
-                    <div class="fd-list" id="fdl-branch">
-                        <div class="fd-empty">Loading…</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Date -->
-            <div class="fd-wrap">
-                <button class="fd-btn" id="fb-dateBtn" onclick="toggleDropdown('dateBtn',event)">
-                    Order Date
-                    <svg class="fd-chevron" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5"
-                        viewBox="0 0 24 24">
-                        <path d="m6 9 6 6 6-6" />
-                    </svg>
-                </button>
-                <div class="fd-menu" id="fdm-dateBtn" onclick="event.stopPropagation()">
-                    <div class="fd-list">
-                        <div class="fd-item" id="fdi-date-Today" onclick="toggleFilter('date','Today')">
-                            <div class="fd-check"></div><span class="fd-item-label">Today</span>
-                        </div>
-                        <div class="fd-item" id="fdi-date-Yesterday" onclick="toggleFilter('date','Yesterday')">
-                            <div class="fd-check"></div><span class="fd-item-label">Yesterday</span>
-                        </div>
-                        <div class="fd-item" id="fdi-date-Last 7 Days" onclick="toggleFilter('date','Last 7 Days')">
-                            <div class="fd-check"></div><span class="fd-item-label">Last 7 Days</span>
-                        </div>
-                        <div class="fd-item" id="fdi-date-Last 30 Days" onclick="toggleFilter('date','Last 30 Days')">
-                            <div class="fd-check"></div><span class="fd-item-label">Last 30 Days</span>
-                        </div>
-                        <div class="fd-item" id="fdi-date-This Month" onclick="toggleFilter('date','This Month')">
-                            <div class="fd-check"></div><span class="fd-item-label">This Month</span>
-                        </div>
-                        <div class="fd-item" id="fdi-date-This Year" onclick="toggleFilter('date','This Year')">
-                            <div class="fd-check"></div><span class="fd-item-label">This Year</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="fb-sep"></div>
-            <button class="fd-clear" id="clearBtn" onclick="clearAll()">
-                <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                    <path d="M18 6 6 18M6 6l12 12" />
-                </svg>
-                Clear All
-            </button>
+        <div class="fb-sep"></div>
+        <button class="fd-clear" id="clearBtn" onclick="clearAll()">
+            <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+            Clear All
+        </button>
         </div>
 
         <!-- Filter chips -->
@@ -2047,7 +2346,7 @@
                     <svg width="10" height="10" fill="currentColor" viewBox="0 0 24 24" style="margin-right:2px;">
                         <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" />
                     </svg>
-                    ADMIN
+                    Admin
                 </div>
             </div>
             <div class="table-wrap">
@@ -2252,6 +2551,32 @@
         </div>
     </div>
 
+    <!-- CANCEL CONFIRM MODAL -->
+    <div class="modal-ov" id="cancelModalOv" onclick="handleCancelModalOvClick(event)">
+        <div class="modal" style="max-width:400px;text-align:center;">
+            <div class="modal-body" style="padding:36px 28px 28px;">
+                <div
+                    style="width:60px;height:60px;border-radius:50%;background:var(--amber-bg);color:var(--amber);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;">
+                    <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="12" />
+                        <line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
+                </div>
+                <h3 style="font-size:18px;font-weight:700;color:var(--ink);margin-bottom:8px;">Cancel Order</h3>
+                <p style="font-size:14px;color:var(--ink-soft);line-height:1.6;margin-bottom:24px;">Are you sure you
+                    want to cancel this order? This action will mark the order as Cancelled.</p>
+                <div style="display:flex;gap:12px;">
+                    <button class="btn btn-ghost" style="flex:1;justify-content:center;"
+                        onclick="closeCancelModal()">No, Keep it</button>
+                    <button class="btn"
+                        style="flex:1;justify-content:center;background:var(--amber);color:#fff;border:none;box-shadow:0 2px 8px rgba(217,119,6,0.25);"
+                        onclick="doCancel()">Yes, Cancel Order</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- SEND ORDER MODAL -->
     <div class="modal-ov" id="sendModalOv" onclick="handleSendModalOvClick(event)">
         <div class="modal" style="max-width:560px; padding:32px;">
@@ -2415,6 +2740,7 @@
             brandField: "Brand_Name",
             assetField: "Asset_Type_Name",
             BATCH: 200,
+            auditLogReport: "All_Audit_Logs",
             roleReport: "All_Branch_User_Role_Mapping",
             ticketForm: "Ticket_form",
             ticketReport: "All_Tickets",
@@ -2427,6 +2753,7 @@
         const S = {
             all: [],
             isSuperAdmin: false,
+            user: { email: "", role: "", authorizedBranchIds: [], isSuperAdmin: false },
             branches: [],
             products: [],
             brands: [],
@@ -2442,6 +2769,7 @@
             drawerRec: null,
             openDrop: null,
             delId: null,
+            canId: null,
             modalRows: [],   // [{rowId, productId, brandId, assetId, qty}]
             tCategories: [],
             ticketId: null // current order for ticket
@@ -2551,11 +2879,18 @@
                     fetchAll(CFG.categoryReport).catch(() => ({ data: [] }))
                 ]);
 
-                S.all = orders;
                 const catData = categories?.data || categories || [];
                 S.tCategories = catData
                     .filter(c => (c.status || c.Status || "") === "Active")
                     .map(c => ({ id: String(c.ID), name: c.category_name || c.Name || "—" }));
+
+                // Apply Branch Restriction
+                if (!S.isSuperAdmin && S.user.authorizedBranchIds.length > 0) {
+                    const authIds = S.user.authorizedBranchIds;
+                    S.all = orders.filter(o => authIds.includes(lookupId(o[CFG.f.branch])));
+                } else {
+                    S.all = orders;
+                }
                 S.branches = branches.map(r => ({ id: String(r.ID), name: r[CFG.branchField] || "—" }));
                 S.products = products
                     .map(r => ({
@@ -2680,7 +3015,7 @@
                         <button class="act-btn" style="color:${isFinal ? "var(--ink-ghost)" : "var(--ink)"}; border-color:${isFinal ? "transparent" : "var(--border)"};" 
                                 ${isFinal ? "disabled" : ""} onclick="openSendModal('${id}')">Send</button>
                         <button class="act-btn" style="color:${isFinal ? "var(--ink-ghost)" : "var(--red)"}; border-color:${isFinal ? "transparent" : "#fca5a5"};" 
-                                ${isFinal ? "disabled" : ""} onclick="updateStatus('${id}', 'Cancelled')">Cancel</button>
+                                ${isFinal ? "disabled" : ""} onclick="confirmCancel('${id}')">Cancel</button>
                         <div style="width:1px; height:14px; background:var(--border); margin:0 4px;"></div>
                         <button class="act-btn" ${isFinal ? "disabled style='opacity:0.5; cursor:not-allowed;'" : ""} onclick="openEdit('${id}')" title="Edit">
                             <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -2946,11 +3281,7 @@
             }
 
             const activeProducts = S.products.filter(p => p.status === "Active");
-            const activeOptionsHTML = activeProducts.map(p => `
-                <div class="ss-opt" onclick="selectSS(IDX, '${escA(p.id)}')">
-                    ${esc(p.name)}
-                </div>
-            `).join("");
+            const selectedIds = S.modalRows.map(r => r.productId).filter(id => !!id);
 
             wrap.innerHTML = `<div class="subform-wrap"><table class="subform-table">
         <thead><tr>
@@ -2964,13 +3295,21 @@
                 const prod = S.products.find(p => p.id === row.productId);
                 const bName = row.brandId ? (S.brands.find(b => b.id === row.brandId)?.name || "—") : "—";
                 const aName = row.assetId ? (S.assets.find(a => a.id === row.assetId)?.name || "—") : "—";
-                
-                // If current product is inactive, we must include it in the dropdown for this row
-                let rowOpts = activeOptionsHTML.replace(/IDX/g, idx);
+
+                // Exclude products selected in OTHER rows
+                const otherSelectedIds = S.modalRows.filter((_, i) => i !== idx).map(r => r.productId);
+                const availableProducts = activeProducts.filter(p => !otherSelectedIds.includes(p.id));
+
+                let rowOpts = availableProducts.map(p => `
+                    <div class="ss-opt ${p.id === row.productId ? "selected" : ""}" onclick="selectSS(${idx}, '${escA(p.id)}')">
+                        ${esc(p.name)}
+                    </div>
+                `).join("");
+
                 if (prod && prod.status !== "Active") {
                     rowOpts = `<div class="ss-opt selected" onclick="selectSS(${idx}, '${escA(prod.id)}')">${esc(prod.name)}</div>` + rowOpts;
                 }
-                
+
                 const ssId = `ss-${idx}`;
                 return `<tr>
                 <td style="min-width:240px;">
@@ -3029,19 +3368,6 @@
             let status = defaultRec[f.status] || "Pending";
             const isFinal = status === "Delivered" || status === "Cancelled";
 
-            const dSend = document.getElementById("dSendBtn");
-            const dCancel = document.getElementById("dCancelBtn");
-            if (dSend) {
-                dSend.disabled = isFinal;
-                dSend.style.opacity = isFinal ? "0.5" : "1";
-                dSend.style.pointerEvents = isFinal ? "none" : "auto";
-            }
-            if (dCancel) {
-                dCancel.disabled = isFinal;
-                dCancel.style.opacity = isFinal ? "0.5" : "1";
-                dCancel.style.pointerEvents = isFinal ? "none" : "auto";
-            }
-
             document.getElementById("dName").textContent = defaultRec[f.orderId] || "—";
             document.getElementById("dDate").textContent = fmtDate(defaultRec[f.date]);
             document.getElementById("dStatus").innerHTML = `<span class="badge ${statusClass(status)}">${esc(status)}</span>`;
@@ -3059,12 +3385,19 @@
                 // Inject admin buttons if needed
                 actBox.innerHTML = `
                     ${S.isSuperAdmin ? `
+                        <button class="btn btn-ghost" id="dSendBtn" ${isFinal ? "disabled style='opacity:0.5; cursor:not-allowed; border:1px solid var(--border);'" : "style='border:1px solid var(--border);'"} onclick="sendFromDrawer()">
+                            Send Order
+                        </button>
+                        <button class="btn btn-ghost" id="dCancelBtn" ${isFinal ? "disabled style='opacity:0.5; cursor:not-allowed; color:var(--red); border:1px solid #fca5a5;'" : "style='color:var(--red); border:1px solid #fca5a5;'"} onclick="cancelFromDrawer()">
+                            Cancel Order
+                        </button>
+                        <div style="width:1px; height:24px; background:var(--border); margin:0 8px;"></div>
                         <button class="btn btn-ghost" ${isFinal ? "disabled style='opacity:0.5; cursor:not-allowed;'" : ""} onclick="editFromDrawer()">
                             <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                             Edit
                         </button>
                         <button class="btn" style="background:var(--red-bg);color:var(--red);border:1px solid #fca5a5;" onclick="deleteFromDrawer()">
-                            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
                             Delete
                         </button>
                     ` : ""}
@@ -3230,6 +3563,24 @@
                 ${rec.Modified_Time ? `<div><div class="d-lbl">Modified</div><div class="d-val">${esc(rec.Modified_Time)}</div></div>` : ""}
             </div>
         </div>`;
+
+            const auditSec = document.createElement('div');
+            auditSec.className = 'audit-sec';
+            auditSec.innerHTML = `
+                <div class="audit-sec-hdr">
+                    <div class="audit-hdr-left">
+                        <div class="audit-hdr-icon">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        </div>
+                        <div class="d-sec-title">Audit History</div>
+                    </div>
+                    <span class="audit-count-badge" id="auditCountBadge">Loading…</span>
+                </div>
+                <div class="audit-body" id="auditTimelineContainer">
+                    <div class="audit-loading"><div class="audit-spinner"></div>Loading audit history…</div>
+                </div>`;
+            document.getElementById('drawerBody').appendChild(auditSec);
+            fetchAndRenderAuditLog(String(rec.ID));
         }
 
         function closeDrawer() {
@@ -3238,10 +3589,178 @@
             S.drawerRec = null;
         }
         function handleDrawerOvClick(e) { if (e.target === document.getElementById("drawerOv")) closeDrawer(); }
+
+        // ─────────────────────────────────────────────
+        // AUDIT LOG TIMELINE
+        // ─────────────────────────────────────────────
+        async function fetchAndRenderAuditLog(recordId) {
+            const container = document.getElementById('auditTimelineContainer');
+            const badge = document.getElementById('auditCountBadge');
+            if (!container) return;
+            container.innerHTML = `<div class="audit-loading"><div class="audit-spinner"></div>Loading audit history…</div>`;
+            if (badge) badge.textContent = 'Loading…';
+            try {
+                const logs = await fetchAuditLogsForRecord(recordId);
+                renderAuditTimeline(container, badge, logs);
+            } catch (e) {
+                console.warn('Audit log fetch error:', e);
+                container.innerHTML = `<div class="audit-empty"><div class="audit-empty-icon">⚠️</div><div class="audit-empty-text">Could not load audit history</div></div>`;
+                if (badge) badge.textContent = 'Error';
+            }
+        }
+
+        async function fetchAuditLogsForRecord(recordId) {
+            let all = [], page = 1;
+            try {
+                while (true) {
+                    const r = await ZOHO.CREATOR.API.getAllRecords({
+                        appName: CFG.appName,
+                        reportName: CFG.auditLogReport,
+                        criteria: `(Module == "Order")`,
+                        page,
+                        pageSize: CFG.BATCH
+                    });
+                    const rows = r?.data ?? [];
+                    all = all.concat(rows);
+                    if (rows.length < CFG.BATCH) break;
+                    page++;
+                }
+            } catch (e) {
+                console.warn('Audit log API error (may mean no records):', e);
+                return [];
+            }
+
+            const rid = String(recordId);
+            const filtered = all.filter(log => String(log.Record_ID || '') === rid);
+            filtered.sort((a, b) => new Date(b.Timestamp || 0) - new Date(a.Timestamp || 0));
+            return filtered;
+        }
+
+        function renderAuditTimeline(container, badge, logs) {
+            if (!logs.length) {
+                container.innerHTML = `<div class="audit-empty"><div class="audit-empty-icon">📋</div><div class="audit-empty-text">No Audit Logs</div></div>`;
+                if (badge) badge.textContent = '0';
+                return;
+            }
+            if (badge) badge.textContent = `${logs.length} event${logs.length !== 1 ? 's' : ''}`;
+
+            const items = logs.map((log, i) => {
+                if (i === 0) console.log("[Audit Debug] Order log entry:", log);
+
+                // fc hoisted so changes table works regardless of Action_field
+                const fc = String(log.Feild_Changed || log.Field_Changed || "");
+                const oldV_raw = String(log.Old_Value || log.OldValue || "").trim();
+                const isDash = (s) => !s || s === "-" || s === "–" || s === "—";
+
+                // Case-insensitive search for Action_field
+                let afRaw = "";
+                for (const key in log) {
+                    if (key.toLowerCase() === "action_field") {
+                        afRaw = log[key];
+                        break;
+                    }
+                }
+                const actionFieldRaw = (typeof afRaw === "object") ? (afRaw.display_value || afRaw.value || "") : String(afRaw || "");
+                const actionFieldVal = actionFieldRaw.trim().toLowerCase();
+
+                let actionLabel;
+                if (actionFieldVal === "create") {
+                    actionLabel = "Created";
+                } else if (actionFieldVal === "update" || actionFieldVal === "edit") {
+                    actionLabel = "Updated";
+                } else if (actionFieldVal === "delete") {
+                    actionLabel = "Deleted";
+                } else if (actionFieldRaw.trim()) {
+                    actionLabel = actionFieldRaw.trim();
+                } else {
+                    const fcLow = fc.toLowerCase();
+                    if (fcLow.includes("creat")) {
+                        actionLabel = "Created";
+                    } else if (fcLow.includes("delet")) {
+                        actionLabel = "Deleted";
+                    } else if (isDash(oldV_raw)) {
+                        actionLabel = "Created";
+                    } else {
+                        actionLabel = "Updated";
+                    }
+                }
+
+                const alLow = actionLabel.toLowerCase();
+                const isCreate = alLow.includes("creat");
+                const isDelete = alLow.includes("delet");
+                const isUpdate = alLow.includes("updat") || alLow.includes("edit");
+
+                const dotClass = isCreate ? "tl-create" : isDelete ? "tl-delete" : isUpdate ? "tl-update" : "tl-other";
+                const pillClass = isCreate ? "tl-pill-create" : isDelete ? "tl-pill-delete" : isUpdate ? "tl-pill-update" : "tl-pill-other";
+
+
+                const userRaw = log.User || "";
+                const userName = typeof userRaw === 'object' ? (userRaw.display_value || userRaw.email || 'System') : String(userRaw || 'System');
+                const initials = userName.split(/\s+/).map(w => w[0] || '').join('').toUpperCase().slice(0, 2) || 'S';
+
+                let tsFormatted = '—';
+                const tsRaw = log.Timestamp || log.Added_Time || '';
+                if (tsRaw) {
+                    try {
+                        tsFormatted = new Date(tsRaw).toLocaleString('en-IN', {
+                            day: '2-digit', month: 'short', year: 'numeric',
+                            hour: '2-digit', minute: '2-digit', hour12: true
+                        });
+                    } catch (_) { tsFormatted = tsRaw; }
+                }
+
+                let changesHtml = '';
+
+                if (isCreate && (!fc || isDash(fc))) {
+                    // Show the "Created" message even if Field_Changed is empty/dash
+                    changesHtml = `<div class="tl-changes">
+                        <div class="tl-change-row" style="grid-template-columns: 28px 1fr; align-items: center;">
+                            <span class="tl-field-name" style="border-right: none; text-align: center; padding-right: 0; font-size: 14px;">✦</span>
+                            <span class="tl-new" style="color: var(--ink-soft); font-weight: 500; font-size: 12px;">New order record created</span>
+                        </div>
+                    </div>`;
+                } else if (fc) {
+                    const fields = fc.split(',').map(f => f.trim()).filter(Boolean);
+                    const oldVals = String(log.Old_Value || log.OldValue || '').split(',').map(v => v.trim());
+                    const newVals = String(log.New_Value || log.NewValue || '').split(',').map(v => v.trim());
+                    const rows = fields.map((field, fi) => {
+                        const oldV = oldVals[fi] || "";
+                        const newV = newVals[fi] || "";
+
+                        // Replace generic dash rows in "Created" events with a more descriptive message
+                        if (isCreate && isDash(field) && isDash(oldV) && isDash(newV)) {
+                            return `<div class="tl-change-row" style="grid-template-columns: 28px 1fr; align-items: center;">
+                                <span class="tl-field-name" style="border-right: none; text-align: center; padding-right: 0; font-size: 14px;">✦</span>
+                                <span class="tl-new" style="color: var(--ink-soft); font-weight: 500; font-size: 12px;">New order record created</span>
+                            </div>`;
+                        }
+
+                        if (!oldV && !newV) return `<div class="tl-change-row" style="grid-template-columns:1fr"><span class="tl-field-name" style="border-right:none">${esc(field)}</span></div>`;
+                        return `<div class="tl-change-row"><span class="tl-field-name">${esc(field)}</span><span class="tl-old">${oldV ? esc(oldV) : '<em style="opacity:.5">—</em>'}</span><span class="tl-new">${newV ? esc(newV) : '<em style="opacity:.5">—</em>'}</span></div>`;
+                    }).join('');
+                    changesHtml = `<div class="tl-changes">${rows}</div>`;
+                }
+
+                return `<div class="tl-item" style="animation-delay:${i * 0.05}s">
+                    <div class="tl-dot ${dotClass}"></div>
+                    <div class="tl-card">
+                        <div class="tl-card-top">
+                            <span class="tl-action-pill ${pillClass}">${esc(actionLabel)}</span>
+                            <span class="tl-time">${esc(tsFormatted)}</span>
+                        </div>
+                        <div class="tl-user"><span class="tl-user-avatar">${esc(initials)}</span>${esc(userName)}</div>
+                        ${changesHtml}
+                    </div>
+                </div>`;
+            }).join('');
+
+            container.innerHTML = `<div class="timeline">${items}</div>`;
+        }
+
         function editFromDrawer() { if (S.drawerRec) { const id = S.drawerRec.ID; closeDrawer(); openEdit(id); } }
         function deleteFromDrawer() { if (S.drawerRec) { const id = S.drawerRec.ID; closeDrawer(); confirmDelete(id); } }
         function sendFromDrawer() { if (S.drawerRec) { openSendModal(S.drawerRec.ID); } }
-        function cancelFromDrawer() { if (S.drawerRec) { updateStatus(S.drawerRec.ID, "Cancelled"); } }
+        function cancelFromDrawer() { if (S.drawerRec) { confirmCancel(S.drawerRec.ID); } }
 
         async function updateStatus(id, newStatus) {
             setLoading(true);
@@ -3355,7 +3874,9 @@
                         <div style="text-align:right;">
                             <input type="number" class="send-qty-input" 
                                    data-idx="${i}" data-ordered="${item.ordered}" 
-                                   value="${item.ordered}" min="0" max="${item.ordered}" 
+                                   value="${item.ordered}" min="0" max="${item.ordered}" step="1"
+                                   onkeydown="if(['-', '+', 'e', '.'].includes(event.key)) event.preventDefault();"
+                                   oninput="if(this.value !== '') this.value = Math.max(0, Math.min(Math.floor(parseFloat(this.value) || 0), ${item.ordered}))"
                                    style="width:80px; padding:8px; text-align:center; border:1px solid #e2e5ed; border-radius:6px; font-size:14px; font-family:inherit;">
                         </div>
                     </div>
@@ -3404,8 +3925,7 @@
                 const p = item.original;
 
                 const newRow = {};
-                // Targeting the existing row ID removed per user request
-                // if (item.rowId) newRow.ID = item.rowId; 
+                // ID omitted to avoid UPLOAD_RULE_NOT_CONFIGURED error
 
                 // ✅ REVERT TO PLAIN STRING IDs (matching your working Edit console)
                 newRow[sf.product] = item.prodId;
@@ -3502,15 +4022,30 @@
         // ─────────────────────────────────────────────
         // ADD / EDIT MODAL
         // ─────────────────────────────────────────────
-        function todayISO() { return new Date().toISOString().split("T")[0]; }
+        function todayISO() {
+            const d = new Date();
+            return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
+        }
 
         function openAdd() {
             S.editId = null; S.modalRows = [];
             document.getElementById("modalTitle").textContent = "Add Order";
             document.getElementById("submitTxt").textContent = "Add Order";
             document.getElementById("fDate").value = todayISO();
-            document.getElementById("fStatus").value = "Pending";
-            document.getElementById("fBranch").value = "";
+            const fStatus = document.getElementById("fStatus");
+            fStatus.value = "Pending";
+            fStatus.disabled = true;
+            const fBranch = document.getElementById("fBranch");
+            console.log("[Form] Restricted branch check. Admin:", S.user.isSuperAdmin, "Authorized:", S.user.authorizedBranchIds);
+            if (!S.user.isSuperAdmin && S.user.authorizedBranchIds.length > 0) {
+                fBranch.value = S.user.authorizedBranchIds[0];
+                fBranch.disabled = true;
+                console.log("[Form] Branch locked to:", fBranch.value);
+            } else {
+                fBranch.value = "";
+                fBranch.disabled = false;
+                console.log("[Form] Branch unlocked.");
+            }
             document.getElementById("fManual").value = "";
             renderSubform(); hideFormErr();
             document.getElementById("modalOv").classList.add("open");
@@ -3525,12 +4060,19 @@
 
             let dateVal = "";
             if (o[f.date]) {
-                try { const d = new Date(o[f.date]); if (!isNaN(d)) dateVal = d.toISOString().split("T")[0]; }
+                try {
+                    const d = new Date(o[f.date]);
+                    if (!isNaN(d)) {
+                        dateVal = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
+                    }
+                }
                 catch { }
             }
 
             document.getElementById("fDate").value = dateVal;
-            document.getElementById("fStatus").value = o[f.status] || "Pending";
+            const fStatus = document.getElementById("fStatus");
+            fStatus.value = o[f.status] || "Pending";
+            fStatus.disabled = false;
             document.getElementById("fBranch").value = lookupId(o[f.branch]);
             document.getElementById("fManual").value = o[f.manual] || "";
 
@@ -3629,9 +4171,16 @@
             if (!branch) { showFormErr("Branch is required."); return; }
             if (S.modalRows.length === 0) { showFormErr("Please add at least one product row."); return; }
 
+            const pIds = new Set();
             for (let i = 0; i < S.modalRows.length; i++) {
                 const r = S.modalRows[i];
                 if (!r.productId) { showFormErr(`Row ${i + 1}: select a Product.`); return; }
+                if (pIds.has(r.productId)) {
+                    const pName = S.products.find(x => x.id === r.productId)?.name || "product";
+                    showFormErr(`Duplicate product: ${pName} is selected multiple times.`);
+                    return;
+                }
+                pIds.add(r.productId);
                 if (!r.qty || parseInt(r.qty, 10) < 1) { showFormErr(`Row ${i + 1}: Ordered Qty must be ≥ 1.`); return; }
             }
 
@@ -3650,15 +4199,13 @@
 
             const data = {};
             const zd = toZohoDate(date);
-            data["Order_Date"] = zd;
-            data["order_date"] = zd;
-            data["Date"] = zd;
+            data[ff.date] = zd;
             data[ff.status] = status;
             data[ff.branch] = branch;
             data[ff.products] = productsData;
+
             const manual = document.getElementById("fManual").value.trim();
             if (manual) data[ff.manual] = manual;
-            else data[ff.manual] = "";
 
             document.getElementById("submitBtn").disabled = true;
             setLoading(true);
@@ -3726,7 +4273,7 @@
                 const rect = btn.getBoundingClientRect();
                 const spaceBelow = window.innerHeight - rect.bottom;
                 const menuHeight = 220; // max-height 180 + search 40
-                
+
                 if (spaceBelow < menuHeight && rect.top > menuHeight) {
                     wrap.classList.add("open-up");
                 } else {
@@ -3802,6 +4349,28 @@
             } finally {
                 setLoading(false);
             }
+        }
+
+        // ─────────────────────────────────────────────
+        // CANCEL
+        // ─────────────────────────────────────────────
+        function confirmCancel(id) {
+            if (!S.isSuperAdmin) { toast("Permission denied", "err"); return; }
+            S.canId = id;
+            document.getElementById("cancelModalOv").classList.add("open");
+        }
+        function closeCancelModal() {
+            document.getElementById("cancelModalOv").classList.remove("open");
+            S.canId = null;
+        }
+        function handleCancelModalOvClick(e) { if (e.target === document.getElementById("cancelModalOv")) closeCancelModal(); }
+
+        async function doCancel() {
+            if (!S.isSuperAdmin) return;
+            if (!S.canId) return;
+            const id = S.canId;
+            closeCancelModal();
+            updateStatus(id, "Cancelled");
         }
 
         // ─────────────────────────────────────────────
@@ -3943,22 +4512,38 @@
             document.addEventListener("click", () => closeDropdowns());
             document.addEventListener("keydown", e => {
                 if (e.key !== "Escape") return;
-                closeModal(); closeDrawer(); closeDropdowns(); closeDelModal(); closeTicketModal();
+                closeModal(); closeDrawer(); closeDropdowns(); closeDelModal(); closeCancelModal(); closeTicketModal();
             });
             try {
                 await ZOHO.CREATOR.init();
                 const initParams = await ZOHO.CREATOR.UTIL.getInitParams() || {};
-                const loginUser = initParams.loginUser || "";
+                const loginUser = (initParams.loginUser || "").toLowerCase().trim();
+                console.log("[Auth] Logged in user:", loginUser);
+
                 if (loginUser) {
                     try {
-                        const allMappedUsers = await fetchAll(CFG.roleReport);
-                        const emailToMatch = loginUser.toLowerCase().trim();
-                        S.isSuperAdmin = allMappedUsers.some(m => {
+                        const mappings = await fetchAll(CFG.roleReport);
+                        const userMappings = mappings.filter(m => {
                             const u = m.User;
                             if (!u) return false;
-                            const currentEmail = (typeof u === "string" ? u : (u.email || u.display_value || "")).toLowerCase().trim();
-                            return currentEmail === emailToMatch && m.Role === "Super Admin";
+                            const email = (typeof u === "string" ? u : (u.email || u.display_value || "")).toLowerCase().trim();
+                            return email === loginUser;
                         });
+
+                        console.log("[Auth] User mappings found:", userMappings.length);
+
+                        if (userMappings.length > 0) {
+                            S.user.role = userMappings[0].Role;
+                            S.user.isSuperAdmin = S.user.role === "Super Admin";
+                            userMappings.forEach(m => {
+                                const b = m.Branch || m.Branches;
+                                if (!b) return;
+                                if (Array.isArray(b)) b.forEach(i => S.user.authorizedBranchIds.push(lookupId(i)));
+                                else S.user.authorizedBranchIds.push(lookupId(b));
+                            });
+                        }
+                        S.isSuperAdmin = S.user.isSuperAdmin;
+                        console.log("[Auth] Role:", S.user.role, "Authorized Branches:", S.user.authorizedBranchIds);
                     } catch (apiErr) { console.error("Permission check failed:", apiErr); }
                 }
                 // UI Status Update

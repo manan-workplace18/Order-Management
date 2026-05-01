@@ -56,10 +56,7 @@
 
         body {
             font-family: var(--font);
-            background: 
-                radial-gradient(circle at 5% 5%, rgba(91, 124, 255, .16), transparent 24%),
-                radial-gradient(circle at 90% 8%, rgba(139, 92, 246, .16), transparent 24%),
-                var(--surface-2);
+            background: var(--surface-2);
             color: var(--ink);
             height: 100vh;
             display: flex;
@@ -72,8 +69,7 @@
 
         /* ── TOPBAR */
         .topbar {
-            background: rgba(255, 255, 255, .84);
-            backdrop-filter: blur(12px);
+            background: var(--surface);
             border-bottom: 1px solid var(--border);
             padding: 0 24px;
             height: 56px;
@@ -94,22 +90,15 @@
         }
 
         .app-icon {
-            width: 38px;
-            height: 38px;
-            background: linear-gradient(135deg, var(--brand), var(--brand-2));
-            border-radius: 11px;
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #4f6ef7, #7c3aed);
+            border-radius: var(--r-sm);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
-            color: #fff;
-            box-shadow: 0 8px 20px rgba(79, 110, 247, .35);
-            animation: pulse 4s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.04); }
+            font-size: 16px;
+            box-shadow: 0 2px 8px rgba(79, 110, 247, .3);
         }
 
         .app-title {
@@ -594,8 +583,7 @@
 
         /* ── TABLE CARD */
         .table-card {
-            background: rgba(255, 255, 255, .88);
-            backdrop-filter: blur(10px);
+            background: var(--surface);
             border: 1px solid var(--border);
             border-radius: var(--r-lg);
             box-shadow: var(--shadow-sm);
@@ -747,11 +735,9 @@
             flex-shrink: 0;
         }
 
-        .badge-admin {
-            background: #fff9db;
-            color: #f08c00;
-            border: 1px solid #ffe066;
-            box-shadow: 0 2px 4px rgba(240, 140, 0, 0.1);
+        .badge-pending {
+            background: var(--amber-bg);
+            color: var(--amber);
         }
 
         .badge-pending::before {
@@ -1824,17 +1810,30 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         @media (max-width: 768px) {
-            .preview-ov { padding: 0; }
-            .preview-card { height: 100vh; border-radius: 0; }
+            .preview-ov {
+                padding: 0;
+            }
+
+            .preview-card {
+                height: 100vh;
+                border-radius: 0;
+            }
         }
     </style>
 </head>
@@ -1848,7 +1847,8 @@
         <div class="topbar-left">
             <div class="app-icon">📋</div>
             <div>
-                <div class="app-title">Tickets</div>
+                <div class="app-title">Tickets <span id="adminBadge" class="badge badge-admin"
+                        style="display:none; margin-left:8px; vertical-align:middle;">Super Admin</span></div>
                 <div class="app-subtitle">Ticket Module</div>
             </div>
         </div>
@@ -1991,12 +1991,6 @@
         <div class="table-card">
             <div class="tc-header">
                 <span class="rec-count" id="recCount"><strong>—</strong> tickets</span>
-                <div id="adminBadge" class="badge badge-admin" style="display:none;margin-left:auto;font-size:10px;">
-                    <svg width="10" height="10" fill="currentColor" viewBox="0 0 24 24" style="margin-right:2px;">
-                        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" />
-                    </svg>
-                    ADMIN
-                </div>
             </div>
             <div class="table-wrap">
                 <table>
@@ -2196,11 +2190,13 @@
                     <span id="previewFileName">File Preview</span>
                 </div>
                 <div style="display:flex; gap:12px;">
-                    <button class="btn btn-primary" id="previewDownloadBtn" style="height:32px; padding:0 12px; font-size:12px;">
+                    <button class="btn btn-primary" id="previewDownloadBtn"
+                        style="height:32px; padding:0 12px; font-size:12px;">
                         Download
                     </button>
                     <button class="btn-icon" onclick="closePreviewModal()" style="padding:4px;">
-                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
                             <path d="M18 6 6 18M6 6l12 12" />
                         </svg>
                     </button>
@@ -2343,13 +2339,24 @@
             let str = typeof val === "object" ? (val.url || val.display_value || val.name || String(val)) : String(val);
 
             let apiPath = str;
+            let sourceOrigin = "";
+            try {
+                const sourceUrl = new URL(str);
+                sourceOrigin = sourceUrl.origin;
+                apiPath = sourceUrl.pathname + sourceUrl.search;
+            } catch (_) {
+                // Non-absolute URL; keep existing fallback behavior.
+            }
+
             const apiIdx = str.indexOf("/api/");
-            if (apiIdx !== -1) {
+            if (apiPath.indexOf("/api/") !== -1) {
+                apiPath = apiPath.substring(apiPath.indexOf("/api/"));
+            } else if (apiIdx !== -1) {
                 apiPath = str.substring(apiIdx);
             } else {
                 // If it's a relative path from older API versions
                 if (str.startsWith("/app/")) apiPath = str;
-                else return str; 
+                else return str;
             }
 
             // Ensure filepath is present in the query string
@@ -2358,15 +2365,15 @@
                 if (rawName) apiPath += (apiPath.includes("?") ? "&" : "?") + "filepath=/" + encodeURIComponent(rawName);
             }
 
-            let base = "https://creatorapp.zoho.in"; // Default for .in
+            let base = sourceOrigin || "https://creatorapp.zoho.in"; // Default for .in
             let envParam = "";
             try {
                 // Try to get base from referrer
-                if (document.referrer) {
+                if (!sourceOrigin && document.referrer) {
                     const refUrl = new URL(document.referrer);
                     if (refUrl.origin.includes("zoho")) base = refUrl.origin;
                 }
-                
+
                 // Get environment from query params
                 const p = ZOHO.CREATOR.UTIL.getQueryParams();
                 if (p && p.environment && p.environment.toLowerCase() !== "production") {
@@ -2404,9 +2411,338 @@
             const titleEl = document.getElementById("previewFileName");
             const iconEl = document.getElementById("previewIcon");
             const downloadBtn = document.getElementById("previewDownloadBtn");
-            const hiddenImg = document.getElementById("zdkHiddenImg");
+
+            const stopLoader = () => { loader.style.display = "none"; };
+            const canReadFile = !!(ZOHO && ZOHO.CREATOR && ZOHO.CREATOR.FILE && typeof ZOHO.CREATOR.FILE.readFile === "function");
+            const safeDownloadName = extractFileName(fileName);
+
+            // 1. Extract context from URL (extremely robust for different Zoho environments)
+            const context = (() => {
+                const out = {
+                    app: String(CFG.appName || ""),
+                    report: String(CFG.ticketReport || ""),
+                    id: String(recId || ""),
+                    field: String(CFG.f.attachment || ""),
+                    path: ""
+                };
+                try {
+                    const u = String(url || "");
+                    const parts = u.split("/");
+                    const v2Idx = parts.indexOf("v2");
+                    if (v2Idx !== -1 && parts.length > v2Idx + 6) {
+                        // Standard API v2 URL: /api/v2/{workspace}/{app}/report/{report}/{id}/{field}/download
+                        out.app = parts[v2Idx + 1] + "/" + parts[v2Idx + 2];
+                        out.report = parts[v2Idx + 4];
+                        out.id = parts[v2Idx + 5];
+                        out.field = parts[v2Idx + 6];
+                    }
+                    const qsIdx = u.indexOf("filepath=");
+                    if (qsIdx !== -1) {
+                        const raw = u.substring(qsIdx + 9).split("&")[0];
+                        try { out.path = decodeURIComponent(raw); } catch (_) { out.path = raw; }
+                    }
+                } catch (e) { console.warn("URL parse failed:", e); }
+                return out;
+            })();
+
+            const buildReportCandidates = () => {
+                const out = [];
+                const push = r => {
+                    const s = String(r || "").trim();
+                    if (s && !out.includes(s)) out.push(s);
+                };
+                push(context.report);
+                push(CFG.ticketReport);
+                push("All_Tickets");
+                return out;
+            };
+
+            const buildAppCandidates = () => {
+                const out = [];
+                const push = a => {
+                    const s = String(a || "").trim();
+                    if (s && !out.includes(s)) out.push(s);
+                };
+                push(context.app);
+                push(CFG.appName);
+                if (context.app.includes("/")) push(context.app.split("/").pop());
+                return out;
+            };
+
+            const buildFieldCandidates = () => {
+                const out = [];
+                const push = f => {
+                    const s = String(f || "").trim();
+                    if (s && !out.includes(s)) out.push(s);
+                };
+                push(context.field);
+                push(CFG.f.attachment);
+                push("Attachment");
+                return out;
+            };
+
+            const triggerBrowserDownload = (blob, downloadName) => {
+                const blobUrl = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = blobUrl;
+                a.download = downloadName;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                setTimeout(() => {
+                    try { URL.revokeObjectURL(blobUrl); } catch (_) { }
+                }, 30000);
+            };
+
+            const isValidImageBlob = async (blob, fileName) => {
+                if (!(blob instanceof Blob) || blob.size < 8) return false;
+                const ext = String(fileName || "").split(".").pop().toLowerCase();
+                const header = new Uint8Array(await blob.slice(0, 16).arrayBuffer());
+                const txt = await blob.slice(0, 64).text().catch(() => "");
+
+                const isPng = header[0] === 0x89 && header[1] === 0x50 && header[2] === 0x4e && header[3] === 0x47;
+                const isJpg = header[0] === 0xff && header[1] === 0xd8 && header[2] === 0xff;
+                const isGif = txt.startsWith("GIF87a") || txt.startsWith("GIF89a");
+                const isWebp = txt.startsWith("RIFF") && txt.includes("WEBP");
+                const isBmp = header[0] === 0x42 && header[1] === 0x4d;
+                const isSvg = /^\s*<svg[\s>]/i.test(txt);
+
+                if (ext === "png") return isPng;
+                if (ext === "jpg" || ext === "jpeg") return isJpg;
+                if (ext === "gif") return isGif;
+                if (ext === "webp") return isWebp;
+                if (ext === "bmp") return isBmp;
+                if (ext === "svg") return isSvg;
+                return isPng || isJpg || isGif || isWebp || isBmp || isSvg;
+            };
+
+            const downloadCreatorFile = async (fileUrl, downloadName) => {
+                // CSP in Zoho widgets can block fetch/XHR to creator domains; prefer SDK readFile.
+                let blob = null;
+                try {
+                    blob = await tryReadBlob("application/octet-stream");
+                } catch (e) {
+                    console.warn("readFile download failed:", e);
+                }
+
+                if (blob && blob.size > 0) {
+                    const ext = String(downloadName || "").split(".").pop().toLowerCase();
+                    const isImageExt = ["png", "jpg", "jpeg", "gif", "webp", "bmp", "svg"].includes(ext);
+
+                    // Only validate as image if it has an image extension
+                    if (isImageExt) {
+                        if (await isValidImageBlob(blob, downloadName)) {
+                            triggerBrowserDownload(blob, downloadName);
+                            return;
+                        } else {
+                            console.warn("Image validation failed for blob. Falling back to direct URL.");
+                        }
+                    } else {
+                        // For non-images, just trigger download
+                        triggerBrowserDownload(blob, downloadName);
+                        return;
+                    }
+                }
+
+                // Final fallback: Native browser iframe download.
+                // We use a hidden iframe instead of window.open or an <a> tag because Zoho widget 
+                // iframes often sandbox and block popups. The iframe forces a native OS download
+                // while seamlessly utilizing the parent session cookies.
+                console.log("[Download] Attempting native hidden iframe fallback...");
+                let iframe = document.getElementById('zoho-download-iframe');
+                if (!iframe) {
+                    iframe = document.createElement('iframe');
+                    iframe.id = 'zoho-download-iframe';
+                    iframe.style.display = 'none';
+                    document.body.appendChild(iframe);
+                }
+                iframe.src = String(fileUrl || "");
+            };
+
+            const setDownload = href => {
+                downloadBtn.onclick = async () => {
+                    try {
+                        await downloadCreatorFile(href, safeDownloadName);
+                    } catch (e) {
+                        toast(e?.message || "Unable to download attachment.", "err");
+                    }
+                };
+            };
+
+            const buildFilePathCandidates = () => {
+                const out = [];
+                const push = raw => {
+                    const p = String(raw || "").trim();
+                    if (!p) return;
+                    const normalized = p.startsWith("/") ? p.substring(1) : p;
+                    if (!normalized) return;
+                    if (!out.includes(normalized)) out.push(normalized);
+                };
+
+                if (context.path) push(context.path);
+
+                const src = String(url || "");
+                const qsIdx = src.indexOf("filepath=");
+                if (qsIdx !== -1) {
+                    const rawPart = src.substring(qsIdx + 9).split("&")[0];
+                    try {
+                        push(decodeURIComponent(rawPart));
+                    } catch (_) {
+                        push(rawPart);
+                    }
+                }
+
+                const cleanName = String(fileName || safeDownloadName).trim();
+                if (cleanName) {
+                    push(cleanName);
+                    const rid = String(context.id || recId || "").trim();
+                    if (rid && !cleanName.startsWith(rid + "_")) {
+                        push(rid + "_" + cleanName);
+                    }
+                    // Try underscore replacement (common in Zoho)
+                    push(cleanName.replace(/\s+/g, "_"));
+                    if (rid) push(rid + "_" + cleanName.replace(/\s+/g, "_"));
+                }
+                return out;
+            };
+
+            const responseToBlob = (resp, mimeType = "application/octet-stream") => {
+                const fromBase64 = (base64String, forcedMimeType) => {
+                    const clean = String(base64String || "").replace(/\s+/g, "");
+                    if (!clean) return null;
+                    const binary = atob(clean);
+                    const bytes = new Uint8Array(binary.length);
+                    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+                    return new Blob([bytes], { type: forcedMimeType || mimeType });
+                };
+
+                if (!resp) return null;
+                if (resp instanceof Blob) return resp;
+                if (resp && typeof resp.size === "number" && typeof resp.type === "string") return resp;
+                if (resp instanceof ArrayBuffer) return new Blob([resp], { type: mimeType });
+                if (ArrayBuffer.isView(resp)) return new Blob([resp.buffer], { type: mimeType });
+
+                if (typeof resp === "string") {
+                    const trimmed = resp.trim();
+                    if (!trimmed) return null;
+
+                    if (trimmed.startsWith("data:")) {
+                        const commaIdx = trimmed.indexOf(",");
+                        if (commaIdx !== -1) {
+                            const header = trimmed.substring(0, commaIdx);
+                            const body = trimmed.substring(commaIdx + 1);
+                            const dataMime = header.substring(5).split(";")[0] || mimeType;
+                            if (header.includes(";base64")) {
+                                try {
+                                    const blob = fromBase64(body, dataMime);
+                                    if (blob) return blob;
+                                } catch (_) {
+                                    // Fallback below.
+                                }
+                            } else {
+                                try {
+                                    return new Blob([decodeURIComponent(body)], { type: dataMime });
+                                } catch (_) {
+                                    return new Blob([body], { type: dataMime });
+                                }
+                            }
+                        }
+                    }
+
+                    if (/^[A-Za-z0-9+/=\r\n]+$/.test(trimmed) && trimmed.length % 4 === 0) {
+                        try {
+                            const blob = fromBase64(trimmed, mimeType);
+                            if (blob) return blob;
+                        } catch (_) {
+                            // Not base64; fallback below.
+                        }
+                    }
+
+                    // Do not coerce unknown plain text into binary blobs.
+                    return null;
+                }
+
+                if (typeof resp?.content === "string") return responseToBlob(resp.content, mimeType);
+                if (typeof resp?.data === "string") return responseToBlob(resp.data, mimeType);
+                if (resp?.data instanceof Blob) return resp.data;
+                if (resp?.data instanceof ArrayBuffer) return new Blob([resp.data], { type: mimeType });
+                if (ArrayBuffer.isView(resp?.data)) return new Blob([resp.data.buffer], { type: mimeType });
+                if (typeof resp?.file_content === "string") return responseToBlob(resp.file_content, mimeType);
+                if (typeof resp?.response === "string") return responseToBlob(resp.response, mimeType);
+                if (typeof resp?.result === "string") return responseToBlob(resp.result, mimeType);
+                if (typeof resp?.result?.content === "string") return responseToBlob(resp.result.content, mimeType);
+                if (typeof resp?.result?.data === "string") return responseToBlob(resp.result.data, mimeType);
+                if (resp?.file instanceof Blob) return resp.file;
+
+                return null;
+            };
+
+            const tryReadBlob = async mimeType => {
+                if (!canReadFile) return null;
+                const appNames = buildAppCandidates();
+                const reportNames = buildReportCandidates();
+                const fieldNames = buildFieldCandidates();
+                const filePaths = buildFilePathCandidates();
+
+                let lastErr = null;
+                for (const appName of appNames) {
+                    for (const reportName of reportNames) {
+                        for (const fieldName of fieldNames) {
+                            // First, try all file paths for this app/report/field combo
+                            for (const filePath of filePaths) {
+                                try {
+                                    const resp = await ZOHO.CREATOR.FILE.readFile({
+                                        app_name: appName,
+                                        report_name: reportName,
+                                        id: context.id,
+                                        field_name: fieldName,
+                                        file_path: filePath
+                                    });
+
+                                    // If we got a 3190 (No record), this app/report/id combo is definitely wrong.
+                                    // Skip all paths and fields for this app/report.
+                                    if (resp?.code === 3190 || resp?.code === "3190") {
+                                        lastErr = resp;
+                                        break;
+                                    }
+
+                                    // If we got a 3800 (File path doesn't match), the app/report/field/id is likely correct,
+                                    // but the path is wrong. Continue to next path.
+                                    if (resp?.code === 3800 || resp?.code === "3800") {
+                                        lastErr = resp;
+                                        continue;
+                                    }
+
+                                    // Structured error check
+                                    if (resp && typeof resp === "object" && (resp.code || resp.message) && !resp.size && !resp.type && !resp.content && !resp.data) {
+                                        lastErr = resp;
+                                        continue;
+                                    }
+
+                                    const blob = responseToBlob(resp, mimeType);
+                                    if (blob) return blob;
+                                } catch (readErr) {
+                                    lastErr = readErr;
+                                    // If caught exception is 3190, break field/path loops for this report
+                                    if (readErr?.code === 3190 || String(readErr?.message).includes("3190")) break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (lastErr) throw lastErr;
+                return null;
+            };
 
             try {
+                // Ensure fileName is always a usable string
+                if (typeof fileName !== "string" || !fileName) {
+                    fileName = (typeof fileName === "object" && fileName)
+                        ? (fileName.display_value || fileName.name || fileName.file_name || "Attachment")
+                        : "Attachment";
+                }
+
                 const ext = fileName.split('.').pop().toLowerCase();
                 const isImage = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp', 'svg'].includes(ext);
                 const isPdf = ext === 'pdf';
@@ -2418,108 +2754,161 @@
                 loader.style.display = "flex";
                 modal.classList.add("open");
 
-                const stopLoader = () => { loader.style.display = "none"; };
-
-                // Extract path for ZDK
-                let filePath = fileName;
-                const qsIdx = url.indexOf("filepath=");
-                if (qsIdx !== -1) filePath = decodeURIComponent(url.substring(qsIdx + 9).split("&")[0]);
-                const cleanPath = filePath.startsWith("/") ? filePath.substring(1) : filePath;
-
-                const initParams = await ZOHO.CREATOR.UTIL.getInitParams();
-                console.log("ZDK Init Params:", initParams);
-                console.log("Fetching via ZDK.readFile...", cleanPath);
-                
-                const fileConfig = {
-                    // Standard snake_case
-                    app_name: String(CFG.appName || ""),
-                    report_name: String(CFG.ticketReport || ""),
-                    id: String(recId),
-                    field_name: String(CFG.f.attachment || ""),
-                    file_path: String(cleanPath || ""),
-                    // CamelCase fallbacks - many SDK methods require these
-                    appName: String(CFG.appName || ""),
-                    reportName: String(CFG.ticketReport || ""),
-                    fieldName: String(CFG.f.attachment || ""),
-                    filePath: String(cleanPath || "")
-                };
-
                 if (isImage) {
-                    console.log("Using ZDK.setImageData (CamelCase Fix)...", fileConfig);
-                    hiddenImg.onload = () => {
-                        content.innerHTML = `<img src="${hiddenImg.src}" style="max-width:100%; max-height:100%; object-fit:contain; box-shadow:0 10px 30px rgba(0,0,0,0.1); border-radius:4px;">`;
-                        stopLoader();
-                        downloadBtn.onclick = () => {
-                            const a = document.createElement("a");
-                            a.href = hiddenImg.src;
-                            a.download = fileName;
-                            document.body.appendChild(a);
-                            a.click();
-                            setTimeout(() => a.remove(), 100);
-                        };
+                    setDownload(url);
+                    content.innerHTML = `<img id="attachmentPreviewImg" alt="${esc(fileName)}" style="max-width:100%; max-height:100%; object-fit:contain; box-shadow:0 10px 30px rgba(0,0,0,0.1); border-radius:4px;">`;
+                    const imgEl = document.getElementById("attachmentPreviewImg");
+                    const rawUrl = String(url || "");
+                    const apiIdx = rawUrl.indexOf("/api/");
+                    const apiPath = apiIdx !== -1 ? rawUrl.substring(apiIdx) : "";
+
+                    imgEl.onload = () => stopLoader();
+                    imgEl.onerror = async () => {
+                        try {
+                            const blob = await tryReadBlob("application/octet-stream");
+                            if (!blob) throw new Error("Image preview not available.");
+
+                            const objUrl = URL.createObjectURL(blob);
+                            content.innerHTML = `<img src="${objUrl}" alt="${esc(fileName)}" style="max-width:100%; max-height:100%; object-fit:contain; box-shadow:0 10px 30px rgba(0,0,0,0.1); border-radius:4px;">`;
+                            setDownload(objUrl);
+                        } catch (fallbackErr) {
+                            console.warn("Image preview fallback failed:", fallbackErr);
+                            content.innerHTML = `<div style="padding:40px; text-align:center; color:var(--red);">Image preview unavailable.<br><a href="${url}" target="_blank" rel="noopener" style="color:var(--accent); font-size:12px; text-decoration:underline;">Open image in new tab</a></div>`;
+                            setDownload(url);
+                        } finally {
+                            stopLoader();
+                        }
                     };
-                    hiddenImg.onerror = (err) => {
-                        console.warn("ZDK.setImageData failed, trying iframe fallback:", err);
-                        // Final fallback: use iframe - browser often handles images in frames better
-                        content.innerHTML = `<iframe src="${url}" style="width:100%; height:100%; border:none;"></iframe>`;
-                        stopLoader();
-                    };
-                    // Try with and without #
-                    try {
-                        ZOHO.CREATOR.UTIL.setImageData("zdkHiddenImg", fileConfig);
-                    } catch (e) {
-                        ZOHO.CREATOR.UTIL.setImageData("#zdkHiddenImg", fileConfig);
-                    }
-                } else {
-                    // Use readFile for PDFs and Text
-                    console.log("Using ZDK.readFile for non-image data...");
-                    const response = await ZOHO.CREATOR.FILE.readFile(fileConfig);
-                    stopLoader();
 
-                    if (!response) throw new Error("No response from SDK");
+                    let loadedViaSdk = false;
+                    if (apiPath && ZOHO?.CREATOR?.UTIL?.setImageData) {
+                        loadedViaSdk = await new Promise(resolve => {
+                            let done = false;
+                            const finish = ok => {
+                                if (done) return;
+                                done = true;
+                                resolve(ok);
+                            };
 
-                    let blob = null;
-                    let textContent = null;
-                    const mime = isPdf ? "application/pdf" : "text/plain";
-
-                    if (response instanceof Blob || (response && response.size)) {
-                        blob = response;
-                    } else {
-                        let contentStr = typeof response === "string" ? response : (response.content || "");
-                        if (contentStr) {
-                            if (isPdf) {
-                                // PDF reconstruction from string - usually safer for PDFs than images
-                                const array = new Uint8Array(contentStr.length);
-                                for (let i = 0; i < contentStr.length; i++) array[i] = contentStr.charCodeAt(i) & 0xff;
-                                blob = new Blob([array], { type: mime });
-                            } else {
-                                textContent = contentStr;
+                            try {
+                                ZOHO.CREATOR.UTIL.setImageData(imgEl, apiPath, resp => {
+                                    const ok = !!(resp && (resp.status === "200" || resp.status === 200 || resp.statusText === "success"));
+                                    finish(ok);
+                                });
+                            } catch (sdkErr) {
+                                console.warn("setImageData failed:", sdkErr);
+                                finish(false);
                             }
+
+                            setTimeout(() => finish(false), 6000);
+                        });
+                    }
+
+                    if (!loadedViaSdk) {
+                        imgEl.src = url;
+                    }
+                    return;
+                }
+
+                if (isPdf) {
+                    let pdfBlob = null;
+
+                    const isValidPdfBlob = async blob => {
+                        if (!(blob instanceof Blob) || blob.size < 5) return false;
+                        try {
+                            const header = await blob.slice(0, 8).text();
+                            return header.startsWith("%PDF-");
+                        } catch (_) {
+                            return false;
+                        }
+                    };
+
+                    try {
+                        const sdkBlob = await tryReadBlob("application/pdf");
+                        if (await isValidPdfBlob(sdkBlob)) {
+                            pdfBlob = sdkBlob;
+                        }
+                    } catch (readErr) {
+                        console.warn("PDF readFile preview failed:", readErr);
+                    }
+
+                    if (!pdfBlob) {
+                        try {
+                            const res = await fetch(url, {
+                                credentials: "include",
+                                headers: { 'Accept': 'application/pdf, application/octet-stream, */*' }
+                            });
+
+                            if (res.ok) {
+                                const contentType = res.headers.get('content-type') || '';
+                                if (!contentType.includes('application/json')) {
+                                    const buffer = await res.arrayBuffer();
+                                    if (buffer.byteLength > 0) {
+                                        const forcedPdfBlob = new Blob([buffer], { type: "application/pdf" });
+                                        if (await isValidPdfBlob(forcedPdfBlob)) {
+                                            pdfBlob = forcedPdfBlob;
+                                        }
+                                    }
+                                } else {
+                                    console.warn("PDF fetch preview failed: API returned JSON.");
+                                }
+                            }
+                        } catch (fetchErr) {
+                            console.warn("PDF fetch preview failed:", fetchErr);
                         }
                     }
 
-                    if (blob) {
-                        const objUrl = URL.createObjectURL(blob);
-                        content.innerHTML = `<iframe src="${objUrl}" style="width:100%; height:100%; border:none;"></iframe>`;
-                        downloadBtn.onclick = () => {
-                            const a = document.createElement("a");
-                            a.href = objUrl;
-                            a.download = fileName;
-                            document.body.appendChild(a);
-                            a.click();
-                            setTimeout(() => a.remove(), 100);
-                        };
-                    } else if (textContent !== null) {
-                        content.innerHTML = `<pre style="width:100%; padding:20px; font-family:var(--mono); font-size:12px; background:#fff; overflow:auto;">${esc(textContent)}</pre>`;
+                    if (pdfBlob) {
+                        const objUrl = URL.createObjectURL(pdfBlob);
+                        content.innerHTML = `<embed src="${objUrl}" type="application/pdf" style="width:100%; height:100%;"></embed>`;
+                        setDownload(url);
                     } else {
-                        content.innerHTML = `<div style="padding:40px; text-align:center;">Preview not available.</div>`;
+                        content.innerHTML = `<div style="padding:40px; text-align:center; color:var(--red);">PDF preview unavailable.<br><a href="${url}" target="_blank" rel="noopener" style="color:var(--accent); font-size:12px; text-decoration:underline;">Open PDF in new tab</a></div>`;
+                        setDownload(url);
                     }
+
+                    stopLoader();
+                    return;
                 }
+
+                if (isText) {
+                    let textContent = null;
+
+                    try {
+                        const blob = await tryReadBlob("text/plain");
+                        if (blob) textContent = await blob.text();
+                    } catch (readErr) {
+                        console.warn("readFile text preview failed:", readErr);
+                    }
+
+                    if (textContent === null) {
+                        try {
+                            const res = await fetch(url, { credentials: "include" });
+                            if (res.ok) textContent = await res.text();
+                        } catch (fetchErr) {
+                            console.warn("fetch text preview failed:", fetchErr);
+                        }
+                    }
+
+                    if (textContent !== null) {
+                        content.innerHTML = `<pre style="width:100%; height:100%; padding:20px; font-family:var(--mono); font-size:12px; background:#fff; overflow:auto; white-space:pre-wrap; word-wrap:break-word;">${esc(textContent)}</pre>`;
+                    } else {
+                        content.innerHTML = `<iframe src="${url}" style="width:100%; height:100%; border:none;"></iframe>`;
+                    }
+
+                    setDownload(url);
+                    stopLoader();
+                    return;
+                }
+
+                content.innerHTML = `<div style="padding:40px; text-align:center;">This file type cannot be previewed here.<br><a href="${url}" target="_blank" rel="noopener" style="color:var(--accent); font-size:12px; text-decoration:underline;">Open file in new tab</a></div>`;
+                setDownload(url);
+                stopLoader();
 
             } catch (e) {
                 console.error("Attachment error:", e);
-                if (loader) loader.style.display = "none";
-                content.innerHTML = `<div style="padding:40px; text-align:center; color:var(--red);">Error loading preview. <br><a href="${url}" target="_blank" style="color:var(--accent); font-size:12px; text-decoration:underline;">Try opening in new tab</a></div>`;
+                stopLoader();
+                content.innerHTML = `<div style="padding:40px; text-align:center; color:var(--red);">Error loading preview.<br><span style="font-size:12px; color:var(--ink-muted);">${esc(e?.message || "File could not be loaded")}</span><br><a href="${url}" target="_blank" rel="noopener" style="color:var(--accent); font-size:12px; text-decoration:underline;">Open file in new tab</a></div>`;
             }
         }
 

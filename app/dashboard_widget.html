@@ -1374,7 +1374,6 @@
                 el.innerHTML = `<div class="empty">No chart data</div>`;
                 return;
             }
-            el.innerHTML = ""; // Clear "No chart data" or any previous content
             const chart = new ApexCharts(el, options);
             chart.render();
             S.charts[key] = chart;

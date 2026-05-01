@@ -246,9 +246,8 @@
 
         .search-wrap {
             position: relative;
-            flex: 1;
-            min-width: 200px;
-            max-width: 340px;
+            width: 320px;
+            flex-shrink: 0;
         }
 
         .search-wrap .s-icon {
@@ -262,7 +261,8 @@
 
         .search-input {
             width: 100%;
-            padding: 8px 12px 8px 34px;
+            height: 38px;
+            padding: 0 12px 0 34px;
             border: 1px solid var(--border);
             border-radius: var(--r-md);
             font-size: 13px;
@@ -287,7 +287,8 @@
         }
 
         .sort-select {
-            padding: 7px 12px;
+            height: 38px;
+            padding: 0 12px;
             border: 1px solid var(--border);
             border-radius: var(--r-md);
             font-size: 12px;
@@ -297,6 +298,7 @@
             outline: none;
             cursor: pointer;
             transition: var(--tr);
+            flex-shrink: 0;
         }
 
         .sort-select:focus {
@@ -308,16 +310,17 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            margin-bottom: 10px;
-            padding: 10px 14px;
+            padding: 0 14px;
+            height: 38px;
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: var(--r-lg);
+            border-radius: var(--r-md);
             box-shadow: var(--shadow-xs);
             flex-wrap: wrap;
             position: relative;
             z-index: 10;
             flex-shrink: 0;
+            flex: 1;
         }
 
         .fb-label {
@@ -679,6 +682,21 @@
             display: flex;
             flex-direction: column;
             height: 100%;
+        }
+
+        .tc-header {
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .rec-count {
+            font-size: 12px;
+            color: var(--ink-soft);
+            font-weight: 500;
         }
 
         .table-wrap {
@@ -1463,6 +1481,13 @@
             box-shadow: 0 0 0 3px var(--accent-glow);
         }
 
+        .form-input:disabled,
+        .form-select:disabled {
+            background: var(--surface-2);
+            color: var(--ink-ghost);
+            cursor: not-allowed;
+        }
+
         .form-err {
             display: none;
             padding: 9px 12px;
@@ -1893,7 +1918,7 @@
             <span id="gErrText"></span>
         </div>
 
-        <!-- TOOLBAR -->
+        <!-- TOOLBAR & FILTERS -->
         <div class="toolbar">
             <div class="search-wrap">
                 <svg class="s-icon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
@@ -1904,7 +1929,112 @@
                 <input class="search-input" id="searchInput" type="text" placeholder="Search by name, brand, SN…"
                     oninput="handleSearch(this.value)">
             </div>
-            <div class="spacer"></div>
+
+            <!-- ── FILTER BAR (Zoho-style inline dropdowns) ── -->
+            <div class="filter-bar" id="filterBar">
+                <span class="fb-label">
+                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                    </svg>
+                    Filters
+                </span>
+                <div class="fb-sep"></div>
+
+                <!-- Status -->
+                <div class="fd-wrap">
+                    <button class="fd-btn" id="fb-status" onclick="toggleDropdown('status',event)">
+                        Status
+                        <svg class="fd-chevron" width="11" height="11" fill="none" stroke="currentColor"
+                            stroke-width="2.5" viewBox="0 0 24 24">
+                            <path d="m6 9 6 6 6-6" />
+                        </svg>
+                    </button>
+                    <div class="fd-menu" id="fdm-status" onclick="event.stopPropagation()">
+                        <div class="fd-list">
+                            <div class="fd-item" id="fdi-status-Active" onclick="toggleFilter('status','Active')">
+                                <div class="fd-check"></div>
+                                <span class="badge badge-active" style="font-size:11px;">Active</span>
+                            </div>
+                            <div class="fd-item" id="fdi-status-Inactive" onclick="toggleFilter('status','Inactive')">
+                                <div class="fd-check"></div>
+                                <span class="badge badge-inactive" style="font-size:11px;">Inactive</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Brand -->
+                <div class="fd-wrap">
+                    <button class="fd-btn" id="fb-brand" onclick="toggleDropdown('brand',event)">
+                        Brand
+                        <svg class="fd-chevron" width="11" height="11" fill="none" stroke="currentColor"
+                            stroke-width="2.5" viewBox="0 0 24 24">
+                            <path d="m6 9 6 6 6-6" />
+                        </svg>
+                    </button>
+                    <div class="fd-menu" id="fdm-brand" onclick="event.stopPropagation()" style="min-width:230px;">
+                        <input class="fd-search" type="text" placeholder="Search brands…"
+                            oninput="searchList('brand',this.value)" id="bs-brand">
+                        <div class="fd-list" id="fdl-brand">
+                            <div class="fd-empty">Loading…</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Asset Type -->
+                <div class="fd-wrap">
+                    <button class="fd-btn" id="fb-assetType" onclick="toggleDropdown('assetType',event)">
+                        Asset Type
+                        <svg class="fd-chevron" width="11" height="11" fill="none" stroke="currentColor"
+                            stroke-width="2.5" viewBox="0 0 24 24">
+                            <path d="m6 9 6 6 6-6" />
+                        </svg>
+                    </button>
+                    <div class="fd-menu" id="fdm-assetType" onclick="event.stopPropagation()" style="min-width:230px;">
+                        <input class="fd-search" type="text" placeholder="Search asset types…"
+                            oninput="searchList('assetType',this.value)" id="bs-assetType">
+                        <div class="fd-list" id="fdl-assetType">
+                            <div class="fd-empty">Loading…</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Qty Range -->
+                <div class="fd-wrap">
+                    <button class="fd-btn" id="fb-qty" onclick="toggleDropdown('qty',event)">
+                        Qty Range
+                        <svg class="fd-chevron" width="11" height="11" fill="none" stroke="currentColor"
+                            stroke-width="2.5" viewBox="0 0 24 24">
+                            <path d="m6 9 6 6 6-6" />
+                        </svg>
+                    </button>
+                    <div class="fd-menu" id="fdm-qty" onclick="event.stopPropagation()" style="min-width:220px;">
+                        <div class="fd-range">
+                            <div class="fd-range-title">Sent Quantity</div>
+                            <div class="fd-range-grid">
+                                <input class="fd-num" type="number" id="sq-min" placeholder="Min" min="0">
+                                <input class="fd-num" type="number" id="sq-max" placeholder="Max" min="0">
+                            </div>
+                            <div class="fd-range-title">Max Order Qty</div>
+                            <div class="fd-range-grid">
+                                <input class="fd-num" type="number" id="mq-min" placeholder="Min" min="0">
+                                <input class="fd-num" type="number" id="mq-max" placeholder="Max" min="0">
+                            </div>
+                            <button class="fd-apply" onclick="applyQtyRange()">Apply Range</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fb-sep"></div>
+                <button class="fd-clear" id="clearBtn" onclick="clearAll()">
+                    <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5"
+                        viewBox="0 0 24 24">
+                        <path d="M18 6 6 18M6 6l12 12" />
+                    </svg>
+                    Clear All
+                </button>
+            </div>
+
             <select class="sort-select" id="sortSelect" onchange="handleSort()">
                 <option value="">Sort: Default</option>
                 <option value="name_asc">Name A→Z</option>
@@ -1913,110 +2043,6 @@
                 <option value="sent_asc">Sent Qty ↑</option>
                 <option value="sent_desc">Sent Qty ↓</option>
             </select>
-        </div>
-
-        <!-- ── FILTER BAR (Zoho-style inline dropdowns) ── -->
-        <div class="filter-bar" id="filterBar">
-            <span class="fb-label">
-                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
-                </svg>
-                Filters
-            </span>
-            <div class="fb-sep"></div>
-
-            <!-- Status -->
-            <div class="fd-wrap">
-                <button class="fd-btn" id="fb-status" onclick="toggleDropdown('status',event)">
-                    Status
-                    <svg class="fd-chevron" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5"
-                        viewBox="0 0 24 24">
-                        <path d="m6 9 6 6 6-6" />
-                    </svg>
-                </button>
-                <div class="fd-menu" id="fdm-status" onclick="event.stopPropagation()">
-                    <div class="fd-list">
-                        <div class="fd-item" id="fdi-status-Active" onclick="toggleFilter('status','Active')">
-                            <div class="fd-check"></div>
-                            <span class="badge badge-active" style="font-size:11px;">Active</span>
-                        </div>
-                        <div class="fd-item" id="fdi-status-Inactive" onclick="toggleFilter('status','Inactive')">
-                            <div class="fd-check"></div>
-                            <span class="badge badge-inactive" style="font-size:11px;">Inactive</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Brand -->
-            <div class="fd-wrap">
-                <button class="fd-btn" id="fb-brand" onclick="toggleDropdown('brand',event)">
-                    Brand
-                    <svg class="fd-chevron" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5"
-                        viewBox="0 0 24 24">
-                        <path d="m6 9 6 6 6-6" />
-                    </svg>
-                </button>
-                <div class="fd-menu" id="fdm-brand" onclick="event.stopPropagation()" style="min-width:230px;">
-                    <input class="fd-search" type="text" placeholder="Search brands…"
-                        oninput="searchList('brand',this.value)" id="bs-brand">
-                    <div class="fd-list" id="fdl-brand">
-                        <div class="fd-empty">Loading…</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Asset Type -->
-            <div class="fd-wrap">
-                <button class="fd-btn" id="fb-assetType" onclick="toggleDropdown('assetType',event)">
-                    Asset Type
-                    <svg class="fd-chevron" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5"
-                        viewBox="0 0 24 24">
-                        <path d="m6 9 6 6 6-6" />
-                    </svg>
-                </button>
-                <div class="fd-menu" id="fdm-assetType" onclick="event.stopPropagation()" style="min-width:230px;">
-                    <input class="fd-search" type="text" placeholder="Search asset types…"
-                        oninput="searchList('assetType',this.value)" id="bs-assetType">
-                    <div class="fd-list" id="fdl-assetType">
-                        <div class="fd-empty">Loading…</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Qty Range -->
-            <div class="fd-wrap">
-                <button class="fd-btn" id="fb-qty" onclick="toggleDropdown('qty',event)">
-                    Qty Range
-                    <svg class="fd-chevron" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5"
-                        viewBox="0 0 24 24">
-                        <path d="m6 9 6 6 6-6" />
-                    </svg>
-                </button>
-                <div class="fd-menu" id="fdm-qty" onclick="event.stopPropagation()" style="min-width:220px;">
-                    <div class="fd-range">
-                        <div class="fd-range-title">Sent Quantity</div>
-                        <div class="fd-range-grid">
-                            <input class="fd-num" type="number" id="sq-min" placeholder="Min" min="0">
-                            <input class="fd-num" type="number" id="sq-max" placeholder="Max" min="0">
-                        </div>
-                        <div class="fd-range-title">Max Order Qty</div>
-                        <div class="fd-range-grid">
-                            <input class="fd-num" type="number" id="mq-min" placeholder="Min" min="0">
-                            <input class="fd-num" type="number" id="mq-max" placeholder="Max" min="0">
-                        </div>
-                        <button class="fd-apply" onclick="applyQtyRange()">Apply Range</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="fb-sep"></div>
-            <button class="fd-clear" id="clearBtn" onclick="clearAll()">
-                <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                    <path d="M18 6 6 18M6 6l12 12" />
-                </svg>
-                Clear All
-            </button>
         </div>
 
         <!-- Active chips -->
@@ -2042,7 +2068,7 @@
                             <th>Brand</th>
                             <th>Asset Type</th>
                             <th>SN Number</th>
-                            <th>Sent Qty</th>
+                            <th id="sentQtyHeader">Sent Qty</th>
                             <th>Max Order Qty</th>
                             <th>Status</th>
                             <th id="actionsHeader" style="width:1px; display:none;">Actions</th>
@@ -2427,6 +2453,7 @@
                 const status = p[f.status] || "Inactive";
                 const active = status === "Active";
                 const id = escA(String(p.ID));
+                const sentCell = S.isSuperAdmin ? `<td><span class="qty-pill">${p[f.sentQty] ?? 0}</span></td>` : "";
                 const acts = S.isSuperAdmin ? `<td><div class="row-acts" onclick="event.stopPropagation()">
                     <button class="act-btn" onclick="openEdit('${id}')">Edit</button>
                     <button class="act-btn del" onclick="confirmDelete('${id}')">Delete</button>
@@ -2438,7 +2465,7 @@
             <td>${esc(brandName(p[f.brand]))}</td>
             <td>${esc(assetName(p[f.at]))}</td>
             <td><span class="sn-mono">${esc(String(p[f.sn] || "—"))}</span></td>
-            <td><span class="qty-pill">${p[f.sentQty] ?? 0}</span></td>
+            ${sentCell}
             <td><span class="qty-pill">${p[f.maxQty] ?? 0}</span></td>
             <td><span class="badge ${active ? "badge-active" : "badge-inactive"}">${esc(status)}</span></td>
             ${acts}
@@ -2448,8 +2475,11 @@
 
         function renderSkeleton(n = 7) {
             const ws = ["15%", "55%", "35%", "40%", "18%", "12%", "12%", "22%", "0"];
-            // Remove the last skeleton cell if not admin
-            if (!S.isSuperAdmin) ws.pop();
+            // Adjust columns based on role
+            if (!S.isSuperAdmin) {
+                ws.splice(5, 1); // Remove Sent Qty width
+                ws.pop(); // Remove Actions width
+            }
 
             document.getElementById("tbody").innerHTML = Array.from({ length: n }, () =>
                 `<tr class="sk-row">${ws.map(w => `<td><div class="sk-cell" style="width:${w}"></div></td>`).join("")}</tr>`
@@ -2458,7 +2488,9 @@
         }
 
         function renderEmpty(msg) {
-            const cols = S.isSuperAdmin ? 9 : 8;
+            let cols = 8;
+            if (S.isSuperAdmin) cols = 9;
+            else cols = 7; // base 8 - 1 (sent qty)
             document.getElementById("tbody").innerHTML = `<tr><td colspan="${cols}"><div class="t-empty">
         <div class="t-empty-icon">📦</div>
         <div class="t-empty-title">${esc(msg)}</div>
@@ -2700,15 +2732,17 @@
             if (actBox) actBox.style.display = S.isSuperAdmin ? "flex" : "none";
 
             const sent = +(p[f.sentQty] ?? 0), maxQ = +(p[f.maxQty] ?? 0);
-            const pct = maxQ > 0 ? Math.min(100, Math.round(sent / maxQ * 100)) : 0;
 
-            document.getElementById("drawerBody").innerHTML = `
-        <div class="stat-cards">
+            const sentCard = S.isSuperAdmin ? `
             <div class="stat-card">
                 <div class="stat-lbl">Sent Quantity</div>
                 <div class="stat-val">${sent}</div>
                 <div class="stat-sub">units dispatched</div>
-            </div>
+            </div>` : "";
+
+            document.getElementById("drawerBody").innerHTML = `
+        <div class="stat-cards" style="${S.isSuperAdmin ? "" : "grid-template-columns: 1fr;"}">
+            ${sentCard}
             <div class="stat-card sc-2">
                 <div class="stat-lbl">Max Order Qty</div>
                 <div class="stat-val">${maxQ}</div>
@@ -2843,14 +2877,56 @@
             if (badge) badge.textContent = `${logs.length} event${logs.length !== 1 ? 's' : ''}`;
 
             const items = logs.map((log, i) => {
-                const fc = String(log.Feild_Changed || '');
-                const fcLow = fc.toLowerCase();
-                const actionLabel = fcLow.includes('creat') ? 'Created'
-                    : fcLow.includes('delet') ? 'Deleted'
-                        : (log.Old_Value || log.New_Value) ? 'Updated'
-                            : fc ? 'Event' : 'Event';
-                const dotClass = actionLabel === 'Created' ? 'tl-create' : actionLabel === 'Deleted' ? 'tl-delete' : actionLabel === 'Updated' ? 'tl-update' : 'tl-other';
-                const pillClass = actionLabel === 'Created' ? 'tl-pill-create' : actionLabel === 'Deleted' ? 'tl-pill-delete' : actionLabel === 'Updated' ? 'tl-pill-update' : 'tl-pill-other';
+                if (i === 0) console.log("[Audit Debug] Product v2 log entry:", log);
+
+                // fc hoisted so changes table works regardless of Action_field
+                const fc = String(log.Feild_Changed || log.Field_Changed || "");
+                const oldV_raw = String(log.Old_Value || log.OldValue || "").trim();
+                const isDash = (s) => !s || s === "" || s === "-" || s === "–" || s === "—" || s === "null" || s === "undefined";
+
+
+
+                // Case-insensitive search for Action_field
+                let afRaw = "";
+                for (const key in log) {
+                    if (key.toLowerCase() === "action_field") {
+                        afRaw = log[key];
+                        break;
+                    }
+                }
+                const actionFieldRaw = (typeof afRaw === "object") ? (afRaw.display_value || afRaw.value || "") : String(afRaw || "");
+                const actionFieldVal = actionFieldRaw.trim().toLowerCase();
+
+                let actionLabel;
+                if (actionFieldVal === "create") {
+                    actionLabel = "Created";
+                } else if (actionFieldVal === "update" || actionFieldVal === "edit") {
+                    actionLabel = "Updated";
+                } else if (actionFieldVal === "delete") {
+                    actionLabel = "Deleted";
+                } else if (actionFieldRaw.trim()) {
+                    actionLabel = actionFieldRaw.trim();
+                } else {
+                    const fcLow = fc.toLowerCase();
+                    if (fcLow.includes("creat")) {
+                        actionLabel = "Created";
+                    } else if (fcLow.includes("delet")) {
+                        actionLabel = "Deleted";
+                    } else if (isDash(oldV_raw)) {
+                        actionLabel = "Created";
+                    } else {
+                        actionLabel = "Updated";
+                    }
+                }
+
+                const alLow = actionLabel.toLowerCase();
+                const isCreate = alLow.includes("creat");
+                const isDelete = alLow.includes("delet");
+                const isUpdate = alLow.includes("updat") || alLow.includes("edit");
+
+                const dotClass = isCreate ? "tl-create" : isDelete ? "tl-delete" : isUpdate ? "tl-update" : "tl-other";
+                const pillClass = isCreate ? "tl-pill-create" : isDelete ? "tl-pill-delete" : isUpdate ? "tl-pill-update" : "tl-pill-other";
+
 
                 const userRaw = log.User || '';
                 const userName = typeof userRaw === 'object' ? (userRaw.display_value || userRaw.email || 'System') : String(userRaw || 'System');
@@ -2868,13 +2944,31 @@
                 }
 
                 let changesHtml = '';
-                if (fc) {
+
+                if (isCreate && (!fc || isDash(fc))) {
+                    // Show the "Created" message even if Field_Changed is empty/dash
+                    changesHtml = `<div class="tl-changes">
+                        <div class="tl-change-row" style="grid-template-columns: 28px 1fr; align-items: center;">
+                            <span class="tl-field-name" style="border-right: none; text-align: center; padding-right: 0; font-size: 14px;">✦</span>
+                            <span class="tl-new" style="color: var(--ink-soft); font-weight: 500; font-size: 12px;">New product record created</span>
+                        </div>
+                    </div>`;
+                } else if (fc) {
                     const fields = fc.split(',').map(f => f.trim()).filter(Boolean);
-                    const oldVals = String(log.Old_Value || '').split(',').map(v => v.trim());
-                    const newVals = String(log.New_Value || '').split(',').map(v => v.trim());
+                    const oldVals = String(log.Old_Value || log.OldValue || '').split(',').map(v => v.trim());
+                    const newVals = String(log.New_Value || log.NewValue || '').split(',').map(v => v.trim());
                     const rows = fields.map((field, fi) => {
-                        const oldV = oldVals[fi] || '';
-                        const newV = newVals[fi] || '';
+                        const oldV = oldVals[fi] || "";
+                        const newV = newVals[fi] || "";
+
+                        // Replace generic dash rows in "Created" events with a more descriptive message
+                        if (isCreate && isDash(field) && isDash(oldV) && isDash(newV)) {
+                            return `<div class="tl-change-row" style="grid-template-columns: 28px 1fr; align-items: center;">
+                                <span class="tl-field-name" style="border-right: none; text-align: center; padding-right: 0; font-size: 14px;">✦</span>
+                                <span class="tl-new" style="color: var(--ink-soft); font-weight: 500; font-size: 12px;">New product record created</span>
+                            </div>`;
+                        }
+
                         if (!oldV && !newV) return `<div class="tl-change-row" style="grid-template-columns:1fr"><span class="tl-field-name" style="border-right:none">${esc(field)}</span></div>`;
                         return `<div class="tl-change-row"><span class="tl-field-name">${esc(field)}</span><span class="tl-old">${oldV ? esc(oldV) : '<em style="opacity:.5">—</em>'}</span><span class="tl-new">${newV ? esc(newV) : '<em style="opacity:.5">—</em>'}</span></div>`;
                     }).join('');
@@ -2920,6 +3014,7 @@
             document.getElementById("modalTitle").textContent = "Add Product";
             document.getElementById("submitTxt").textContent = "Add Product";
             clearForm(); hideFormErr();
+            document.getElementById("fSentQty").disabled = false;
             document.getElementById("modalOv").classList.add("open");
             document.getElementById("fName").focus();
         }
@@ -2937,6 +3032,7 @@
             document.getElementById("fSentQty").value = p[f.sentQty] ?? "";
             document.getElementById("fMaxQty").value = p[f.maxQty] ?? "";
             document.getElementById("fStatus").value = p[f.status] || "Active";
+            document.getElementById("fSentQty").disabled = true;
             document.getElementById("modalTitle").textContent = "Edit Product";
             document.getElementById("submitTxt").textContent = "Update Product";
             hideFormErr();
@@ -2969,17 +3065,21 @@
             if (brand) data[f.brand] = brand;
             if (at) data[f.at] = at;
             if (sn) data[f.sn] = parseInt(sn, 10);
-            if (sq) data[f.sentQty] = parseInt(sq, 10);
+            if (sq && !S.editId) data[f.sentQty] = parseInt(sq, 10);
             if (mq) data[f.maxQty] = parseInt(mq, 10);
 
             document.getElementById("submitBtn").disabled = true;
             setLoading(true);
             try {
                 if (S.editId) {
-                    await ZOHO.CREATOR.API.updateRecord({
+                    const r = await ZOHO.CREATOR.API.updateRecord({
                         appName: CFG.appName, reportName: CFG.productReport,
                         id: S.editId, data: { data }
                     });
+                    if (r.code !== 3000) {
+                        console.log(r);
+                        throw new Error(extractError(r, "Update failed"));
+                    }
                     // Update local state immediately — no re-fetch needed
                     const idx = S.all.findIndex(x => String(x.ID) === String(S.editId));
                     if (idx !== -1) S.all[idx] = { ...S.all[idx], ...data };
@@ -2988,6 +3088,9 @@
                     const r = await ZOHO.CREATOR.API.addRecord({
                         appName: CFG.appName, formName: CFG.productForm, data: { data }
                     });
+                    if (r.code !== 3000) {
+                        throw new Error(extractError(r, "Add failed"));
+                    }
                     // Prepend to local state
                     S.all.unshift({ ID: r?.data?.ID ?? ("tmp_" + Date.now()), ...data });
                     toast("Product added ✓", "ok");
@@ -3028,9 +3131,12 @@
             closeDelModal();
             setLoading(true);
             try {
-                await ZOHO.CREATOR.API.deleteRecord({
+                const r = await ZOHO.CREATOR.API.deleteRecord({
                     appName: CFG.appName, reportName: CFG.productReport, criteria: `(ID == ${id})`
                 });
+                if (r.code !== 3000) {
+                    throw new Error(extractError(r, "Delete failed"));
+                }
                 S.all = S.all.filter(p => String(p.ID) !== String(id));
                 toast("Product deleted", "ok");
                 closeDrawer();
@@ -3063,6 +3169,32 @@
 
         function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
         function escA(s) { return String(s).replace(/'/g, "\\'"); }
+
+        function extractError(r, def) {
+            if (!r) return def;
+
+            // 1. Handle 'error' property (could be Array or Object)
+            if (r.error) {
+                const err = r.error;
+                const first = Array.isArray(err) ? err[0] : err;
+
+                if (typeof first === 'string') return first;
+                if (first && typeof first === 'object') {
+                    if (first.message) return first.message;
+                    // Handle { Field_Name: "Error message" }
+                    const entries = Object.entries(first).map(([k, v]) => {
+                        const label = k.replace(/_/g, " ");
+                        const msg = typeof v === "object" ? JSON.stringify(v) : String(v);
+                        return `${label}: ${msg}`;
+                    });
+                    if (entries.length > 0) return entries.join(", ");
+                }
+            }
+
+            // 2. Fallback to message or default
+            if (r.message) return r.message;
+            return def;
+        }
 
         // ─────────────────────────────────────────────
         // BOOT
@@ -3123,10 +3255,12 @@
                 const badge = document.getElementById("adminBadge");
                 const addBtn = document.getElementById("addBtn");
                 const actHdr = document.getElementById("actionsHeader");
+                const sentHdr = document.getElementById("sentQtyHeader");
 
                 if (badge) badge.style.display = S.isSuperAdmin ? "inline-block" : "none";
                 if (addBtn) addBtn.style.display = S.isSuperAdmin ? "flex" : "none";
                 if (actHdr) actHdr.style.display = S.isSuperAdmin ? "table-cell" : "none";
+                if (sentHdr) sentHdr.style.display = S.isSuperAdmin ? "table-cell" : "none";
 
                 await loadAll();
             } catch (e) {
