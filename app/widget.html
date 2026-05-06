@@ -2180,7 +2180,7 @@
                 <div class="form-row">
                     <div class="form-grp">
                         <label class="form-lbl">SN Number</label>
-                        <input class="form-input" type="number" id="fSN" placeholder="SN number">
+                        <input class="form-input" type="number" id="fSN" placeholder="SN number" oninput="filterNumberInput(this)">
                     </div>
                     <div class="form-grp">
                         <label class="form-lbl">Status <span class="req">*</span></label>
@@ -2189,15 +2189,9 @@
                             <option value="Inactive">Inactive</option>
                         </select>
                     </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-grp">
-                        <label class="form-lbl">Sent Quantity</label>
-                        <input class="form-input" type="number" id="fSentQty" placeholder="0" min="0">
-                    </div>
                     <div class="form-grp">
                         <label class="form-lbl">Max Order Quantity</label>
-                        <input class="form-input" type="number" id="fMaxQty" placeholder="0" min="0">
+                        <input class="form-input" type="number" id="fMaxQty" placeholder="0" min="0" oninput="filterNumberInput(this)">
                     </div>
                 </div>
             </div>
@@ -3014,7 +3008,6 @@
             document.getElementById("modalTitle").textContent = "Add Product";
             document.getElementById("submitTxt").textContent = "Add Product";
             clearForm(); hideFormErr();
-            document.getElementById("fSentQty").disabled = false;
             document.getElementById("modalOv").classList.add("open");
             document.getElementById("fName").focus();
         }
@@ -3029,10 +3022,8 @@
             document.getElementById("fBrand").value = lookupId(p[f.brand]);
             document.getElementById("fAssetType").value = lookupId(p[f.at]);
             document.getElementById("fSN").value = p[f.sn] || "";
-            document.getElementById("fSentQty").value = p[f.sentQty] ?? "";
             document.getElementById("fMaxQty").value = p[f.maxQty] ?? "";
             document.getElementById("fStatus").value = p[f.status] || "Active";
-            document.getElementById("fSentQty").disabled = true;
             document.getElementById("modalTitle").textContent = "Edit Product";
             document.getElementById("submitTxt").textContent = "Update Product";
             hideFormErr();
@@ -3044,7 +3035,7 @@
             clearForm(); S.editId = null;
         }
         function clearForm() {
-            ["fName", "fSN", "fSentQty", "fMaxQty"].forEach(id => document.getElementById(id).value = "");
+            ["fName", "fSN", "fMaxQty"].forEach(id => document.getElementById(id).value = "");
             document.getElementById("fBrand").value = "";
             document.getElementById("fAssetType").value = "";
             document.getElementById("fStatus").value = "Active";
@@ -3056,16 +3047,23 @@
             if (!name) { showFormErr("Product Name is required."); return; }
 
             const f = CFG.f;
+            const normalizeName = v => String(v || "").trim().toLowerCase().replace(/\s+/g, " ");
+            const newName = normalizeName(name);
+            const dup = S.all.find(p => normalizeName(p[f.name]) === newName &&
+                String(p.ID) !== String(S.editId || ""));
+            if (dup) {
+                showFormErr("Product name already exists. Please use a different name.");
+                return;
+            }
             const data = {};
             data[f.name] = name;
             data[f.status] = document.getElementById("fStatus").value;
             const brand = document.getElementById("fBrand").value, at = document.getElementById("fAssetType").value,
-                sn = document.getElementById("fSN").value, sq = document.getElementById("fSentQty").value,
+                sn = document.getElementById("fSN").value,
                 mq = document.getElementById("fMaxQty").value;
             if (brand) data[f.brand] = brand;
             if (at) data[f.at] = at;
             if (sn) data[f.sn] = parseInt(sn, 10);
-            if (sq && !S.editId) data[f.sentQty] = parseInt(sq, 10);
             if (mq) data[f.maxQty] = parseInt(mq, 10);
 
             document.getElementById("submitBtn").disabled = true;
@@ -3165,6 +3163,10 @@
             t.innerHTML = `<span class="dot"></span>${esc(msg)}`;
             shelf.appendChild(t);
             setTimeout(() => { t.style.cssText = "opacity:0;transform:translateY(6px);transition:.22s"; setTimeout(() => t.remove(), 240); }, 3000);
+        }
+
+        function filterNumberInput(el) {
+            el.value = el.value.replace(/[^0-9]/g, '');
         }
 
         function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }

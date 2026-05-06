@@ -2428,7 +2428,7 @@
                 try {
                     const u = String(url || "");
                     const parts = u.split("/");
-                    const v2Idx = parts.indexOf("v2");
+                    const v2Idx = parts.findIndex(p => /^v2(\.1)?$/i.test(p));
                     if (v2Idx !== -1 && parts.length > v2Idx + 6) {
                         // Standard API v2 URL: /api/v2/{workspace}/{app}/report/{report}/{id}/{field}/download
                         out.app = parts[v2Idx + 1] + "/" + parts[v2Idx + 2];
@@ -2492,6 +2492,11 @@
                 setTimeout(() => {
                     try { URL.revokeObjectURL(blobUrl); } catch (_) { }
                 }, 30000);
+            };
+
+            const isLikelyProtectedCreatorUrl = val => {
+                const s = String(val || "");
+                return /\/api\/v2(?:\.1)?\//i.test(s) && /\/download/i.test(s);
             };
 
             const isValidImageBlob = async (blob, fileName) => {
@@ -2571,12 +2576,27 @@
 
             const buildFilePathCandidates = () => {
                 const out = [];
+                const seen = new Set();
                 const push = raw => {
                     const p = String(raw || "").trim();
                     if (!p) return;
-                    const normalized = p.startsWith("/") ? p.substring(1) : p;
-                    if (!normalized) return;
-                    if (!out.includes(normalized)) out.push(normalized);
+                    const variants = [p];
+                    if (p.startsWith("/")) variants.push(p.substring(1));
+                    else variants.push("/" + p);
+                    for (const v of variants) {
+                        const normalized = String(v || "").trim();
+                        if (!normalized || seen.has(normalized)) continue;
+                        seen.add(normalized);
+                        out.push(normalized);
+                    }
+                };
+
+                const fieldNames = [context.field, CFG.f.attachment, "Attachment"]
+                    .map(v => String(v || "").trim())
+                    .filter(Boolean);
+                const pushWithField = base => {
+                    if (!base) return;
+                    fieldNames.forEach(f => push(f + "/" + base));
                 };
 
                 if (context.path) push(context.path);
@@ -2594,14 +2614,23 @@
 
                 const cleanName = String(fileName || safeDownloadName).trim();
                 if (cleanName) {
-                    push(cleanName);
                     const rid = String(context.id || recId || "").trim();
-                    if (rid && !cleanName.startsWith(rid + "_")) {
-                        push(rid + "_" + cleanName);
-                    }
+                    const addNameVariants = name => {
+                        if (!name) return;
+                        push(name);
+                        pushWithField(name);
+                        if (rid && !name.startsWith(rid + "_")) {
+                            push(rid + "_" + name);
+                            pushWithField(rid + "_" + name);
+                        }
+                        if (rid && !name.startsWith(rid + "/")) {
+                            push(rid + "/" + name);
+                        }
+                    };
+
+                    addNameVariants(cleanName);
                     // Try underscore replacement (common in Zoho)
-                    push(cleanName.replace(/\s+/g, "_"));
-                    if (rid) push(rid + "_" + cleanName.replace(/\s+/g, "_"));
+                    addNameVariants(cleanName.replace(/\s+/g, "_"));
                 }
                 return out;
             };
@@ -2656,6 +2685,10 @@
                         } catch (_) {
                             // Not base64; fallback below.
                         }
+                    }
+
+                    if (String(mimeType || "").toLowerCase().startsWith("text/")) {
+                        return new Blob([resp], { type: mimeType || "text/plain" });
                     }
 
                     // Do not coerce unknown plain text into binary blobs.
@@ -2814,10 +2847,18 @@
                     let pdfBlob = null;
 
                     const isValidPdfBlob = async blob => {
-                        if (!(blob instanceof Blob) || blob.size < 5) return false;
+                        if (!(blob instanceof Blob) || blob.size < 16) return false;
                         try {
-                            const header = await blob.slice(0, 8).text();
-                            return header.startsWith("%PDF-");
+                            const headerBytes = new Uint8Array(await blob.slice(0, 1024).arrayBuffer());
+                            const sig = [0x25, 0x50, 0x44, 0x46, 0x2d];
+                            for (let i = 0; i <= headerBytes.length - sig.length; i++) {
+                                let ok = true;
+                                for (let j = 0; j < sig.length; j++) {
+                                    if (headerBytes[i + j] !== sig[j]) { ok = false; break; }
+                                }
+                                if (ok) return true;
+                            }
+                            return false;
                         } catch (_) {
                             return false;
                         }
@@ -2832,7 +2873,7 @@
                         console.warn("PDF readFile preview failed:", readErr);
                     }
 
-                    if (!pdfBlob) {
+                    if (!pdfBlob && !isLikelyProtectedCreatorUrl(url)) {
                         try {
                             const res = await fetch(url, {
                                 credentials: "include",
@@ -3367,8 +3408,12 @@
             document.getElementById("modalTitle").textContent = "Add Ticket";
             document.getElementById("submitTxt").textContent = "Add Ticket";
             document.getElementById("fCategory").value = "";
-            document.getElementById("fOrder").value = "";
-            document.getElementById("fBranch").value = "";
+            const fOrder = document.getElementById("fOrder");
+            fOrder.value = "";
+            fOrder.disabled = false;
+            const fBranch = document.getElementById("fBranch");
+            fBranch.value = "";
+            fBranch.disabled = false;
             document.getElementById("fPriority").value = "Medium";
             document.getElementById("fStatus").value = "Pending";
             document.getElementById("fDesc").value = "";
@@ -3386,6 +3431,8 @@
             document.getElementById("fCategory").value = lookupId(o[f.category]);
             document.getElementById("fOrder").value = lookupId(o[f.order]);
             document.getElementById("fBranch").value = lookupId(o[f.branch]);
+            document.getElementById("fOrder").disabled = true;
+            document.getElementById("fBranch").disabled = true;
             document.getElementById("fPriority").value = o[f.priority] || "Medium";
             document.getElementById("fStatus").value = o[f.status] || "Pending";
             document.getElementById("fDesc").value = o[f.description] || "";
