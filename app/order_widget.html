@@ -4027,11 +4027,26 @@
             return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
         }
 
+        function setDateConstraints() {
+            const today = new Date();
+            const minDate = new Date(today);
+            minDate.setDate(minDate.getDate() - 30);
+            
+            const todayISO = today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, '0') + "-" + String(today.getDate()).padStart(2, '0');
+            const minDateISO = minDate.getFullYear() + "-" + String(minDate.getMonth() + 1).padStart(2, '0') + "-" + String(minDate.getDate()).padStart(2, '0');
+            
+            const fDate = document.getElementById("fDate");
+            fDate.min = minDateISO;
+            fDate.max = todayISO;
+        }
+
         function openAdd() {
             S.editId = null; S.modalRows = [];
             document.getElementById("modalTitle").textContent = "Add Order";
             document.getElementById("submitTxt").textContent = "Add Order";
+            setDateConstraints();
             document.getElementById("fDate").value = todayISO();
+            document.getElementById("fDate").disabled = false;
             const fStatus = document.getElementById("fStatus");
             fStatus.value = "Pending";
             fStatus.disabled = true;
@@ -4069,11 +4084,15 @@
                 catch { }
             }
 
+            setDateConstraints();
             document.getElementById("fDate").value = dateVal;
+            document.getElementById("fDate").disabled = true;
             const fStatus = document.getElementById("fStatus");
             fStatus.value = o[f.status] || "Pending";
             fStatus.disabled = false;
-            document.getElementById("fBranch").value = lookupId(o[f.branch]);
+            const fBranch = document.getElementById("fBranch");
+            fBranch.value = lookupId(o[f.branch]);
+            fBranch.disabled = true;
             document.getElementById("fManual").value = o[f.manual] || "";
 
             // Open modal immediately with basic fields
